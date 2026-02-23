@@ -1,0 +1,69 @@
+.arrowBtn {
+    &:hover {
+        .arrowIcon {
+            animation: bounce 1s infinite;
+        }
+    }
+}
+
+.arrowBtnBack {
+    &:hover {
+        .arrowIconBack {
+            animation: bounceBack 1s infinite;
+        }
+    }
+}
+
+@keyframes bounce {
+    0% {
+        transform: translateX(0%);
+        animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+    }
+    100% {
+        transform: translateX(0%);
+        animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+    }
+    50% {
+        transform: translateX(35%);
+        animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+    }
+}
+
+@keyframes bounceBack {
+    0% {
+        transform: translateX(0%);
+        animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+    }
+    100% {
+        transform: translateX(0%);
+        animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+    }
+    50% {
+        transform: translateX(-35%);
+        animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+    }
+}
+
+:host::ng-deep .ql-container .ql-editor {
+    background: none !important;
+    background-color: none !important;
+}
+
+:host::ng-deep .ql-container {
+    min-height: 0px !important;
+    --tw-shadow: none !important;
+    font-family: Inter var, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", Segoe UI Symbol, "Noto Color Emoji";
+    font-size: 14px;
+}
+
+// Spinner in button
+:host ::ng-deep {
+    .mat-mdc-progress-spinner {
+        --mdc-circular-progress-active-indicator-color: white;
+    }
+}
+
+/* Hide editor-only action buttons in the review/read-only view */
+:host ::ng-deep .pdf-delete-btn {
+  display: none !important;
+}

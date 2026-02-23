@@ -1,0 +1,15 @@
+/*
+[hidden] {
+    display: none !important;
+}
+*/
+
+input::placeholder {
+    // font-size: 12px;
+    font-size: smaller;
+}
+
+::ng-deep body.light .mat-input-element:disabled{
+    color: #505050 ;
+    font-weight: 600;
+}

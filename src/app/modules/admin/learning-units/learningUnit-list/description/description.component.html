@@ -1,0 +1,136 @@
+<form [formGroup]="descriptionForm" (ngSubmit)="saveDescription(descriptionForm)">
+    <div class="grid grid-cols-1 sm:grid-cols-2  sm:h-56 -mt-4 ">
+        <div class="sm:border-r border-primary-300 sm:pr-6">
+            <!-- <mat-form-field appearance="fill" class="w-full text-accent-600 text-sm">
+                 -->
+            <!-- <textarea [title]="trashUINotEditable?matTooltipMsg:''" formControlName="longDescription" class="bg-white w-full custom-textarea"  matInput ></textarea> -->
+
+            <!-- </mat-form-field> -->
+            <div class="mt-1 border rounded">
+                <div class="custom-grid1 mb-2 relative">
+                    <mat-label class="text-[#282B66] font-medium text-sm pb-2">Learning Unit Long Description</mat-label>
+                    <mat-icon [svgIcon]="'heroicons_outline:information-circle'" matSuffix
+                    *ngIf="error"
+                    matTooltip="The Learning Unit Long Description has a limit of 125 characters" matTooltipPosition="above"
+                    class="text-warn-400    absolute customdifferentdevice5"></mat-icon>
+                </div>
+                <quill-editor #editor formControlName="longDescription" class=""
+                [ngStyle]="!error ? {'min-height': '170px', 'max-height': '220px','height':'200px','border-radius': '8px', 'border-width': '1px','border-color':'rgb(203,213,225)','margin-top':'5px'} :
+                {'min-height': '170px', 'max-height': '220px','height':'200px','border-radius': '8px', 'border-width': '1px','border-color':'red','margin-top':'5px'}" placeholder=""
+                    [modules]="{ toolbar: false }"  (onContentChanged)="limitCharacters($event)" (onEditorCreated)="onEditorCreated($event)"
+                   (click)="enableEditor(editor)"
+
+                    ></quill-editor>
+            </div>
+
+
+
+            <!-- <mat-form-field appearance="fill" class="w-full text-accent-600 text-sm mt-3">
+                <mat-label class="text-accent-600">Learning Unit Short Description</mat-label>
+                <textarea [title]="trashUINotEditable?matTooltipMsg:''" formControlName="shortDescription" matInput class=""></textarea>
+            </mat-form-field> -->
+            <div [ngClass]="error1 ? 'mt-3' : 'mt-3'">
+                <div class="custom-grid1 mb-2 relative">
+                    <mat-label class="text-[#282B66] font-medium text-sm pb-2 " >Learning Unit Short Description</mat-label>
+                    <mat-icon [svgIcon]="'heroicons_outline:information-circle'" matSuffix
+                    *ngIf="error1"
+                    matTooltip="The Learning Unit Short Description has a limit of 125 characters" matTooltipPosition="above"
+                    class="text-warn-400    absolute customdifferentdevice"></mat-icon>
+                </div>
+                <quill-editor #editor1 classes="" formControlName="shortDescription" [modules]="{ toolbar: false }"
+                [ngStyle]="!error1 ? {'min-height': '70px', 'max-height': '160px', 'overflow-y': 'hidden', 'height': '148px', 'border-radius': '8px', 'border': '1px solid rgb(203,213,225)','margin-top':'5px'} :
+                 {'min-height': '70px', 'max-height': '160px', 'overflow-y': 'hidden', 'height': '148px', 'border-radius': '8px', 'border': '1px solid red','margin-top':'5px'}"
+                placeholder="" (onEditorCreated)="onEditorCreated1($event)"
+                    (onContentChanged)="limitCharacters1($event)"(click)="enableEditor(editor1)">
+
+                </quill-editor>
+            </div>
+
+
+
+            <!-- <mat-form-field appearance="fill" class="w-full text-accent-600 text-sm mt-1 ">
+                <mat-label class="text-accent-600 mt-0">Learning Unit Tiny Description</mat-label>
+                <textarea [title]="trashUINotEditable?matTooltipMsg:''" formControlName="tinyDescription" matInput
+                    class=""></textarea>
+            </mat-form-field> -->
+
+            <div [ngClass]="error3 ? 'mt-3' : 'mt-3'">
+                <div class="custom-grid2 mb-2 relative">
+                    <mat-label class="text-[#282B66] font-medium text-sm pb-2  " >Learning Unit Tiny Description</mat-label>
+                    <mat-icon [svgIcon]="'heroicons_outline:information-circle'" matSuffix
+                    *ngIf="error3"  matTooltipPosition="above"
+
+                    matTooltip="The Learning Unit Tiny Description has a limit of 125 characters"
+                    class="text-warn-400  absolute customdifferentdevice1"
+                    ></mat-icon>
+                </div>
+                <quill-editor #editor4 classes="" formControlName="tinyDescription" [modules]="{ toolbar: false }"
+                [ngStyle]="!error3 ? {'min-height': '70px', 'max-height': '160px', 'overflow-y': 'hidden', 'height': '148px', 'border-radius': '8px', 'border': '1px solid rgb(203,213,225)' ,'margin-top':'5px'} :
+                {'min-height': '70px', 'max-height': '160px', 'overflow-y': 'hidden', 'height': '148px', 'border-radius': '8px', 'border': '1px solid red','margin-top':'5px'}" placeholder="" (onEditorCreated)="onEditorCreated4($event)"
+
+                    (onContentChanged)="limitCharacter5($event)"(click)="enableEditor(editor4)">
+
+                </quill-editor>
+            </div>
+        </div>
+
+
+        <div class=" border-primary-300  sm:px-3 ">
+            <!-- <mat-form-field appearance="fill" class="w-full text-accent-600 text-sm ">
+                <mat-label class="text-accent-600">Learning Unit Alternate Long Description</mat-label>
+                <textarea [title]="trashUINotEditable?matTooltipMsg:''" formControlName="alternateLongDescription" matInput class=""></textarea>
+            </mat-form-field> -->
+
+            <div class="mt-1">
+                <div class="custom-grid1 mb-2 relative">
+                    <mat-label class="text-[#282B66] font-medium text-sm py-1">Learning Unit Alternate Long
+                        Description</mat-label>                    <mat-icon [svgIcon]="'heroicons_outline:information-circle'" matSuffix
+                    *ngIf="error4"
+                    matTooltip="The Learning Unit Alternate Long Description has a limit of 125 characters" matTooltipPosition="above"
+                    class="text-warn-400    absolute customdifferentdevice6"></mat-icon>
+                </div>
+
+                <quill-editor #editor2 formControlName="alternateLongDescription" class=""
+                 placeholder=""
+                    [modules]="{ toolbar: false }" [ngStyle]="!error4 ? {'min-height': '170px', 'max-height': '220px','height':'200px',
+                    'border-radius': '8px', 'border-width': '1px','border-color':'rgb(203,213,225)','margin-top':'5px'}:
+                    {'min-height': '170px', 'max-height': '220px','height':'200px',
+                    'border-radius': '8px', 'border-width': '1px','border-color':'red','margin-top':'5px'}"
+
+                     (onEditorCreated)="onEditorCreated2($event)"
+                    (click)="enableEditor(editor2)" (onContentChanged)="limitCharacters2($event)"></quill-editor>
+            </div>
+
+            <!-- <mat-form-field appearance="fill" class="w-full text-accent-600 text-sm ">
+                <mat-label class="text-accent-600">Learning Unit Alternate Short Description</mat-label>
+                <textarea [title]="trashUINotEditable?matTooltipMsg:''" formControlName="alternateShortDescription" matInput class=""></textarea>
+            </mat-form-field> -->
+            <div [ngClass]="error2 ? 'mt-3' : 'mt-3'">
+                <div class="custom-grid mb-2 relative">
+                    <mat-label class="text-[#282B66] font-medium text-sm py-0  " >Learning Unit Alternate Short Description</mat-label>
+                    <mat-icon [svgIcon]="'heroicons_outline:information-circle'" matSuffix
+                    *ngIf="error2"
+                    matTooltip="The Learning Unit Alternate Short Description has a limit of 125 characters"
+                     class="text-warn-400   absolute customdifferentdevice2"
+                    matTooltipPosition="above"></mat-icon>
+                </div>
+
+                <quill-editor #editor3 classes="" formControlName="alternateShortDescription"
+                [ngStyle]="!error2 ? {'min-height': '70px', 'max-height': '160px', 'overflow-y': 'hidden', 'height': '148px', 'border-radius': '8px', 'border': '1px solid rgb(203,213,225)','margin-top':'5px'} :
+                {'min-height': '70px', 'max-height': '160px', 'overflow-y': 'hidden', 'height': '148px', 'border-radius': '8px', 'border': '1px solid red','margin-top':'5px'}"
+                     [modules]="{ toolbar: false }" placeholder=""
+                    (onEditorCreated)="onEditorCreated3($event)"
+                    (onContentChanged)="limitCharacter3($event)"(click)="enableEditor(editor3)">
+                    <!-- <div quill-editor-toolbar>
+                    </div> -->
+                </quill-editor>
+            </div>
+        </div>
+    </div>
+    <div [ngClass]="trashUINotEditable==true?'hidden':''" class="sm:px-6 w-full text-center lg:mt-[400px] xs:mt-[30px] -mb-5">
+        <button type="submit" mat-raised-button color="primary" [disabled]="!descriptionForm?.valid || !enableForm"
+            class=" px-2 leading-6 ">
+            Save
+        </button>
+    </div>
+</form>

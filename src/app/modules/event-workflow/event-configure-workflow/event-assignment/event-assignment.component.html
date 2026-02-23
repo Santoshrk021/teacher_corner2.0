@@ -1,0 +1,77 @@
+<div class="h-full">
+    <mat-tab-group class="tab-body ">
+        <div *ngFor="let content of workflow?.contents">
+            <mat-tab *ngIf="content?.contentName" [label]="content?.contentName">
+                <!-- <div *ngIf="content.contentType=='ASSIGNMENT';else noAssignmentsTemp" class="tac-container"> -->
+                <div *ngIf="content.contentType==='ASSIGNMENT';else noAssignmentsTemp">
+                    <div [ngSwitch]="content.assignmentType">
+                        <div *ngSwitchCase="'TEXTBLOCK'">
+
+                            <!-- <quill-view-html [content]="content?.contentTextBlock" theme="snow"></quill-view-html> -->
+
+                            <!-- <div class="max-w-3xl lg:mt-4 p-6 sm:p-10  rounded-2xl bg-card"> -->
+                                <quill-view-html [content]="content?.contentTextBlock"></quill-view-html>
+                            <!-- </div> -->
+
+                            <!-- <div  [innerHTML]="content?.contentTextBlock"
+                                class="max-w-3xl mx-auto sm:my-2 lg:mt-4 p-6 sm:p-10 sm:py-12 rounded-2xl shadow overflow-hidden bg-card">
+                            </div> -->
+
+                        </div>
+                        <div *ngSwitchCase="'UPLOAD'">
+                            <div class="border-b border-primary-200">
+                                <app-upload-assignments [contentInfo]="content" [workflowId]="workflowId"
+                                    [currentWorkflow]="workflow"></app-upload-assignments>
+                            </div>
+                        </div>
+                        <div *ngSwitchCase="'QUIZ'">
+                            <app-quiz [quizId]="content.assignmentId" [workflowId]="workflowId"></app-quiz>
+                        </div>
+                        <div *ngSwitchCase="'GAME'">
+                            <div class="border-b border-primary-200">
+                                <app-game [gameUrl]="content.resourcePath"></app-game>
+                            </div>
+                        </div>
+                        <div *ngSwitchCase="'FORM'">
+                            <app-subject-form [contentInfo]="content" [workflowId]="workflowId"></app-subject-form>
+                        </div>
+                        <div *ngSwitchCase="'VIDEO'">
+                            <app-video-form [contentInfo]="content" [workflowId]="workflowId"></app-video-form>
+                        </div>
+                    </div>
+                </div>
+                <ng-template #noAssignmentsTemp>
+                    <div *ngIf="content.contentType==='RESOURCES';else other">
+                        <div *ngIf="content.resourceType==='PDF' && content?.resourcePath ">
+                            <div *ngIf="content?.isDownloadable ==undefined ||content?.isDownloadable ==true"
+                                class="text-right mr-16">
+                                <a [href]="content?.resourcePath|getDownloadURL" appDownloadDirective
+                                    [download]="content?.resourcePath" #dwld="appDownloadDirective" title="Download"
+                                    target="_blank">
+                                    <mat-icon class="download-pdf  icon-size-8"
+                                        svgIcon="mat_solid:cloud_download"></mat-icon>
+                                </a>
+                            </div>
+                            <div class="tac-container-height">
+                                <app-pdf [pdfUrl]="content?.resourcePath | getDownloadURL"
+                                    class=" w-full  h-full"></app-pdf>
+                            </div>
+                        </div>
+                        <div *ngIf="content.resourceType==='LINK' && content?.resourcePath" class="">
+                            <app-video [videoUrl]="content?.resourcePath">
+                            </app-video>
+                        </div>
+                        <div *ngIf="content.resourceType==='PPT' && content?.resourcePath " class="tac-container">
+                            <a [href]="content?.resourcePath| getDownloadURL" target="_blank"
+                                class="fuse-mat-stroked-button-large disabled:bg-primary-200 text-center mt-6 bg-primary-600 text-white hover:bg-primary-500"
+                                mat-stroked-button>Download PPT</a>
+                        </div>
+                    </div>
+                </ng-template>
+                <ng-template #other>
+                    <div>OOPS !! Currently Not supported</div>
+                </ng-template>
+            </mat-tab>
+        </div>
+    </mat-tab-group>
+</div>

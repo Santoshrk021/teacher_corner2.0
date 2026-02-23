@@ -1,0 +1,87 @@
+<ng-container *ngIf="isDataLoaded; else dataNotLoaded">
+  <div class="h-[63vh] overflow-auto bg-primary-50 rounded-xl p-8 mt-1">
+    <div class="grid grid-cols-2 gap-4">
+      <mat-form-field appearance="fill" class="w-full">
+        <mat-label>Filter by Language</mat-label>
+        <mat-select (selectionChange)="selectedLang($event)">
+          <mat-option *ngFor="let option of newlanguages" [value]="option.code" name="option">
+            {{option.name}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field class="example-form-field" class=" w-full" floatLabel="never">
+        <mat-label>Search Learning unit</mat-label>
+        <input matInput name="searchElement" placeholder="Search Here" autocomplete="off"
+          (keyup)="filterLearningunit($event)">
+        <mat-icon svgIcon="heroicons_outline:search"></mat-icon>
+      </mat-form-field>
+    </div>
+
+    <h4 class="text-accent-600 font-medium">Learning Units</h4>
+    <form [formGroup]="selectLearningListForm" (ngSubmit)="onSubmit(selectLearningListForm)">
+      <div class="ex3 grid grid-cols-2 gap-4 w-full mt-2">
+        <div cdkDropList #todoList="cdkDropList" [cdkDropListData]="learningunits" [cdkDropListConnectedTo]="[doneList]"
+          class="example-list ex3 myBox " (cdkDropListDropped)="drop($event)">
+          <div class="example-box border " *ngFor="let item of learningunits" cdkDrag>
+            <span
+              [matTooltip]="(item?.learningUnitCode || '') + '-' + (item?.learningUnitName || '') + '-' + (item?.typeCode || '') + '-' + (item?.isoCode || '') + '-' + (item?.version || '') + '-' + (item?.Maturity || '')"
+              matTooltipPosition="right">
+
+              <strong>
+                {{item?.learningUnitCode}} - {{item?.learningUnitName}}
+              </strong>
+              - ({{ item?.typeCode }}) - ({{ item?.isoCode }}) - ({{ item?.version }}) - ({{ item?.Maturity }})
+            </span>
+          </div>
+        </div>
+        <div cdkDropList #doneList="cdkDropList" [cdkDropListData]="selectedLearningunits"
+          [cdkDropListConnectedTo]="[todoList]" class="example-list ex3 myBox w-full"
+          (cdkDropListDropped)="drop($event)">
+          <div class="example-box border " *ngFor="let item of selectedLearningunits" [item]="item" cdkDrag
+            formControlname="selectedLearningList">
+            <span
+              [matTooltip]="(item?.learningUnitCode ?? '') + '-' + (item?.learningUnitName ?? '') + '-' + (item?.typeCode ?? '') + '-' + (item?.isoCode ?? '') + '-' + (item?.version ?? '') + '-' + (item?.Maturity ?? '')"
+              matTooltipPosition="right">
+
+              <strong>
+                {{item?.learningUnitCode}} - {{item?.learningUnitName}}
+
+              </strong>
+              - ({{ item?.typeCode }}) - ({{ item?.isoCode }}) - ({{ item?.version }}) - ({{ item?.Maturity }})
+
+            </span>
+          </div>
+        </div>
+      </div>
+
+    </form>
+  </div>
+
+  <div *ngIf="addNewTemplateFlag" class="flex justify-between">
+    <button matStepperPrevious mat-stroked-button type="button"
+      class="bg-primary text-white  arrowBtnBack disabled:bg-primary-100">
+      <mat-icon class="mr-2 icon-size-5  text-white arrowIconBack"
+        [svgIcon]="'heroicons_solid:arrow-sm-left'"></mat-icon>
+      Back
+    </button>
+    <button matStepperNext mat-stroked-button type="button" [disabled]="!selectedLearningunits?.length"
+      class="bg-primary text-white arrowBtn disabled:bg-primary-100">
+      Continue
+      <mat-icon class="ml-2 icon-size-5  text-white arrowIcon" [svgIcon]="'heroicons_solid:arrow-sm-right'"></mat-icon>
+    </button>
+  </div>
+
+  <div *ngIf="!addNewTemplateFlag" class="text-center pt-2">
+    <button mat-stroked-button (click)="onSubmit(selectLearningListForm)" type="submit"
+      class="bg-primary text-white  disabled:bg-primary-100">
+      Save
+    </button>
+  </div>
+</ng-container>
+
+<ng-template #dataNotLoaded>
+  <div class="flex justify-center items-center">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+</ng-template>

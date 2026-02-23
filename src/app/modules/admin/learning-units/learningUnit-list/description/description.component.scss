@@ -1,0 +1,225 @@
+// .auto-height {
+//     height: auto !important;
+// }
+
+// ::ng-deep .mat-form-field-appearance-fill:last-child .mat-form-field-flex:last-child{
+//     padding: 0px 0em 0em !important;
+// }
+
+
+
+// ::ng-deep .mat-form-field.mat-form-field-appearance-fill .mat-form-field-wrapper .mat-form-field-flex {
+//      height: 40px !important;
+// }
+
+// ::ng-deep .mat-form-field.mat-form-field-appearance-fill .mat-form-field-wrapper .mat-form-field-flex .mat-form-field-infix textarea.mat-input-element {
+
+//     margin: 2px 0px !important;
+//     padding:0px 3px 0px 3px !important
+// }
+
+
+// .custom-textarea {
+//     width: 100%;
+//     height: auto;
+//     min-height: 50px; /* You can adjust this value as needed */
+//     padding: 8px; /* You can adjust this value as needed */
+//     box-sizing: border-box;
+// }
+
+// .small-editor.ql-editor {
+//     min-height: 30px; /* Adjust this value as needed */
+//     max-height: 30px; /* Adjust this value as needed */
+//     overflow-y: hidden;
+//     border-radius: 20px;
+//     height: 20px;
+
+// }
+
+// .customclass{
+//     border-radius: 12px;
+// }
+
+
+.quill-container {
+    border-radius: 10px;
+    /* Adjust the border radius as needed */
+    overflow: hidden;
+    // border: 1px solid red;
+}
+
+/* Style the Quill editor content area */
+.quill-editor .ql-editor {
+    border-radius: 10px;
+    /* Adjust the border radius as needed */
+    overflow: hidden;
+}
+
+.jj {
+    margin-left: 7px;
+}
+
+.jj1 {
+    margin-left: 7px;
+}
+
+// ::ng-deep .custom-grid1 mat-icon svg {
+//     height: 15px; /* Set your desired height */
+//     margin-top: 6px;
+// }
+// ::ng-deep .custom-grid mat-icon svg {
+//     height: 15px; /* Set your desired height */
+//     margin-top: 6px;
+// }
+
+// ::ng-deep .custom-grid2 mat-icon svg {
+//     height: 15px; /* Set your desired height */
+//     margin-top: 6px;
+// }
+
+@media only screen and (max-width: 800px) {
+    //     .customdifferentdevice{
+    //         position: absolute;
+    //         top: -1px;
+    //         right: 280px;
+    //         scale: 75%;
+    //         }
+
+}
+
+//  @media screen and (max-zoom: 0.9) {
+//     .customdifferentdevice{
+//         position: absolute;
+//         top: -1px;
+//         right: 215px;
+//         scale: 75%;
+//         }
+//   }
+
+//   /* Styles for 100% zoom */
+//   @media screen and (min-zoom: 1) {
+
+//   }
+  @media only screen and (min-width: 1421px) and (max-width: 1700px) {
+
+    .customdifferentdevice {
+        position: absolute;
+        top: -1px;
+        right: 280px;
+        scale: 75%;
+    }
+
+
+    .customdifferentdevice1 {
+        position: absolute;
+        top: -1px;
+        right: 290px;
+        scale: 75%;
+    }
+
+
+    .customdifferentdevice2 {
+        position: absolute;
+        top: -1px;
+        right: 225px;
+        scale: 75%;
+    }
+    .customdifferentdevice5 {
+        position: absolute;
+        top: -1px;
+        right: 280px;
+        scale: 75%;
+    }
+
+    .customdifferentdevice6 {
+        position: absolute;
+        top: -1px;
+        right: 225px;
+        scale: 75%;
+    }
+
+  }
+
+  @media only screen and (min-width: 1200px) and (max-width: 1421px) {
+
+    .customdifferentdevice {
+        position: absolute;
+        top: -1px;
+        right: 215px;
+        scale: 75%;
+    }
+    .customdifferentdevice1 {
+        position: absolute;
+        top: -1px;
+        right: 220px;
+        scale: 75%;
+    }
+
+    .customdifferentdevice2 {
+        position: absolute;
+        top: -1px;
+        right: 155px;
+        scale: 75%;
+    }
+
+    .customdifferentdevice5 {
+        position: absolute;
+        top: -1px;
+        right: 215px;
+        scale: 75%;
+    }
+
+    .customdifferentdevice6 {
+        position: absolute;
+        top: -1px;
+        right: 160px;
+        scale: 75%;
+    }
+
+  }
+
+
+
+
+
+@media only screen and (max-width: 1200px) {
+    .custom-grid1 {
+        display: grid;
+        grid-template-columns: 36.7% 63.3%;
+
+    }
+
+
+    .custom-grid2 {
+        display: grid;
+        grid-template-columns: 35% 65%;
+    }
+
+    .custom-grid {
+        display: grid;
+        grid-template-columns: 47.6% 51%;
+
+    }
+
+}
+
+@media only screen and (min-width: 1730px) {
+    .custom-grid {
+        display: grid;
+        grid-template-columns: 50% 50%;
+    }
+
+
+
+
+
+    .custom-grid1 {
+        display: grid;
+        grid-template-columns: 40% 60%;
+    }
+
+    .custom-grid2 {
+        display: grid;
+        grid-template-columns: 39% 61%;
+    }
+}

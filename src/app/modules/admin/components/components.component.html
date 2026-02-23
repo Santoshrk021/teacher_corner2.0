@@ -1,0 +1,54 @@
+<div class="flex flex-col w-full bg-[#F1F5F9] ">
+    <div class="flex items-center justify-between bg-gray-100 px-4">
+        <!--  Title -->
+        <div class="text-3xl font-bold">Components </div>
+
+        <!--  Search Bar -->
+        <div class="flex flex-row w-[470px] h-[40px] mb-5 mr-3">
+            <form [formGroup]="searchForm">
+                <mat-form-field class="relative w-80 m-auto pt-2">
+                  <mat-icon aria-hidden="false" aria-label="Search" fontIcon="search" class="text-gray-400"></mat-icon>
+                  <input matInput formControlName="search" placeholder="Search Components" class="ml-3" />
+                </mat-form-field>
+              </form>
+              
+
+            <button (click)="search()"
+                class="flex items-center ml-4 bg-[#049BD8] text-white px-4 py-2 w-[92px] h-[40px]  mt-3 rounded-full shadow-md">
+                <span class="text-center ml-1 font-semibold">Search</span>
+            </button>
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex gap-2 justify-end font-semibold">
+            <button class="flex items-center gap-2 bg-[#049BD8] text-white px-4 py-2 rounded-full shadow-md"
+                (click)="addDialog()">
+                <mat-icon svgIcon="heroicons_outline:plus-circle" aria-hidden="false" class="text-white scale-110">
+                </mat-icon>Add
+            </button>
+            <button class="flex items-center gap-2 bg-[#049BD8] text-white px-4 py-2 rounded-full shadow-md"
+                (click)="trashDialog()">
+                <mat-icon svgIcon="heroicons_outline:trash" aria-hidden="false" class="text-white scale-110">
+                </mat-icon>Trash
+            </button>
+            <button class="flex items-center gap-2 bg-[#049BD8] text-white px-4 py-2 rounded-full shadow-md"
+                (click)="exportDialog()">
+                <mat-icon class="mr-1 text-white">cloud_download</mat-icon>
+                Export
+            </button>
+        </div>
+    </div>
+
+    <!-- List -->
+    <div class="flex flex-col w-full  justify-start ">
+        <app-list [filterValue]="filterValue"></app-list>
+    </div>
+</div>
+
+
+<fuse-drawer *ngIf="show" class="w-screen min-w-screen" [opened]="drawerOpened" fixed [mode]="'over'"
+    [position]="'left'">
+    <div>
+        <ng-container *ngComponentOutlet="component"></ng-container>
+    </div>
+</fuse-drawer>

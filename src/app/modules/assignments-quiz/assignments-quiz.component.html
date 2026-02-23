@@ -1,0 +1,128 @@
+<div class="flex flex-col w-full">
+    <div class="h-12 ml-2 my-2">
+        <!-- <a [routerLink]="['..']"
+            class="inline-flex items-center leading-6 text-primary hover:underline cursor-pointer mt-2">
+            <span class="inline-flex items-center">
+                <mat-icon class="icon-size-5 text-current" [svgIcon]="'heroicons_solid:arrow-sm-left'">
+                </mat-icon>
+                <span class="ml-1.5 font-medium leading-5">Back To Classroom</span>
+            </span>
+        </a> -->
+        <button mat-stroked-button
+            class="inline-flex items-center leading-6 text-white bg-primary-600 hover:underline cursor-pointer m-1"
+            (click)="goBack()">
+            <span class="inline-flex items-center">
+                <mat-icon class="icon-size-5 text-current" [svgIcon]="'heroicons_solid:arrow-sm-left'">
+                </mat-icon>
+                <span class="ml-1.5 font-medium leading-5">Back</span>
+            </span>
+        </button>
+    </div>
+    <div class="">
+        <div class="grid ">
+            <div
+                class="inventory-grid z-10 bg-slate-50 text-left sticky top-0 grid gap-12 py-4 px-1 shadow  text-md font-semibold text-secondary  dark:bg-black dark:bg-opacity-5">
+                <div class="pl-4">Student Name</div>
+                <div *ngIf="privilege">Student Id</div>
+                <div>Assignment Name</div>
+                <div>Assignment Type</div>
+                <div>Due Date</div>
+                <div>Allowed Attempts</div>
+                <div>Number of student submissions</div>
+                <div>View More</div>
+            </div>
+
+
+            <div class="h-[calc(100vh_-_199px)]  overflow-auto">
+                <div *ngIf="infoArr?.length > 0; else noSubmissions">
+                    <ng-container *ngFor="let assignment of infoArr; let i = index">
+                        <div
+                            class="bg-gray-100 inventory-grid grid gap-12 text-left  items-center text-secondary py-3 px-1 border-b border-gray-300 ">
+                            <div class="pl-4">{{assignment?.studentInfo?.firstName}}
+                                {{assignment?.studentInfo?.lastName}}</div>
+                            <div *ngIf="privilege" class="text-sm">{{assignment?.studentInfo?.docId}}</div>
+                            <div>{{assignment?.assignment?.assignmentName}}</div>
+                            <div>{{assignment?.assignment?.assignmentType}}</div>
+                            <div>{{assignment?.assignment?.assignmentDueDate?.seconds * 1000 | date:'medium'}}</div>
+                            <div>{{assignment?.assignment?.numberOfAllowedSubmissions}}</div>
+                            <div>{{assignment?.assignment?.numberOfStudentSubmissions}}</div>
+                            <div>
+                                <button class="bg-slate-50 px-2 leading-6 arrowBtn" mat-stroked-button
+                                    (click)="goToSubmissionAttemptsTable(assignment)">
+                                    <span>View Attempts</span>
+                                    <mat-icon class="ml-1.5 icon-size-5 arrowIcon" [svgIcon]="'heroicons_solid:arrow-sm-right'">
+                                    </mat-icon>
+                                </button>
+                                <!-- logic for showing submission attempts on toggle -->
+                                <!-- <button class="min-w-10 min-h-7 h-7 px-2 leading-6" mat-stroked-button
+                                    (click)="toggleDetails(assignment)" [ngClass]="{
+                                        'bg-slate-200':
+                                            selectedSubmission?.studentInfo?.docId ===
+                                            assignment?.studentInfo?.docId
+                                    }">
+                                    <mat-icon class="icon-size-5" [svgIcon]="
+                                            selectedSubmission?.studentInfo?.docId ===
+                                            assignment?.studentInfo?.docId
+                                                ? 'heroicons_solid:chevron-up'
+                                                : 'heroicons_solid:chevron-down'
+                                        ">
+                                    </mat-icon>
+                                </button> -->
+                            </div>
+                        </div>
+                        <!-- logic for showing submission attempts on toggle -->
+                        <!-- <div class="grid">
+                            <ng-container
+                                *ngIf="selectedSubmission?.studentInfo?.docId === assignment?.studentInfo?.docId">
+                                <ng-container
+                                    *ngTemplateOutlet="rowDetailsTemplate; context: { $implicit: assignment }">
+                                </ng-container>
+                            </ng-container>
+                        </div> -->
+                    </ng-container>
+                </div>
+            </div>
+            <ng-template #noSubmissions>
+                <div class="flex items-center justify-center mt-3">No Submissions</div>
+            </ng-template>
+        </div>
+    </div>
+</div>
+
+<!-- logic for showing submission attempts on toggle -->
+<!-- <ng-template #rowDetailsTemplate let-assignment>
+    <div class="grid">
+        <div
+            class="inventory-grid-2 z-10 bg-slate-50 text-left sticky top-0 grid gap-12 py-4 px-1 shadow  text-md font-semibold text-secondary  dark:bg-black dark:bg-opacity-5">
+            <div class="pl-4">Attempt Number</div>
+            <div>Attempt Time</div>
+            <div></div>
+            <div>Replay Quiz</div>
+        </div>
+
+        <div class="overflow-auto">
+            <div
+                *ngIf="selectedSubmission?.submission?.versions?.['workflowId_'+params.workflowId]?.['assignmentId_'+params.assignmentId] !== undefined; else noSubmissions">
+                <div *ngFor="let submission of selectedSubmission?.submission?.versions?.['workflowId_'+params.workflowId]?.['assignmentId_'+params.assignmentId] | keyvalue; let i = index"
+                    class="bg-gray-100 inventory-grid-2 grid gap-12 text-left  items-center text-secondary py-3 px-1 border-b border-gray-300 ">
+                    <div class="pl-4">{{submission.value.attemptNumber}}</div>
+                    <div>{{submission.value.lastAttemptTime.seconds * 1000 | date:'medium'}}</div>
+                    <div>
+                        <button (click)="submissionDialog(submission, selectedSubmission, i)"
+                            class="bg-slate-50 px-2 leading-6 arrowBtn" mat-stroked-button>
+                            <span class="text-sm">View Score</span>
+                            <mat-icon class="ml-1.5 icon-size-5 arrowIcon" [svgIcon]="'heroicons_solid:arrow-sm-right'">
+                            </mat-icon>
+                        </button>
+                    </div>
+                    <div>
+                        <button (click)="quizReplayDialog(submission, selectedSubmission)"
+                            class="bg-slate-50 px-2 leading-6 arrowBtn" mat-stroked-button>
+                            <span class="text-sm">Replay</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template> -->

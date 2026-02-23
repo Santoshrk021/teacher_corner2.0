@@ -1,0 +1,47 @@
+<div *ngIf="isDataLoaded; else dataNotLoaded" class="h-[63vh] overflow-auto  mt-1  md:w-[calc(75vw_-_48px)] sm:w-full">
+    <div class="md:w-140 sm:w-full m-auto bg-primary-50 rounded-xl p-8">
+        <form [formGroup]="addInstitution" (ngSubmit)="onSubmit(addInstitution)">
+            <mat-form-field appearance="fill" class="w-full">
+                <mat-label>Institutions</mat-label>
+
+                <ng-container *ngIf="isProgrammeNameHasInstitution">
+                    <mat-select formControlName="institution">
+                        <mat-option value="" disabled selected>Select</mat-option>
+                        <mat-option
+                            [matTooltip]="'board: '+institution?.board+', '+'city: '+institution?.institutionAddress?.city+', '+'District: '+institution?.institutionAddress?.district+', '+'State: '+institution?.institutionAddress?.state"
+                            *ngFor="let institution of institutions" [value]="institution" name="option">
+                            {{institution?.institutionName}}
+                        </mat-option>
+                    </mat-select>
+                </ng-container>
+
+                <ng-container *ngIf="!isProgrammeNameHasInstitution">
+                    <input type="text" placeholder="Search Institution" matInput formControlName="institution"
+                        [matAutocomplete]="institutionAutoComplete" (keyup)="searchInstitution($event)">
+                    <mat-autocomplete autoActiveFirstOption #institutionAutoComplete="matAutocomplete"
+                        [displayWith]="displayInstitution">
+                        <mat-option *ngFor="let institution of filteredOptionsInstitutions | async"
+                            [value]="institution" matTooltipPosition="right"
+                            [matTooltip]="'name: ' + institution?.institutionName + ', ' + 'board: '+institution?.board"
+                            class="text-sm" name="option">
+                            {{institution?.institutionName}}
+                        </mat-option>
+                    </mat-autocomplete>
+                </ng-container>
+            </mat-form-field>
+
+            <div class="flex justify-center items-center">
+                <button [disabled]="addInstitution.invalid" mat-stroked-button type="submit"
+                    class="bg-primary text-white  disabled:bg-primary-300 disabled:border">
+                    Submit
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<ng-template #dataNotLoaded>
+    <div class="flex justify-center items-center">
+        <mat-spinner diameter="40"></mat-spinner>
+    </div>
+</ng-template>

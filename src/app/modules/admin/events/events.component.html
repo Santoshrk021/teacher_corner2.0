@@ -1,0 +1,25 @@
+<div class="w-full h-full overflow-y-auto  py-4">
+    <div class="mx-4">
+        <button [matMenuTriggerFor]="menu" matTooltipPosition="above"
+            matTooltip="Add new Challenge or Competition Wizard" mat-stroked-button
+            class="quizCreateBtn text-primary bg-gray-50">
+            Add Event
+            <mat-icon class="ml-4 icon-size-8 text-primary-600 cursor-pointer plusIcon active:text-primary-500"
+                [svgIcon]="'heroicons_solid:plus-circle'">
+            </mat-icon>
+        </button>
+        <mat-menu #menu="matMenu" xPosition="before">
+            <button mat-menu-item (click)="createEvent('WORKSHOP')">
+                <mat-icon class="text-primary-700" svgIcon="mat_outline:ballot"></mat-icon>
+                <span class="text-primary-700 font-medium">Workshop</span>
+            </button>
+            <button mat-menu-item (click)="createEvent('BOOTCAMP')">
+                <mat-icon class="text-primary-700" svgIcon="mat_outline:ballot"></mat-icon>
+                <span class="text-primary-700 font-medium">Bootcamp</span>
+            </button>
+        </mat-menu>
+    </div>
+    <div class="w-full ">
+        <app-all-events-table></app-all-events-table>
+    </div>
+</div>

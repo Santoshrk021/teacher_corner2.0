@@ -1,0 +1,21 @@
+<div matRipple matRippleColor="#049cd836"
+    class="p-4 flex flex-col rounded-2xl bg-card shadow w-60 h-60 scale_on_hover hover:shadow-lg hover:cursor-pointer relative">
+    <div class="mb-4">
+        <p class="text-gray-600 mb-2 font-medium">
+            {{shortenText('thinkTac Institute of science and technology',50)}}
+        </p>
+        <p class="text-lg text-primary-600">Class VII</p>
+    </div>
+    <div
+        class="max-w-fit mt-4  py-0.5 px-3 rounded-lg text-sm font-small text-gray-500 bg-gray-200 dark:text-gray-300 dark:bg-gray-700">
+        Lorem ipsum dolor sit amet
+    </div>
+    <div class="px-6 py-4 text-right bg-gray-50 dark:bg-transparent absolute bottom-0 right-0">
+        <a mat-stroked-button [routerLink]="">
+            <span class="inline-flex items-center">
+                <span>Continue</span>
+                <mat-icon class="ml-1.5 icon-size-5" [svgIcon]="'heroicons_solid:arrow-sm-right'"></mat-icon>
+            </span>
+        </a>
+    </div>
+</div>

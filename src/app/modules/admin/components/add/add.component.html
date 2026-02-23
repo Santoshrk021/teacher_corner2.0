@@ -1,0 +1,115 @@
+<div class="h-[80vh] w-full relative">
+
+  <div class="flex flex-row mt-4 mb-2 w-full">
+      <button mat-dialog-close class="m-4 sm:m-6 sm:mx-7 absolute -top-10 -right-6 z-40" type="button"
+          (click)="close()">
+          <mat-icon class=" hover:scale-110 transition duration-5000 transform" svgIcon="mat_outline:close">
+          </mat-icon>
+      </button>
+  </div>
+
+<mat-stepper linear #stepper class="overflow-scroll w-200 ">  
+<mat-step>
+  <ng-template matStepLabel>Component Info</ng-template>
+  <ng-template matStepContent>
+      <ng-container>
+          <app-component-form [editForm]="form" [isReadOnly]="false" [addMode]="true" 
+          (formStatus)="onEditFormStatusChanged($event)" (docIdGenerated)="onGeneratedocId($event)"
+          [formSubmitted]="formWasSubmitted" (uploadedFilesChanged)="onFilesUpdated($event)"
+          (imagePreviewsChanged)="onPreviewsUpdated($event)"
+          ></app-component-form>
+      </ng-container>
+
+      <div class="flex justify-end p-8 rounded_full">
+
+        <button
+        matStepperNext
+        mat-stroked-button
+        [disabled]="!editFormIsValid"
+        class="bg-primary text-white arrowBtn disabled:bg-primary-100"
+        type="button"
+        (click)="onNext()"
+      >
+        Next
+        <mat-icon
+          [ngClass]="editFormIsValid ? 'ml-2 icon-size-5 text-white arrowIcon' : 'ml-2 icon-size-5 text-white'"
+          [svgIcon]="'heroicons_solid:arrow-sm-right'">
+        </mat-icon>
+      </button>
+      
+      </div>
+  </ng-template>
+</mat-step>
+
+<mat-step>
+  <ng-template matStepLabel>Review</ng-template>
+  <ng-template matStepContent>
+    <div class="flex">
+      <div class="grid grid-cols-5 my-4 p-4 rounded-lg w-200 bg-blue-50">
+        <div class="col-span-2 text-accent font-semibold">
+            <p class="mb-2  ">Component Name</p>
+            <p class="mb-2 ">Component Code</p>
+            <p class="mb-2 ">Group Name</p>
+            <p class="mb-2 ">Category Name</p>
+            <p class="mb-2 ">Sub Category Name</p>
+            <!-- <p class="mb-2 ">Attribute Name</p> -->
+            <p class="mb-2 ">Component Size</p>
+            <p class="mb-2 ">Quantity</p>
+            <p class="mb-2 ">Images</p>
+        </div>
+        <div class="col-span-3 text-accent font-medium">
+            <p class="mb-2 pl-3">{{form?.get('componentName')?.value}}</p>
+            <p class="mb-2 pl-3">{{form?.get('componentCode')?.value}}</p>
+            <p class="mb-2 pl-3">{{form?.get('groupName')?.value.displayName}}</p>
+            <p class="mb-2 pl-3">{{form?.get('category')?.value.displayName}}</p>
+            <p class="mb-2 pl-3">{{form?.get('subCategory')?.value.displayName}}</p>
+            <!-- <p class="mb-2 pl-3">{{form?.get('attribute')?.value}}</p> -->
+            <p class="mb-2 pl-3">{{form?.get('componentSize')?.value.displayName}}</p>
+            <p class="mb-2 pl-3">{{form?.get('quantity')?.value}}</p>
+            <div class="flex flex-wrap gap-2 max-w-full overflow-x-auto">
+              <div
+              *ngFor="let img of imageUrlArray"
+                class="w-12 h-12 rounded overflow-hidden border flex items-center justify-center"
+              >
+              <a [href]="getImagePreview(img)" target="_blank">
+              <img
+              class="object-cover w-full h-full"
+              [alt]="'Component image'"
+              [src]="getImagePreview(img)"
+              loading="lazy"
+            />
+            </a>
+              </div>
+          </div>
+          
+        </div>
+    </div>
+    </div>
+
+
+      <div class="flex justify-between mt-6">
+        <button matStepperPrevious mat-stroked-button type="button" class="bg-primary text-white arrowBtn ">
+            <mat-icon class="mr-2 icon-size-5 text-white arrowIcon" [svgIcon]="'heroicons_solid:arrow-sm-left'">
+            </mat-icon>Back
+        </button>
+        <div *ngIf="submitLoader; else deleted">
+          <button mat-button class="bg-white border-2 border-primary text-primary rounded-full p-5">
+            <mat-spinner [diameter]="30"></mat-spinner>
+          </button>  
+      </div>
+        <ng-template #deleted>
+        <div>
+            <button mat-button class="bg-primary text-white arrowBtn rounded-full p-5" (click)="onSubmitForm()">
+              Submit
+              <mat-icon class="ml-2 icon-size-5 text-white arrowIcon" [svgIcon]="'heroicons_solid:arrow-sm-right'"></mat-icon>
+            </button>
+        </div>
+        </ng-template>
+    </div>
+
+  </ng-template>
+</mat-step>
+
+</mat-stepper>
+
+</div>

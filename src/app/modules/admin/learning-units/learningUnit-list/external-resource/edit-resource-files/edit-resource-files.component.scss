@@ -1,0 +1,13 @@
+.inventory-grid {
+    display: grid;
+    grid-template-columns:5% 25% 60% 10%;
+    align-items: center;
+    gap: 1rem; // Adjust the gap between grid items as needed
+    padding: 1rem 2rem; // Adjust padding as needed
+    border-bottom: 1px solid #d1d5db; // Tailwind's gray-300 color
+    color: #6b7280; // Tailwind's text-secondary color
+
+    @media (min-width: 768px) {
+      padding: 1rem 2rem;
+    }
+  }

@@ -1,0 +1,99 @@
+<div class="flex justify-center " *ngIf="isAssignmentUi;else asgnDeleted">
+    <div class="w-full">
+        <mat-stepper labelPosition="bottom" linear #stepper class=" bg-transparent" [animationDuration]="1000" (selectionChange)="onStepChange($event)">
+            <!-- <mat-step state="camera">
+                <ng-template matStepLabel>Upload the image of completed activity</ng-template>
+                <app-image-upload></app-image-upload>
+            </mat-step>
+            <mat-step state="pdf">
+                <ng-template matStepLabel>Fill the observation sheet</ng-template>
+                <app-word-upload></app-word-upload>
+            </mat-step> -->
+
+            <div *ngFor="let assignment of assignments?.assignments; let i=index">
+                <mat-step>
+                    <ng-template matStepLabel>{{assignment?.title}}</ng-template>
+                    <ng-template matStepContent>
+                        <app-assignment-step [parent]="assignment.uploadFileType" [contentIndex]="contentIndex"
+                            [assignmentData]="assignment" [asgnId]="assignments.docId" [workflowId]="workflowId"
+                            [currentWorkflow]="currentWorkflow" [currentsubmissionurl]="selectedsubm"
+                            (changeMatstep)="changestepperStep($event)"[currentMatIndex]="currentIndexMatStepper" [currentData]="currentAssignments" [assignmentIdwithtabchange]="assignmentIdwithtabchange"></app-assignment-step>
+                    </ng-template>
+                </mat-step>
+                <!--
+                <mat-step *ngIf="assignment?.uploadFileType=='IMAGE' ||assignment?.uploadFileType=='image'">
+                    <ng-template matStepLabel>{{assignment?.title}}</ng-template>
+                    <ng-template matStepContent>
+                        <app-image-upload [assignmentData]="assignment" [asgnId]="assignments.docId"
+                            [workflowId]="workflowId" [currentWorkflow]="currentWorkflow"></app-image-upload>
+                    </ng-template>
+                </mat-step>
+                <mat-step *ngIf="assignment?.uploadFileType=='PDF' ||assignment?.uploadFileType=='pdf'">
+                    <ng-template matStepLabel>{{assignment?.title}}</ng-template>
+                    <ng-template matStepContent>
+                        <app-word-upload [assignmentData]='assignment' [asgnId]="assignments.docId"
+                            [workflowId]="workflowId" [currentWorkflow]="currentWorkflow"></app-word-upload>
+                    </ng-template>
+                </mat-step>
+                -->
+                <!-- <mat-step *ngIf="assignment?.uploadFileType=='url'">
+                                <ng-template matStepLabel>Join the live session</ng-template>
+                                <app-live-session [assignmentData]='assignment'></app-live-session>
+                            </mat-step> -->
+            </div>
+
+
+            <!-- Icon overrides. -->
+            <ng-template matStepperIcon="camera">
+                <mat-icon> perm_media</mat-icon>
+            </ng-template>
+            <ng-template matStepperIcon="pdf">
+                <mat-icon>receipt</mat-icon>
+            </ng-template>
+
+        </mat-stepper>
+        <div class="flex items-center w-full justify-between ">
+            <!-- Previous Step Button -->
+            <div class="flex items-center justify-center p-3 rounded-full shadow-lg bg-primary ml-5 mb-4">
+                <button class="flex items-center text-white fill-white" (click)="goToPreviousStep()">
+                    <span class="mr-1">Previous Step</span>
+                </button>
+            </div>
+
+            <!-- Next Step Button -->
+            <div class="flex items-center justify-center p-3 rounded-full shadow-lg bg-primary mr-10 mb-4">
+                <button class="flex items-center text-white" (click)="goToNextStep()">
+                    <span class="ml-1">Next Step</span>
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<ng-template #asgnDeleted>
+    <div class="text-slate-600 font-medium text-lg h-[300px] w-full flex justify-center items-center">
+        <div>
+            <p>
+                The Quiz has been deleted.
+            </p>
+            <div class="mt-3 flex flex-wrap">
+                <span>Please&nbsp;contact&nbsp;us&nbsp;at</span>
+                <span class="text-primary">&nbsp;+{{environment.whatsAppSender}}</span>
+                <span>&nbsp;or&nbsp;</span>
+                <span class="flex  items-center bg-white h-max w-max px-1 py-0.5 rounded shadow">
+                    <img class="h-4 w-4 mr-1 " src="https://static.whatsapp.net/rsrc.php/v3/yz/r/ujTY9i_Jhs1.png">
+                    <a class="text-[#049CD8] text-base hover:underline underline-offset-2 " target="_blank"
+                        [href]="'https://api.whatsapp.com/send/?phone=' + environment.whatsAppSender + '&text=Greetings%21+I+have+a+question+regarding+Teacher+Corner&type=phone_number&app_absent=0'">
+                        {{environment.whatsAppSender}}
+                    </a>
+                </span>
+                <span>&nbsp;,&nbsp;</span>
+                <span>for&nbsp;further assistance.</span>
+
+            </div>
+
+        </div>
+    </div>
+
+</ng-template>

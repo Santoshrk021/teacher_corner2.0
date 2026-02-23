@@ -1,0 +1,33 @@
+/* ----------------------------------------------------------------------------------------------------- */
+/*  @ Main Tailwind file for injecting utilities.
+/* ----------------------------------------------------------------------------------------------------- */
+@tailwind utilities;
+@tailwind components;
+@layer components {
+    .scale_on_hover {
+        @apply transform transition duration-500 hover:scale-105;
+    }
+    .scale_on_hover125 {
+        @apply transform transition duration-500 hover:scale-125;
+    }
+
+    .tac-container-height {
+        height: calc(100vh - calc(4rem + 98px));
+
+        @media (max-width:600px) {
+            height: calc(100vh - 7rem)
+        }
+    }
+
+    .tac-container {
+        height: calc(100vh - 17rem);
+
+        @media (max-width:600px) {
+            height: calc(100vh - 14rem)
+        }
+    }
+
+    .container-height {
+        height: calc(100vh - 4rem);
+    }
+}

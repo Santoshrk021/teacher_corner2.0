@@ -1,0 +1,76 @@
+<div class="py-6 h-screen w-screen overflow-hidden relative">
+    <button (click)="drawerClose()" class="m-3  absolute top-0 right-0 z-40">
+        <mat-icon class=" hover:scale-110 transition duration-5000 transform" svgIcon="mat_outline:close">
+        </mat-icon>
+    </button>
+
+    <button (click)="emptyTrash()" mat-stroked-button color="warn"
+        class=" m-3 text-center absolute top-1 right-10 z-40">
+        <mat-icon class="text-red-500  cursor-pointer transition duration-500 transform  hover:scale-[115%]"
+            svgIcon="delete_outline">
+        </mat-icon>Empty Trash
+    </button>
+
+    <div class="pl-4 pr-22 h-10 flex justify-between">
+        <p Class=" font-bold text-lg text-accent-600">
+            View Deleted Classrooms
+        </p>
+    </div>
+
+    <div class="w-full ">
+        <div class="grid mt-4 ">
+            <div
+                class="inventory-grid z-10 sticky top-0 grid gap-8 py-4 px-10 md:px-8 shadow text-md font-semibold text-secondary bg-gray-50 dark:bg-black dark:bg-opacity-5">
+                <div>Classroom Name</div>
+                <div>Grade</div>
+                <div>School Name</div>
+                <div>Created On</div>
+                <div>Programmes</div>
+                <div class="hidden sm:block">Restore</div>
+                <div class="hidden sm:block">Delete</div>
+            </div>
+
+            <div *ngIf="deletedClassrooms.length else noTrashClassrooms" class="overflow-y-auto h-[calc(100vh_-_240px)]">
+                <ng-container *ngFor="let cls of deletedClassrooms">
+                    <div
+                        class="inventory-grid grid items-center text-secondary gap-8 py-3 px-10 md:px-8 border-b border-gray-400 ">
+                        <div>{{cls?.classroomName || cls?.stemClubName}}</div>
+                        <div>{{cls?.grade}}</div>
+                        <div>{{cls?.institutionName}}</div>
+                        <div>
+                            {{(cls?.createdAt?.seconds || cls?.creationDate?.seconds) * 1000 | date :'shortDate'}}
+                        </div>
+                        <div [matTooltip]="cls?.viewProgrammes" class="truncate">{{cls?.viewProgrammes}}</div>
+                        <!-- Restore -->
+                        <div>
+                            <mat-icon (click)="restoreIcls(cls)"
+                                class="text-primary icon-size-5 cursor-pointer transition duration-500 transform  hover:scale-[115%]">
+                                <span class="material-icons">
+                                    restore_from_trash
+                                </span>
+                            </mat-icon>
+                        </div>
+                        <!-- Delete  -->
+                        <div>
+                            <mat-icon (click)="deletecls(cls)"
+                                class="text-red-500  cursor-pointer transition duration-500 transform  hover:scale-[115%]"
+                                svgIcon="delete_outline"></mat-icon>
+                        </div>
+                    </div>
+                    <div class="grid">
+                        <ng-container *ngIf="selectedcls?.docId === cls?.docId">
+                            <ng-container *ngTemplateOutlet="rowDetailsTemplate;context: {$implicit: cls}">
+                            </ng-container>
+                        </ng-container>
+                    </div>
+                </ng-container>
+            </div>
+
+            <ng-template #noTrashClassrooms>
+                <div class="flex justify-center items-center h-[calc(100vh-_240px)]">
+                    <p class="text-lg text-secondary">No classrooms found in trash</p>
+                </div>
+            </ng-template>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,9 @@
+.inventory-grid {
+    grid-template-columns: repeat(6, 1fr) ;
+}
+.inventory-grid-for-equal {
+    grid-template-columns: repeat(4, 25%) ;
+}
+// .inventory-grid {
+//     grid-template-columns: repeat(4, 10vw) 30px 30px;
+// }

@@ -1,0 +1,144 @@
+<div class="m-auto md:w-[40vw] xs:w-[55vw] md:px-8 xs:px-0 relative ">
+    <div class="">
+        <div class=" absolute -top-4 -right-2 ">
+            <button mat-dialog-close class="">
+                <mat-icon class=" hover:scale-110 transition duration-5000 transform" svgIcon="mat_outline:close">
+                </mat-icon>
+            </button>
+        </div>
+        <form *ngIf="infoForm" class="rounded-2xl overflow-hidden" [formGroup]="infoForm" (ngSubmit)="onSubmit(infoForm)">
+            <div class="flex flex-row items-center justify-center w-full ">
+                <div class="flex flex-row justify-center w-full">
+                    <p class="text-2xl font-semibold mb-2 text-center text-accent ">Edit Profile</p>
+                </div>
+            </div>
+            <div class="">
+                <div class="">
+                    <mat-form-field class="w-full">
+                        <input matInput [placeholder]="'First name'" [formControlName]="'firstName'">
+                        <mat-icon class="icon-size-5" matPrefix [svgIcon]="'heroicons_solid:user-circle'"></mat-icon>
+                    </mat-form-field>
+                </div>
+
+                <div class="">
+                    <mat-form-field class="w-full">
+                        <input matInput [placeholder]="'Last name'" [formControlName]="'lastName'">
+                        <mat-icon class="icon-size-5" matPrefix [svgIcon]="'heroicons_solid:user-circle'"></mat-icon>
+                    </mat-form-field>
+                </div>
+                <!----------------EmailUpdate-------------------------->
+                <div class="w-full">
+                    <div [ngClass]="emailVerification.emailChanged ? 'shortEmail' : 'longEmail'">
+                        <div>
+                            <mat-form-field class="w-full">
+                                <mat-icon class="icon-size-5" matPrefix [svgIcon]="'heroicons_solid:mail'"></mat-icon>
+                                <input matInput [placeholder]="'Email Address'" [formControlName]="'email'"
+                                    (keyup)="emailChange($event)" [(ngModel)]="emailInput"
+                                    [readonly]="emailVerification.disableEmailInput">
+                                <mat-error
+                                    *ngIf="infoForm.get('email').hasError('email')&& infoForm.get('email').touched">Enter
+                                    valid email address</mat-error>
+                                <mat-icon *ngIf="emailVerification.editEmailAftersubmit" svgIcon="edit" class="absolute"
+                                    (click)="editEmailAfterSubmit()" class="mt-1.5 -ml-23"></mat-icon>
+                            </mat-form-field>
+                            <mat-error *ngIf="isserverError" class="w-full mb-3">{{serverError.message}}</mat-error>
+                            <span *ngIf="emailVerification.isLinkSent" class="text-sky-500 mb-3">Verify your mail by clicking the link
+                                sent your updated mail</span>
+                        </div>
+                        <!--------------------------------->
+                        <div class="text-center w-full pb-3  " [hidden]="emailVerification.hideEmailVerifybtn">
+                            <button class="fuse-mat-stroked-button-large w-max mt-1" mat-flat-button [color]="'primary'"
+                                type="button" (click)="updateEmail()"
+                                [disabled]="emailVerification.disableEmailVerify|| infoForm.get('email').hasError('email')">
+                                {{emailVerification.hideResendLinkbtn?'Send OTP':'Resend OTP'}}
+                            </button>
+                        </div>
+                        <!-- <div class="text-center ml-4 w-full " [hidden]=" hideSubmitbtn">
+                            <button class="fuse-mat-stroked-button-large w-max mt-1" mat-flat-button [color]="'primary'"
+                                [disabled]="disableSubmit" type="button" (click)="sendOTP()">
+                                {{hideResendbtn?'Send OTP':'Resend OTP'}}
+                            </button>
+                        </div> -->
+                        <div class="w-full ml-2">
+                            <div [hidden]="emailVerification.hideEmailVerification" class="sm:ml-0">
+                                <div class="verifyButtonPosition">
+                                    <mat-form-field class="text-accent-600 sm:w-full xs:w-full xs:pr-1 sm:px-0">
+                                        <input id="otp" matInput type="number" name="code" placeholder="Enter OTP"
+                                            [(ngModel)]="verificationEmailCode" [ngModelOptions]="{standalone: true}">
+                                        <mat-error>
+                                            OTP is required
+                                        </mat-error>
+                                    </mat-form-field>
+                                    <div class="w-full mt-1">
+                                        <button class="fuse-mat-stroked-button-large w-max  " type="button"
+                                            mat-flat-button [color]="'primary'" (click)="verifyEmail()">Verify
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--------------------------------------------->
+                    </div>
+                </div>
+
+                <!----------------------------------------------------->
+                <!----------------PhoneAuthUpdate----------------------->
+                <div class="w-full">
+                    <div [ngClass]="phoneVerification.numberChanged ? 'short' : 'long'">
+                        <div>
+                            <mat-form-field class="w-full">
+                                <mat-icon class="icon-size-5 m-0" matPrefix
+                                    [svgIcon]="'heroicons_solid:phone'"></mat-icon>
+                                <span class="ml-2">{{countryCode}}</span>
+                                <input id="phone" [maxLength]="10" pattern="^[0-9]{10}" class=" ml-1" matInput
+                                    placeholder="Enter a valid 10 digits phone number" [(ngModel)]="phoneNumber"
+                                    [formControlName]="'phone'" (keyup)="phoneChange($event)"
+                                    [readonly]="phoneVerification.disablePhoneInput">
+                                <!-- <mat-error
+                                    *ngIf="infoForm.get('phone').hasError('phone')&& infoForm.get('phone').touched">Enter
+                                    a valid phone Number</mat-error> -->
+                                <mat-icon *ngIf="phoneVerification.editPhoneAftersubmit" svgIcon="edit" class="absolute"
+                                    (click)="editPhonenumber()" class="mt-1.5 -ml-23"></mat-icon>
+                            </mat-form-field>
+                            <div class="w-full text-left">
+                                <mat-error *ngIf="isphoneAuthError"
+                                    class="w-full">{{phoneAuthError.message}}</mat-error>
+                            </div>
+                        </div>
+                        <div class="text-center w-full " [hidden]=" phoneVerification.hideSubmitbtn">
+                            <button class="fuse-mat-stroked-button-large w-max mt-1" mat-flat-button [color]="'primary'"
+                                [disabled]="phoneVerification.disableSubmit" type="button" (click)="sendOTP()">
+                                {{phoneVerification.hideResendbtn?'Send OTP':'Resend OTP'}}
+                            </button>
+                        </div>
+                        <div class="w-full">
+                            <div [hidden]="phoneVerification.hideVerification" class="sm:ml-0">
+                                <div class="verifyButtonPosition">
+                                    <mat-form-field class="text-accent-600 sm:w-full xs:w-full xs:pr-1 sm:px-0">
+                                        <input id="otp" matInput type="otp" type="text" name="code"
+                                            (keyup)="getVerificationCode($event)" placeholder="Enter OTP">
+                                        <mat-error>
+                                            OTP is required
+                                        </mat-error>
+                                    </mat-form-field>
+                                    <div class="w-full mt-1">
+                                        <button class="fuse-mat-stroked-button-large w-max  " type="button"
+                                            mat-flat-button [color]="'primary'" (click)="verifyPhoneNumber()">Verify
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--------------------------------------------------------->
+                <div class="w-full text-center">
+                    <button type="submit" class="fuse-mat-stroked-button-large  mt-6" mat-flat-button
+                        [color]="'primary'" [disabled]="btnDisabled">
+                        Save
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,100 @@
+<div class="flex flex-col flex-auto min-w-0">
+    <div class="flex-auto  sm:p-10">
+        <div class="max-w-3xl">
+            <form [formGroup]="infoForm" (ngSubmit)="onSubmit(infoForm)"
+                class="flex flex-col sm:px-8 sm:pt-10 sm:bg-card sm:shadow sm:rounded-2xl overflow-hidden">
+                <p class="text-lg font-medium">Innovation submission</p>
+                <p class="text-secondary mb-6">
+                    These include: Name of Innovation; Subject/Topic/Subtopic; Materials Used; Description etc
+                </p>
+
+                <div class="flex flex-col gt-xs:flex-row">
+                    <mat-form-field class="flex-auto gt-xs:pr-3" [matTooltip]="tooltipMessage"
+                        matTooltipPosition="above">
+                        <mat-label class="text-accent-600">Selected Subject</mat-label>
+                        <mat-select [placeholder]="'Selected Subject'" formControlName="subject"
+                            (selectionChange)="subjectChange($event.value)">
+                            <mat-option label="Select" value="" selected>Select</mat-option>
+                            <mat-option label="All" value="A">All</mat-option>
+                            <mat-option label="Biology" value="B">Biology</mat-option>
+                            <mat-option label="Chemistry" value="C">Chemistry</mat-option>
+                            <mat-option label="Earth Science" value="E">Earth Science</mat-option>
+                            <mat-option label="Others" value="O">Others</mat-option>
+                            <mat-option label="Physics" value="P">Physics</mat-option>
+                        </mat-select>
+                        <!-- <mat-icon class="icon-size-5" matPrefix
+                            [svgIcon]="'heroicons_solid:location-marker'"></mat-icon> -->
+                        <mat-icon class="icon-size-5" matPrefix svgIcon="subject"></mat-icon>
+                    </mat-form-field>
+
+                    <mat-form-field class="flex-auto gt-xs:pr-3" [matTooltip]="tooltipMessage"
+                        matTooltipPosition="above">
+                        <mat-label class="text-accent-600">Choose Category</mat-label>
+                        <mat-select [placeholder]="'Choose Category'" formControlName="category"
+                            (selectionChange)="categoryChange($event.value)">
+                            <mat-option label="Select" value="" selected>Select</mat-option>
+                            <mat-option [value]="category"
+                                *ngFor="let category of infoForm?.get('selectedCategoryArr').value">
+                                {{category}}</mat-option>
+                        </mat-select>
+                        <mat-icon class="icon-size-5" matPrefix svgIcon="mat_outline:category"></mat-icon>
+                    </mat-form-field>
+
+                    <mat-form-field class="flex-auto gt-xs:pr-3" [matTooltip]="tooltipMessage"
+                        matTooltipPosition="above">
+                        <mat-label class="text-accent-600">Sub Topic</mat-label>
+                        <mat-select [placeholder]="'Sub Topic'" formControlName="topic"
+                            (selectionChange)="topicChange($event.value)">
+                            <mat-option [value]="topic"
+                                *ngFor="let topic of infoForm?.get('selectedTopicArr').value">{{topic}}</mat-option>
+
+                        </mat-select>
+                        <mat-icon class="icon-size-5" matPrefix svgIcon="subject"></mat-icon>
+                    </mat-form-field>
+
+
+                    <mat-form-field class="flex-auto" [matTooltip]="tooltipMessage" matTooltipPosition="above">
+                        <mat-label class="text-accent-600">Title</mat-label>
+                        <input matInput formControlName="title" [placeholder]="'Title Of The Learning Unit'">
+                        <mat-icon class="icon-size-5" matPrefix svgIcon="mat_outline:title"></mat-icon>
+                    </mat-form-field>
+
+                    <mat-form-field class="fuse-mat-textarea flex-auto" [matTooltip]="tooltipMessage"
+                        matTooltipPosition="above">
+                        <mat-label class="text-accent-600">Description</mat-label>
+                        <textarea formControlName="description" matInput [placeholder]="'Add Description'" [rows]="4">
+                        </textarea>
+                    </mat-form-field>
+                    <div class="flex">
+                        <mat-form-field class="fuse-mat-textarea flex-auto" [matTooltip]="tooltipMessage"
+                            matTooltipPosition="above">
+                            <mat-label class="text-accent-600">Material Used</mat-label>
+                            <textarea formControlName="materialUsed" matInput [placeholder]="'Add Material Used'"
+                                [rows]="4">
+                            </textarea>
+                        </mat-form-field>
+                    </div>
+
+                    <mat-form-field class="flex-auto gt-xs:pr-3" [matTooltip]="tooltipMessage"
+                        matTooltipPosition="above">
+                        <mat-label class="text-accent-600">Additional Language</mat-label>
+                        <mat-select formControlName="additionalLanguage" [placeholder]="'Additional Language'"
+                            (selectionChange)="languageChange($event.value)">
+                            <mat-option [value]="lang.id"
+                                *ngFor="let lang of selectedLangArr">{{lang?.language}}</mat-option>
+                        </mat-select>
+                        <mat-icon class="icon-size-5" matPrefix svgIcon="heroicons_solid:language"></mat-icon>
+                    </mat-form-field>
+
+                </div>
+
+                <button
+                    [disabled]="infoForm?.invalid || isFinalSubmission === true || isContestEnd === true || isSubmitted === true || !inBetweenContest"
+                    type="submit" class="mb-4 m-auto" mat-flat-button [color]="'primary'"
+                    [matTooltip]="isContestEnd?message: isFinalSubmission?toltipMessage:''">
+                    Save
+                </button>
+            </form>
+        </div>
+    </div>
+</div>

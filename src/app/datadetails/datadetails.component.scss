@@ -1,0 +1,20 @@
+/* Delete icon: red by default, white on hover */
+.delete-icon {
+  color: #ef4444;
+  transition: color 0.2s ease-in-out;
+}
+.delete-icon:hover {
+  color: #ffffff;
+}
+
+/* Keep native range interactions */
+:host ::ng-deep input[type="range"] {
+  appearance: auto;
+  -webkit-appearance: auto;
+}
+
+/* Ensure material/overlay backdrops don't cover the drawer */
+:host ::ng-deep .mat-drawer-backdrop,
+:host ::ng-deep .cdk-overlay-backdrop {
+  z-index: 80 !important; /* lower than drawer's 120 */
+}

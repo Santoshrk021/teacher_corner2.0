@@ -1,0 +1,65 @@
+<div class="flex flex-col w-full">
+    <div class="h-12 ml-2 my-2">
+        <!-- <a [routerLink]="['..']"
+            class="inline-flex items-center leading-6 text-primary hover:underline cursor-pointer mt-2">
+            <span class="inline-flex items-center">
+                <mat-icon class="icon-size-5 text-current" [svgIcon]="'heroicons_solid:arrow-sm-left'">
+                </mat-icon>
+                <span class="ml-1.5 font-medium leading-5">Back To Classroom</span>
+            </span>
+        </a> -->
+        <button mat-stroked-button
+            class="inline-flex items-center leading-6 text-white bg-primary-600 hover:underline cursor-pointer m-1"
+            (click)="goBack()">
+            <span class="inline-flex items-center">
+                <mat-icon class="icon-size-5 text-current" [svgIcon]="'heroicons_solid:arrow-sm-left'">
+                </mat-icon>
+                <span class="ml-1.5 font-medium leading-5">Back</span>
+            </span>
+        </button>
+    </div>
+
+    <div class="grid">
+        <div
+            class="inventory-grid z-10 bg-slate-50 text-left sticky top-0 grid gap-12 py-4 px-1 shadow  text-md font-semibold text-secondary  dark:bg-black dark:bg-opacity-5">
+            <div class="pl-4">Student Name</div>
+            <div>Student ID</div>
+            <div>Attempt Number</div>
+            <div>Attempt Time</div>
+            <div></div>
+            <div>Replay</div>
+        </div>
+
+        <div class="overflow-auto">
+            <div *ngIf="versions !== undefined; else noSubmissions">
+                <div *ngFor="let submission of versions | keyvalue; let i = index"
+                    class="bg-gray-100 inventory-grid grid gap-12 text-left  items-center text-secondary py-3 px-1 border-b border-gray-300 ">
+                    <div class="pl-4">{{selectedSubmission.studentInfo.firstName}}
+                        {{selectedSubmission.studentInfo.lastName}}</div>
+                    <div>{{selectedSubmission.studentInfo.docId}}</div>
+                    <div>{{submission.value.attemptNumber}}</div>
+                    <div>{{submission.value.lastAttemptTime.seconds * 1000 | date:'medium'}}</div>
+                    <div>
+                        <button (click)="viewScore(submission, selectedSubmission, i)"
+                            class="bg-slate-50 px-2 leading-6 arrowBtn" mat-stroked-button>
+                            <span class="text-sm">View Score</span>
+                            <mat-icon class="ml-1.5 icon-size-5 arrowIcon" [svgIcon]="'heroicons_solid:arrow-sm-right'">
+                            </mat-icon>
+                        </button>
+                    </div>
+                    <div>
+                        <button (click)="uploadReplayDialog(submission, selectedSubmission)"
+                            class="bg-slate-50 px-2 leading-6 arrowBtn" mat-stroked-button>
+                            <span class="text-sm">Replay Upload</span>
+                            <mat-icon class="ml-1.5 icon-size-5 arrowIcon" [svgIcon]="'heroicons_solid:arrow-sm-right'">
+                            </mat-icon>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <ng-template #noSubmissions>
+            <div class="flex items-center justify-center mt-3">No Submissions</div>
+        </ng-template>
+    </div>

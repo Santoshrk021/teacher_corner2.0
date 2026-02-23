@@ -1,0 +1,30 @@
+::ng-deep.mat-step-text-label {
+    font-size: smaller !important;
+}
+
+:host ::ng-deep.mat-stepper-horizontal-line {
+    border-top-color: #049cd858 !important;
+}
+
+:host ::ng-deep.mat-step-label.mat-step-label-active {
+    border-top-color: #049cd8 !important;
+}
+
+:host ::ng-deep.mat-step-header {
+    color: #fff !important;
+}
+
+:host ::ng-deep.mat-step-header[aria-selected="true"] {
+    background-color: rgba(0, 168, 206, 0.105) !important;
+    border-radius: 32px;
+
+    & div.mat-step-label.mat-step-label-active.mat-step-label-selected {
+        color: #0080b3;
+    }
+}
+
+:host ::ng-deep.mat-step-header {
+    &:hover {
+        border-radius: 32px !important;
+    }
+}

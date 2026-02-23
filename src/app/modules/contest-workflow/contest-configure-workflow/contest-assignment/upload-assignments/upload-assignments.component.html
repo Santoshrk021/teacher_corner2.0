@@ -1,0 +1,43 @@
+<div class="flex justify-center ">
+    <div class="w-full">
+        <mat-stepper labelPosition="bottom" linear #stepper class=" bg-transparent" [animationDuration]="1000">
+            <!-- <mat-step state="camera">
+                <ng-template matStepLabel>Upload the image of completed activity</ng-template>
+                <app-image-upload></app-image-upload>
+            </mat-step>
+            <mat-step state="pdf">
+                <ng-template matStepLabel>Fill the observation sheet</ng-template>
+                <app-obs-upload></app-obs-upload>
+            </mat-step> -->
+
+            <div *ngFor="let assignment of assignments?.assignments ">
+                <mat-step *ngIf="assignment?.uploadFileType==='IMAGE' ||assignment?.uploadFileType==='image'">
+                    <ng-template matStepLabel>{{assignment?.title}}</ng-template>
+                    <app-image-upload [assignmentData]="assignment" [asgnId]="assignments.docId"
+                        [workflowId]="workflowId" [currentWorkflow]="currentWorkflow"></app-image-upload>
+                </mat-step>
+                <mat-step *ngIf="assignment?.uploadFileType==='PDF' ||assignment?.uploadFileType==='pdf'">
+                    <ng-template matStepLabel>{{assignment?.title}}</ng-template>
+                    <app-obs-upload [assignmentData]='assignment' [asgnId]="assignments.docId" [workflowId]="workflowId"
+                        [currentWorkflow]="currentWorkflow"></app-obs-upload>
+                </mat-step>
+                <!-- <mat-step *ngIf="assignment?.uploadFileType=='url'">
+                                <ng-template matStepLabel>Join the live session</ng-template>
+                                <app-live-session [assignmentData]='assignment'></app-live-session>
+                            </mat-step> -->
+            </div>
+
+
+            <!-- Icon overrides. -->
+            <ng-template matStepperIcon="camera">
+                <mat-icon> perm_media</mat-icon>
+            </ng-template>
+            <ng-template matStepperIcon="pdf">
+                <mat-icon>receipt</mat-icon>
+            </ng-template>
+
+        </mat-stepper>
+
+
+    </div>
+</div>

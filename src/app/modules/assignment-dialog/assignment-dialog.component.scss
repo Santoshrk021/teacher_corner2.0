@@ -1,0 +1,9 @@
+::ng-deep body.light .mat-dialog-container{
+    box-shadow:none;
+    background:transparent
+}
+
+app-pdf{
+    height: 100%;
+    width: 100%;
+}

@@ -1,0 +1,226 @@
+<form [formGroup]="stageInfoForm">
+    <div class=" h-[57vh]  grid grid-cols-12 ">
+        <div formArrayName="stagesFormArr"
+            class="px-2 pt-1 h-full overflow-y-auto col-span-11 bg-slate-50  rounded-xl border">
+            <mat-stepper labelPosition="bottom" linear #stageStepperRef class=" bg-transparent"
+                [animationDuration]="1000" (selectionChange)="onStepChange($event)">
+                <mat-step *ngFor="let stage of getFormArr.controls let i=index;let l=last" [formGroupName]="i">
+                    <ng-template matStepLabel>
+                        {{stage?.value?.stageName}}
+                    </ng-template>
+
+                    <div class="mt-1 font-bold ">
+
+                        <div class="pt-1 ">
+                            <div class="bg-primary-50 rounded-xl">
+                                <div class="p-4 grid grid-cols-2 gap-8">
+                                    <div>
+                                        <mat-form-field class="w-full text-accent-600">
+                                            <mat-label class="text-[#282B66]">Stage Number</mat-label>
+                                            <input id="stageNo" matInput formControlName="stageNumber"
+                                                [readonly]="disabled" placeholder="Enter Number Stage Number" />
+                                        </mat-form-field>
+
+                                        <mat-form-field class="w-full text-accent-600">
+                                            <mat-label class="text-[#282B66]">Number Of Allowed
+                                                Submissions</mat-label>
+                                            <input id="numberOfAllowedSubmissions" matInput
+                                                formControlName="numberOfAllowedSubmissions"
+                                                placeholder="Enter Number Of Allowed Submissions" />
+                                            <mat-error *ngIf="stage?.get('numberOfAllowedSubmissions')?.invalid ">
+                                                Number Of Allowed Submissions is required
+                                            </mat-error>
+                                        </mat-form-field>
+
+                                        <mat-form-field *ngIf="this.contestBasicInfo?.isRysiPartnerContest" class="w-full text-accent-600">
+                                            <mat-label class="text-[#282B66]">Number Of Minimum Male Candidates</mat-label>
+                                            <input id="numberOfAllowedSubmissions" matInput
+                                                formControlName="numberOfMinMaleCandidates"
+                                                placeholder="Enter Number Of Minimum Male Candidates" />
+                                            <mat-error *ngIf="stage?.get('numberOfAllowedSubmissions')?.invalid ">
+                                                Number Of Minimum Male Candidates is required
+                                            </mat-error>
+                                        </mat-form-field>
+
+                                        <mat-form-field *ngIf="this.contestBasicInfo?.isRysiPartnerContest" class="w-full text-accent-600">
+                                            <mat-label class="text-[#282B66]">Number Of Minimum Female Candidates</mat-label>
+                                            <input id="numberOfAllowedSubmissions" matInput
+                                                formControlName="numberOfMinFemaleCandidates"
+                                                placeholder="Enter Number Of Minimum Female Candidates" />
+                                            <mat-error *ngIf="stage?.get('numberOfAllowedSubmissions')?.invalid ">
+                                                Number Of Minimum Female Candidates is required
+                                            </mat-error>
+                                        </mat-form-field>
+
+                                        <mat-form-field *ngIf="stage?.get('isNominationAllowed')?.value" class="w-full text-accent-600">
+                                            <mat-label class="text-[#282B66]">Maximum Nomination</mat-label>
+                                            <input id="title" [min]="1" [max]="1000" matInput
+                                                formControlName="maximumNomination" type="number"
+                                                placeholder="Enter stage name" />
+                                            <mat-error *ngIf="stage?.get('maximumNomination')?.invalid ">
+                                                Maximum Nomination is required
+                                            </mat-error>
+                                        </mat-form-field>
+
+                                        <!-- Upload Student Certificate Button -->
+                                        <div class="text-center  mt-4">
+                                            <button 
+                                                (click)="openUploadCertificateDialog()"
+                                                class="bg-primary text-white px-4 py-2 rounded-2xl"
+                                                >
+                                                Upload Template Certificate
+                                            </button>
+                                        </div>
+
+                                        <div  class="text-center mt-4">
+                                            <button 
+                                                (click)="addCustomCertificateDialog()"
+                                                class="bg-primary text-white px-4 py-2 rounded-2xl"
+                                                >
+                                                Custom Certificate
+                                            </button>
+                                        </div>
+
+                                        <mat-form-field class="w-full text-accent-600" floatLabel="always"
+                                            appearance="none">
+                                            <mat-slide-toggle class="w-full" color="primary"
+                                                formControlName="isAllStepsMandatory" (change)="isAllStepsMandatory($event, i)">Are all steps mandatory?
+                                            </mat-slide-toggle>
+                                            <input matInput hidden>
+                                        </mat-form-field>
+                                    </div>
+
+                                    <div>
+                                        <mat-form-field class="w-full text-accent-600">
+                                            <mat-label class="text-[#282B66]">Stage Name</mat-label>
+                                            <input id="title" matInput formControlName="stageName" type="text"
+                                                placeholder="Enter stage name" />
+                                            <mat-error *ngIf="stage?.get('stageName')?.invalid ">
+                                                Stage Name is required
+                                            </mat-error>
+                                        </mat-form-field>
+
+                                        <mat-form-field class="w-full text-accent-600">
+                                            <mat-label class="text-[#282B66]">Time Period</mat-label>
+                                            <mat-date-range-input [rangePicker]="picker">
+                                                <input matStartDate placeholder="Select Time Start Date" required
+                                                    formControlName="startDate">
+                                                <input matEndDate placeholder="Select Contest End Date" required
+                                                    formControlName="endDate">
+                                            </mat-date-range-input>
+
+                                            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                                            <mat-date-range-picker #picker></mat-date-range-picker>
+
+                                            <mat-error
+                                                *ngIf="stage?.controls?.startDate?.hasError('matStartDateInvalid')">Contest
+                                                start date Invalid</mat-error>
+                                            <mat-error
+                                                *ngIf="stage?.controls?.endDate?.hasError('matEndDateInvalid')">Contest
+                                                end date Invalid</mat-error>
+
+                                            <mat-error *ngIf="stage?.controls?.startDate?.errors?.required">Contest
+                                                Start
+                                                Date
+                                                Required</mat-error>
+                                            <mat-error *ngIf="stage?.controls?.endDate?.errors?.required">Contest End
+                                                Date
+                                                Required</mat-error>
+                                        </mat-form-field>
+
+                                        <mat-form-field  *ngIf="stage?.get('isNominationAllowed')?.value"  class="w-full text-accent-600">
+                                            <mat-label>Nomination Start Date</mat-label>
+                                            <input placeholder="Select Time Start Date" required formControlName="nominationStartDate" matInput
+                                                [matDatepicker]="picker">
+                                            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                                            <mat-datepicker #picker></mat-datepicker>
+                                        </mat-form-field>
+
+                                        <mat-form-field  *ngIf="stage?.get('isNominationAllowed')?.value"  class="w-full text-accent-600">
+                                            <mat-label>Nomination End Date</mat-label>
+                                            <input placeholder="Select Time End Date" required formControlName="nominationEndDate" matInput
+                                                [matDatepicker]="picker1">
+                                            <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+                                            <mat-datepicker #picker1></mat-datepicker>
+                                        </mat-form-field>
+
+                                        <mat-form-field  class="w-full text-accent-600">
+                                            <mat-label>Result Award Date</mat-label>
+                                            <input placeholder="Select Result Date" required formControlName="resultAwardDate" matInput
+                                                [matDatepicker]="picker4">
+                                            <mat-datepicker-toggle matSuffix [for]="picker4"></mat-datepicker-toggle>
+                                            <mat-datepicker #picker4></mat-datepicker>
+                                        </mat-form-field>
+
+                                        <mat-form-field class="w-full text-accent-600">
+                                             <mat-label>Choose Rubrics</mat-label>
+                                             <mat-select formControlName="chosenRubric" required>
+                                                 <mat-option [value]="null" disabled>Select</mat-option>
+                                                 <mat-option *ngFor="let opt of rubricOptions" [value]="opt.value">{{ opt.label }}</mat-option>
+                                             </mat-select>
+                                             <mat-error *ngIf="stage?.get('chosenRubric')?.hasError('required')">
+                                                 Select a Rubrics
+                                             </mat-error>
+                                         </mat-form-field>
+                                    </div>
+
+
+                                </div>
+
+
+                                <div class="p-4 grid grid-cols-1 gap-8 -mt-12">
+                                    <div>
+                                        <mat-form-field class="w-full text-accent-600" floatLabel="always"
+                                            appearance="none">
+                                            <mat-slide-toggle class="w-full" [color]="'primary'"
+                                                formControlName="isNominationAllowed" (change)="toggle($event)">Nomination?
+                                            </mat-slide-toggle>
+                                            <input matInput hidden>
+                                        </mat-form-field>
+
+                                        <mat-form-field class="w-full text-accent-600 -mt-4" floatLabel="always"
+                                            appearance="none">
+                                            <mat-slide-toggle class="w-full" [color]="'primary'"
+                                                formControlName="isDependentOtherStage">Is this stage dependant on
+                                                the previous stages?
+                                            </mat-slide-toggle>
+                                            <input matInput hidden>
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-2 flex flex-row-reverse">
+                            <button (click)="removeStage(i)" type="button" mat-flat-button color="warn">Remove</button>
+                        </div>
+                    </div>
+                </mat-step>
+
+            </mat-stepper>
+        </div>
+        <div class="col-span-1">
+            <button class="mt-2" (click)="addNewStage()">
+                <mat-icon matTooltip="Add New Assignment"
+                    class="ml-4 icon-size-8 text-primary-600 cursor-pointer plusIcon active:text-primary-500"
+                    [svgIcon]="'heroicons_solid:plus-circle'">
+                </mat-icon>
+            </button>
+        </div>
+    </div>
+</form>
+
+<div class="flex justify-between pt-3">
+    <button matStepperPrevious mat-stroked-button type="button"
+        class="bg-primary text-white  arrowBtnBack disabled:bg-primary-100">
+        <mat-icon class="mr-2 icon-size-5  text-white arrowIconBack"
+            [svgIcon]="'heroicons_solid:arrow-sm-left'"></mat-icon>
+        Back
+    </button>
+    <button (click)='onClickNext()' matStepperNext mat-stroked-button type="button" [disabled]="stageInfoForm.invalid"
+        class="bg-primary text-white arrowBtn disabled:bg-primary-100">
+        Next
+        <mat-icon class="ml-2 icon-size-5  text-white arrowIcon"
+            [svgIcon]="'heroicons_solid:arrow-sm-right'"></mat-icon>
+    </button>
+</div>

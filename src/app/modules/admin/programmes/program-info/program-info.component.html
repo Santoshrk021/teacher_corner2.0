@@ -1,0 +1,52 @@
+<div class="relative  h-[85vh] w-[75vw] ">
+    <button mat-dialog-close class=" absolute top-0 right-0 z-40">
+        <mat-icon class=" hover:scale-110 transition duration-5000 transform" (click)="close()"
+            svgIcon="mat_outline:close">
+        </mat-icon>
+    </button>
+    <mat-stepper [linear]="true" #stepper class="bg-transparent  w-full  h-full">
+        <!-- <mat-step label="Institution"> -->
+        <mat-step>
+            <ng-template matStepLabel>Institution</ng-template>
+            <ng-template matStepContent>
+                <app-institution-selection [stepper]="stepper" [stepperData]="stepperData"
+                         [addNewProgramFlag]="addNewProgramFlag"></app-institution-selection>
+            </ng-template>
+        </mat-step>
+        <!-- <mat-step label="Create Programme"> -->
+        <mat-step>
+            <ng-template matStepLabel>Create Programme</ng-template>
+            <ng-template matStepContent>
+                <app-add-new-programme [stepper]="stepper" [stepperData]="stepperData"
+                    [addNewProgramFlag]="addNewProgramFlag">
+                </app-add-new-programme>
+            </ng-template>
+        </mat-step>
+        <!-- <mat-step label="Select Learning Units"> -->
+        <mat-step>
+            <ng-template matStepLabel>Select Learning Units</ng-template>
+            <ng-template matStepContent>
+                <app-learning-list [stepper]="stepper" [stepperData]="stepperData"
+                    [addNewProgramFlag]="addNewProgramFlag">
+                </app-learning-list>
+            </ng-template>
+        </mat-step>
+        <!-- <mat-step label="Select Assignments"> -->
+        <mat-step>
+            <ng-template matStepLabel>Select Assignments</ng-template>
+            <ng-template matStepContent>
+                <app-assignment-list [stepper]="stepper" [stepperData]="stepperData"
+                    [addNewProgramFlag]="addNewProgramFlag">
+                </app-assignment-list>
+            </ng-template>
+        </mat-step>
+        <!-- <mat-step label="Review"> -->
+        <mat-step>
+            <ng-template matStepLabel>Review</ng-template>
+            <ng-template matStepContent>
+                    <app-review-programme [stepper]="stepper" [stepperData]="stepperData"
+                        [addNewProgramFlag]="addNewProgramFlag"></app-review-programme>
+            </ng-template>
+        </mat-step>
+    </mat-stepper>
+</div>

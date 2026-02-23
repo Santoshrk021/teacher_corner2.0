@@ -1,0 +1,11 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+/* Ensure the dialog takes full height and allows scrolling */
+:host ::ng-deep app-quiz-case-study {
+  display: block;
+  height: 100%;
+  overflow: auto;
+}

@@ -1,0 +1,51 @@
+<div class="w-full h-full overflow-y-auto  py-4">
+    <div class="mx-4 flex ">
+        <div>
+            <button [matMenuTriggerFor]="menu" matTooltipPosition="above" matTooltip="Quiz Assignment Wizard"
+                mat-stroked-button class="quizCreateBtn text-primary bg-gray-50">
+                Create New Assignment
+                <mat-icon class="ml-4 icon-size-8 text-primary-600 cursor-pointer plusIcon active:text-primary-500"
+                    [svgIcon]="'heroicons_solid:plus-circle'">
+                </mat-icon>
+            </button>
+
+            <mat-menu #menu="matMenu" xPosition="before">
+                <button mat-menu-item (click)="createAssignment('quiz')">
+                    <mat-icon class="text-primary-700" svgIcon="mat_outline:ballot"></mat-icon>
+                    <span class="text-primary-700 font-medium">Quiz Type</span>
+                </button>
+                <button mat-menu-item (click)="createAssignment('upload')">
+                    <mat-icon class="text-primary-700" svgIcon="mat_outline:upload_file"></mat-icon>
+                    <span class="text-primary-700 font-medium">Upload Type</span>
+                </button>
+                <button mat-menu-item (click)="createAssignment('form')">
+                    <mat-icon class="text-primary-700" svgIcon="mat_outline:description"></mat-icon>
+                    <span class="text-primary-700 font-medium">Form Type</span>
+                </button>
+                <button mat-menu-item (click)="createAssignment('textblock')">
+                    <mat-icon class="text-primary-700" svgIcon="mat_outline:description"></mat-icon>
+                    <span class="text-primary-700 font-medium">Textblock Type</span>
+                </button>
+            </mat-menu>
+        </div>
+
+        <div class="w-full relative">
+            <button mat-raised-button color="primary" class="w-max absolute right-2" (click)="goToTrash()">
+                <mat-icon class="mr-1 " svgIcon="heroicons_outline:trash"></mat-icon>Trash
+            </button>
+        </div>
+    </div>
+
+    <div class="w-full ">
+        <app-all-assignments-table></app-all-assignments-table>
+    </div>
+
+    <fuse-drawer class="w-screen min-w-screen" [opened]="drawerOpened" fixed [mode]="'over'" [position]="'left'">
+        <div>
+            <ng-container *ngComponentOutlet="component"></ng-container>
+        </div>
+    </fuse-drawer>
+</div>
+
+
+

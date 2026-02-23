@@ -1,0 +1,405 @@
+<div>
+    <div class="md:grid md:grid-cols-3 sm:grid sm:grid-cols-1  sm:h-64 -mt-4 w-full">
+        <div class="sm:border-r  border-primary-300">
+            <!---------------------------------LU Guide file Upload----------------------------------------------->
+            <div class="">
+                <mat-label class="text-accent-600 text-sm font-medium relative right-2">Learning Unit
+                    Guide</mat-label>
+                <div class="grid grid-cols-2 gap-27 mt-1">
+                    <div  [title]="trashUINotEditable?matTooltipMsg:''"
+                        class="flex flex-col bg-grey-lighter">
+                        <label matRipple class=" border border-primary relative w-full right-2
+                        flex flex-col items-center  rounded-lg p-2  cursor-pointer
+                         rounded-r-none bg-slate-100 text-primary-600"
+                            [ngClass]="trashUINotEditable?'':' hover:bg-slate-200'">
+
+
+                            <span class=" md:mx-2 absolute left-0 sm:mr-2 mt-[-2px] ">
+                                <mat-icon class="text-primary" svgIcon="heroicons_outline:arrow-circle-up"></mat-icon>
+                            </span>
+
+                            <div class="flex items-center ">
+                                <span class=" md:mr-2 md:text-base relative sm:text-[10px] sm:ml-6">
+                                    {{externalResourcePath.guidePath?'Re-Upload':'Upload'}}
+                                </span>
+                            </div>
+                            <!-- <input [disabled]="trashUINotEditable==true?true:false" type='file' class="hidden"
+                                accept=".pdf" (change)="selectFile($event,'guide')" #guideRef /> -->
+                        </label>
+
+                    </div>
+
+                    <div class="">
+                        <div  *ngIf="externalResourcePath?.guidePath" matRipple class="w-3/5 md:ml-1 sm:mr-1 p-2 border border-primary-600 rounded-lg rounded-l-none
+                        bg-primary-600 hover:bg-primary text-white
+                        active:bg-primary-800 cursor-pointer relative md:left-1 sm:left-0 md:text-base sm:text-[10px]">
+                            <!-- <a target="_blank" [href]="externalResourcePath?.guidePath| getDownloadURL"
+                                class="w-full h-full flex items-center justify-center">
+                                
+                            </a> -->
+                            <p>View</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Upload Progress -->
+                <div *ngIf="uploadProgress.guide!=0 && uploadProgress.guide <100;else succfullyUpladedGuide"
+                    class="grid grid-cols-1 gap-1 justify-left mt-3 right-2 w-80">
+                    <mat-progress-bar mode="buffer" [value]="uploadProgress.guide" class="bg-blue-300">
+                    </mat-progress-bar>
+                    <p class="mb-3 font-normal">
+                        {{uploadProgress.guide}}% uploaded</p>
+                </div>
+
+                <ng-template #succfullyUpladedGuide>
+                    <p *ngIf="uploadProgress.guide==100" class="mb-3" class="text-green-500">
+                        Successfully Uploaded</p>
+                </ng-template>
+            </div>
+
+
+            <!------------------------------------------------------------------------------------->
+            <!-----------------------------------LU observation sheet---------------------------------------------->
+            <div class="mt-3">
+                <mat-label class=" text-accent-600 text-sm font-medium relative right-2">Lerning Unit Observation
+                    sheet</mat-label>
+                <div class="grid grid-cols-2 gap-27 mt-1">
+                    <div class="flex flex-col bg-grey-lighter" [title]="trashUINotEditable?matTooltipMsg:''">
+                        <label matRipple class=" border border-primary relative w-full right-2
+                         flex flex-col items-center  rounded-lg p-2  cursor-pointer
+                          rounded-r-none bg-slate-100 text-primary-600"
+                            [ngClass]="trashUINotEditable?'':' hover:bg-slate-200'">
+                            <span class=" md:mx-2 absolute left-0 sm:mr-2 mt-[-2px] ">
+                                <mat-icon class="text-primary" svgIcon="heroicons_outline:arrow-circle-up"></mat-icon>
+                            </span>
+                            <div class="flex items-center ">
+                                <span class=" md:mr-2 md:text-base relative sm:text-[10px] sm:ml-5">
+                                    {{externalResourcePath.observationPath?'Re-Upload':'Upload'}}</span>
+                            </div>
+                            <input [disabled]="trashUINotEditable==true?true:false" type='file' class="hidden"
+                                accept=".pdf" (change)="selectFile($event,'observationSheet')" #observationSheetRef />
+                        </label>
+                    </div>
+                    <div class="">
+                        <div *ngIf="externalResourcePath?.observationPath" matRipple class="w-3/5 md:ml-1 sm:mr-1 p-2 border border-primary-600 rounded-lg rounded-l-none
+                        bg-primary-600 hover:bg-primary text-white
+                        active:bg-primary-800 cursor-pointer relative md:left-1 sm:left-0 md:text-base sm:text-[10px]">
+                            <a target="_blank" [href]="externalResourcePath?.observationPath| getDownloadURL"
+                                class="w-full h-full flex items-center justify-center">
+                                <p>View</p>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Upload Progress -->
+                <div *ngIf="uploadProgress.observationSheet!=0 && uploadProgress.observationSheet <100;else succfullyUpladedObs"
+                    class="grid grid-cols-1 gap-1 justify-left mt-3 right-2 w-80">
+                    <mat-progress-bar mode="buffer" [value]="uploadProgress.observationSheet" class="bg-blue-300">
+                    </mat-progress-bar>
+                    <p class="mb-3 font-normal">
+                        {{uploadProgress.observationSheet}}% uploaded</p>
+                </div>
+
+                <ng-template #succfullyUpladedObs>
+                    <p *ngIf="uploadProgress.observationSheet==100" class="mb-3" class="text-green-500">
+                        Successfully Uploaded</p>
+                </ng-template>
+            </div>
+            <!------------------------------------------------------------------------------>
+            <!-------------------------------LU Materials------------------------------------------------>
+            <div class="mt-3">
+                <mat-label class="text-accent-600 text-sm font-medium relative right-2">
+                    Lerning Unit Materials </mat-label>
+                <div class="grid grid-cols-2 gap-27 mt-1">
+                    <div class="flex flex-col bg-grey-lighter" [title]="trashUINotEditable?matTooltipMsg:''">
+                        <label matRipple class=" border border-primary relative w-full right-2
+                    flex flex-col items-center  rounded-lg p-2  cursor-pointer
+                     rounded-r-none bg-slate-100 text-primary-600"
+                            [ngClass]="trashUINotEditable?'':' hover:bg-slate-200'">
+                            <span class=" md:mx-2 absolute left-0 sm:mr-2 mt-[-2px] ">
+                                <mat-icon class="text-primary" svgIcon="heroicons_outline:arrow-circle-up"></mat-icon>
+                            </span>
+                            <div class="flex items-center ">
+                                <span class=" md:mr-2 md:text-base relative sm:text-[10px] sm:ml-5">
+                                    {{externalResourcePath.materialPath?'Re-Upload':'Upload'}}</span>
+                            </div>
+                            <input [disabled]="trashUINotEditable==true?true:false" type='file' class="hidden"
+                                accept=".pdf" (change)="selectFile($event,'material')" #materialRef />
+                        </label>
+                    </div>
+                    <div class="">
+                        <div *ngIf="externalResourcePath?.materialPath" matRipple class="w-3/5 md:ml-1 sm:mr-1 p-2 border border-primary-600 rounded-lg rounded-l-none
+                   bg-primary-600 hover:bg-primary text-white
+                   active:bg-primary-800 cursor-pointer relative md:left-1 sm:left-0 md:text-base sm:text-[10px]">
+                            <a target="_blank" [href]="externalResourcePath?.materialPath| getDownloadURL"
+                                class="w-full h-full flex items-center justify-center">
+                                <p>View</p>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Upload Progress -->
+                <div *ngIf="uploadProgress.material!=0 && uploadProgress.material <100;else succfullyUpladedMat"
+                    class="grid grid-cols-1 gap-1 justify-left mt-3 right-2 w-80">
+                    <mat-progress-bar mode="buffer" [value]="uploadProgress.material" class="bg-blue-300">
+                    </mat-progress-bar>
+                    <p class="mb-3 font-normal">
+                        {{uploadProgress.material}}% uploaded</p>
+                </div>
+
+                <ng-template #succfullyUpladedMat>
+                    <p *ngIf="uploadProgress.material==100" class="mb-3" class="text-green-500">
+                        Successfully Uploaded</p>
+                </ng-template>
+            </div>
+            <div class="mt-3">
+                <mat-label class="text-accent-600 text-sm font-medium relative right-2">Lerning Unit Video
+                </mat-label>
+                <div class="grid grid-cols-2 gap-27 mt-1">
+                    <div [title]="trashUINotEditable?matTooltipMsg:''" class="flex flex-col bg-grey-lighter">
+                        <label matRipple class=" border border-primary relative w-full right-2
+                    flex flex-col items-center  rounded-lg p-2  cursor-pointer
+                     rounded-r-none bg-slate-100 text-primary-600"
+                            [ngClass]="trashUINotEditable?'':' hover:bg-slate-200'">
+                            <input [disabled]="trashUINotEditable" class="w-full"
+                                [(ngModel)]="externalResourcePath.videoUrl" type="text"
+                                (ngModelChange)="onInputChange($event, 'videoUrl')">
+                        </label>
+                    </div>
+                    <div class="">
+                        <div *ngIf="externalResourcePath?.videoUrl" matRipple class="w-3/5 md:ml-1 sm:mr-1 p-2 border border-primary-600 rounded-lg rounded-l-none
+                   bg-primary-600 hover:bg-primary text-white
+                   active:bg-primary-800 cursor-pointer relative md:left-1 sm:left-0 md:text-base sm:text-[10px]">
+                            <a target="_blank" [href]="externalResourcePath?.videoUrl"
+                                class="w-full h-full flex items-center justify-center">
+                                <p>View</p>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-------------------------------------------------------------------------->
+            <!---------------------------------LU view------------------------------------------->
+            <div class="mt-3">
+                <mat-label class="text-accent-600 text-sm font-medium right-2">Lerning Unit Template
+                    (Optional)</mat-label>
+                <div class="grid grid-cols-2 gap-27 mt-1">
+                    <div class="flex flex-col bg-grey-lighter" [title]="trashUINotEditable?matTooltipMsg:''">
+                        <label matRipple class=" border border-primary relative w-full right-2
+                         flex flex-col items-center  rounded-lg p-2  cursor-pointer
+                          rounded-r-none bg-slate-100 text-primary-600"
+                            [ngClass]="trashUINotEditable?'':' hover:bg-slate-200'">
+                            <span class=" md:mx-2 absolute left-0 sm:mr-2 mt-[-2px] ">
+                                <mat-icon class="text-primary" svgIcon="heroicons_outline:arrow-circle-up"></mat-icon>
+                            </span>
+                            <div class="flex items-center ">
+                                <span class=" md:mr-2 md:text-base relative sm:text-[10px] sm:ml-5">
+                                    {{externalResourcePath.templatePath?'Re-Upload':'Upload'}}</span>
+                            </div>
+                            <input [disabled]="trashUINotEditable==true?true:false" type='file' class="hidden"
+                                accept=".pdf" (change)="selectFile($event,'template')" #templateRef />
+                        </label>
+
+                    </div>
+                    <div class="">
+                        <div *ngIf="externalResourcePath?.templatePath" matRipple class="w-3/5 md:ml-1 sm:mr-1 p-2 border border-primary-600 rounded-lg rounded-l-none
+                        bg-primary-600 hover:bg-primary text-white
+                        active:bg-primary-800 cursor-pointer relative md:left-1 sm:left-0 md:text-base sm:text-[10px]">
+                            <a target="_blank" [href]="externalResourcePath?.templatePath| getDownloadURL"
+                                class="w-full h-full flex items-center justify-center">
+                                <p>View</p>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Upload Progress -->
+                <div *ngIf="uploadProgress.template!=0 && uploadProgress.template <100;else succfullyUpladedTemp"
+                    class="grid grid-cols-1 gap-1 justify-left mt-3 right-2 w-80">
+                    <mat-progress-bar mode="buffer" [value]="uploadProgress.template" class="bg-blue-300">
+                    </mat-progress-bar>
+                    <p class="mb-3 font-normal">
+                        {{uploadProgress.template}}% uploaded</p>
+                </div>
+
+                <ng-template #succfullyUpladedTemp>
+                    <p *ngIf="uploadProgress.template==100" class="mb-3" class="text-green-500">
+                        Successfully Uploaded</p>
+                </ng-template>
+
+            </div>
+        </div>
+        <div class="sm:border-r  border-primary-300 md:pl-6 sm:pl-0">
+            <!-------------------------------topic file -------------------------------------------->
+            <div>
+                <mat-label class="text-accent-600 text-sm font-medium relative right-2">Topic
+                    Guide</mat-label>
+                <div class="grid grid-cols-2 gap-27 mt-1">
+                    <div class="flex flex-col bg-grey-lighter" [title]="trashUINotEditable?matTooltipMsg:''">
+                        <label matRipple class=" border border-primary relative w-full right-2
+                         flex flex-col items-center  rounded-lg p-2  cursor-pointer
+                          rounded-r-none bg-slate-100 text-primary-600"
+                            [ngClass]="trashUINotEditable?'':' hover:bg-slate-200'">
+                            <span class=" md:mx-2 absolute left-0 sm:mr-2 mt-[-2px] ">
+                                <mat-icon class="text-primary" svgIcon="heroicons_outline:arrow-circle-up"></mat-icon>
+                            </span>
+                            <div class="flex items-center ">
+                                <span class=" md:mr-2 md:text-base relative sm:text-[10px] sm:ml-5">
+                                    {{externalResourcePath.topicGuidePath?'Re-Upload':'Upload'}}</span>
+                            </div>
+                            <input [disabled]="trashUINotEditable==true?true:false" type='file' class="hidden"
+                                accept=".pdf" (change)="selectFile($event,'topicGuide')" #topicGuideRef />
+                        </label>
+                    </div>
+                    <div class="">
+                        <div *ngIf="externalResourcePath?.topicGuidePath" matRipple class="w-3/5 md:ml-1 sm:mr-1 p-2 border border-primary-600 rounded-lg rounded-l-none
+                        bg-primary-600 hover:bg-primary text-white
+                        active:bg-primary-800 cursor-pointer relative md:left-1 sm:left-0 md:text-base sm:text-[10px]">
+                            <a target="_blank" [href]="externalResourcePath?.topicGuidePath| getDownloadURL"
+                                class="w-full h-full flex items-center justify-center">
+                                <p>View</p>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Upload Progress -->
+                <div *ngIf="uploadProgress.topicGuide!=0 && uploadProgress.topicGuide <100;else succfullyUpladedTopicGuide"
+                    class="grid grid-cols-1 gap-1 justify-left mt-3 right-2 w-80">
+                    <mat-progress-bar mode="buffer" [value]="uploadProgress.topicGuide" class="bg-blue-300">
+                    </mat-progress-bar>
+                    <p class="mb-3 font-normal">
+                        {{uploadProgress.topicGuide}}% uploaded</p>
+                </div>
+
+                <ng-template #succfullyUpladedTopicGuide>
+                    <p *ngIf="uploadProgress.topicGuide==100" class="mb-3" class="text-green-500">
+                        Successfully Uploaded</p>
+                </ng-template>
+            </div>
+            <!----------------------------------------------------------------------------->
+
+            <!-----------------------------topic video--------------------------------------->
+            <div>
+                <mat-label class="text-accent-600 text-sm font-medium relative right-2">Topic
+                    Video</mat-label>
+                <div class="grid grid-cols-2 gap-27 mt-1">
+                    <div class="flex flex-col bg-grey-lighter" [title]="trashUINotEditable?matTooltipMsg:''">
+                        <label matRipple class=" border border-primary relative w-full right-2
+                    flex flex-col items-center  rounded-lg p-2  cursor-pointer
+                     rounded-r-none bg-slate-100 text-primary-600"
+                            [ngClass]="trashUINotEditable?'':' hover:bg-slate-200'">
+                            <input [readonly]="trashUINotEditable==true?true:false" class="w-full"
+                                [(ngModel)]="externalResourcePath.topicVideoUrl"
+                                (ngModelChange)="onInputChange($event, 'topicVideoUrl')">
+                        </label>
+                    </div>
+                    <div class="">
+                        <div *ngIf="externalResourcePath?.topicVideoUrl" matRipple class="w-3/5 md:ml-1 sm:mr-1 p-2 border border-primary-600 rounded-lg rounded-l-none
+                   bg-primary-600 hover:bg-primary text-white
+                   active:bg-primary-800 cursor-pointer relative md:left-1 sm:left-0 md:text-base sm:text-[10px]">
+                            <a target="_blank" [href]="externalResourcePath?.topicVideoUrl"
+                                class="w-full h-full flex items-center justify-center">
+                                <p>View</p>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!------------------------------------------------------------------------->
+        <!--------------------------------------------------------------------------------->
+        <div class=" border-primary-300  md:pl-6 sm:pl-0">
+            <div>
+                <mat-label class="text-accent-600 text-sm font-medium relative right-2">Var
+                    Guide(pdf)</mat-label>
+                <div class="grid grid-cols-2 gap-27 mt-1">
+                    <div class="flex flex-col bg-grey-lighter" [title]="trashUINotEditable?matTooltipMsg:''">
+
+                        <label matRipple class=" border border-primary relative w-full right-2
+                         flex flex-col items-center  rounded-lg p-2  cursor-pointer
+                          rounded-r-none bg-slate-100 text-primary-600"
+                            [ngClass]="trashUINotEditable?'':' hover:bg-slate-200'">
+                            <span class=" md:mx-2 absolute left-0 sm:mr-2 mt-[-2px] ">
+                                <mat-icon class="text-primary" svgIcon="heroicons_outline:arrow-circle-up"></mat-icon>
+                            </span>
+                            <div class="flex items-center ">
+
+                                <span class=" md:mr-2 md:text-base relative sm:text-[10px] sm:ml-5">
+                                    {{externalResourcePath.varGuidePath?'Re-Upload':'Upload'}}</span>
+                            </div>
+                            <input [disabled]="trashUINotEditable==true?true:false" type='file' class="hidden"
+                                (change)="selectFile($event,'varGuide')" accept=".pdf" #varGuideRef />
+                        </label>
+
+                    </div>
+                    <div class="">
+                        <div *ngIf="externalResourcePath?.varGuidePath" matRipple class="w-3/5 md:ml-1 sm:mr-1 p-2 border border-primary-600 rounded-lg rounded-l-none
+                        bg-primary-600 hover:bg-primary text-white
+                        active:bg-primary-800 cursor-pointer relative md:left-1 sm:left-0 md:text-base sm:text-[10px]">
+                            <a target="_blank" [href]="externalResourcePath?.varGuidePath| getDownloadURL"
+                                class="w-full h-full flex items-center justify-center">
+                                <p>View</p>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Upload Progress -->
+                <div *ngIf="uploadProgress.varGuide!=0 && uploadProgress.varGuide <100;else succfullyUpladedVar"
+                    class="grid grid-cols-1 gap-1 justify-left mt-3 right-2 w-80">
+                    <mat-progress-bar mode="buffer" [value]="uploadProgress.guide" class="bg-blue-300">
+                    </mat-progress-bar>
+                    <p class="mb-3 font-normal">
+                        {{uploadProgress.varGuide}}% uploaded</p>
+                </div>
+
+                <ng-template #succfullyUpladedVar>
+                    <p *ngIf="uploadProgress.varGuide==100" class="mb-3" class="text-green-500">
+                        Successfully Uploaded</p>
+                </ng-template>
+            </div>
+            <!--  Var Video -->
+
+            <div class="mt-3">
+                <mat-label class="text-accent-600 text-sm font-medium relative right-2">Var
+                    video</mat-label>
+                <div class="grid grid-cols-2 gap-27 mt-1">
+                    <div class="flex flex-col bg-grey-lighter" [title]="trashUINotEditable?matTooltipMsg:''">
+
+                        <label matRipple class=" border border-primary relative w-full right-2
+                         flex flex-col items-center  rounded-lg p-2  cursor-pointer
+                          rounded-r-none bg-slate-100 text-primary-600"
+                            [ngClass]="trashUINotEditable?'':' hover:bg-slate-200'">
+                            <input [readonly]="trashUINotEditable==true?true:false" class="" matInput
+                                [(ngModel)]="externalResourcePath.varVideoUrl"
+                                (ngModelChange)="onInputChange($event, 'varVideoUrl')">
+                        </label>
+
+                    </div>
+                    <div class="">
+                        <div *ngIf="externalResourcePath?.varVideoUrl" matRipple class="w-3/5 md:ml-1 sm:mr-1 p-2 border border-primary-600 rounded-lg rounded-l-none
+                        bg-primary-600 hover:bg-primary text-white
+                        active:bg-primary-800 cursor-pointer relative md:left-1 sm:left-0 md:text-base sm:text-[10px]">
+                            <a target="_blank" [href]="externalResourcePath?.varVideoUrl"
+                                class="w-full h-full flex items-center justify-center">
+                                <p>View</p>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- <div class="sm:px-6 w-full text-center absolute  h-full mt-2">
+        <button type="submit" mat-raised-button color="primary" class=" relative px-2 leading-6  mt-60">
+            save
+        </button>
+    </div> -->
+    <div [ngClass]="trashUINotEditable==true?'hidden':''" class="sm:px-6 w-full text-center mt-[90px] -mb-5">
+        <button type="button" (click)="updateDB(false)" mat-raised-button color="primary" class=" px-2 leading-6 ml-18 "
+            [disabled]="!enableForm">
+            Save
+        </button>
+    </div>
+</div>

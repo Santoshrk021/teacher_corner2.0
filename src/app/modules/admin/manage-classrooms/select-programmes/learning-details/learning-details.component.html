@@ -1,0 +1,113 @@
+<div class="m-auto min-h-max md:w-[30vw] xs:w-[45vw] md:px-8 xs:px-0 relative ">
+    <div class="">
+        <div class="absolute -top-4 -right-2">
+            <button mat-dialog-close class="">
+                <mat-icon class=" hover:scale-110 transition duration-5000 transform" svgIcon="mat_outline:close">
+                </mat-icon>
+            </button>
+        </div>
+        <form *ngIf="workflowIdsForm ;else showloading" class="rounded-2xl overflow-hidden"
+            [formGroup]="workflowIdsForm" (ngSubmit)="onSubmit()">
+            <div class="flex flex-row items-center justify-center w-full">
+                <div class="flex flex-row justify-center w-full">
+                    <p class="text-2xl font-semibold mb-2 text-center text-accent">{{data.title}}
+                    </p>
+                </div>
+            </div>
+            <div class="h-[62vh] overflow-auto">
+                <div class="pt-1">
+                    <div class="bg-primary-50 rounded-xl">
+                        <div class="flex w-full justify-center items-center py-2">
+                            <mat-slide-toggle class="" [color]="'primary'" formControlName="sequentiallyLocked"
+                                (change)="onSequntialLockToggleChange($event)">
+                                Is sequentially locked?
+                            </mat-slide-toggle>
+                        </div>
+
+                        <div *ngIf="currentSelectedProgram?.learningUnitsIds" class="p-4" formArrayName="workflowIds">
+                            <mat-tab-group>
+                                <mat-tab
+                                    *ngFor="let learningUnit of currentSelectedProgram?.learningUnitsIds; let i = index">
+                                    <ng-template class="w-full flex justify-center" matTabLabel>
+                                        <span class="font-semibold">For {{learningUnitNames?.[i]}}</span>
+                                    </ng-template>
+
+                                    <ng-template matTabContent>
+                                        <div [formGroupName]="i">
+                                            <div class=""
+                                                [appCustomTooltip]="workflowIdsForm.get('sequentiallyLocked').value ? 'Date unlock disabled as sequential lock is enabled' : ''">
+                                                <!-- [matTooltip]="workflowIdsForm.get('sequentiallyLocked').value ? 'Date unlock disabled as sequential lock is enabled' : ''"> -->
+                                                <div class="w-full">
+                                                    <mat-form-field floatLabel="always" class="w-full text-accent-600">
+                                                        <mat-label class="text-[#282B66]">Lock At Date</mat-label>
+                                                        <!-- <input #ref matInput [ngxMatDatetimePicker]="pickerLockAt" (dateChange)="onDateChange($event)"
+                                                            placeholder="Choose date and time" formControlName="lockAt" [value]="currentProgramObj[currentSelectedProgram.docId].workflowIds[i].lockAt "
+                                                            [min]="currentDate">
+                                                        <mat-datepicker-toggle matSuffix
+                                                            [for]="pickerLockAt"></mat-datepicker-toggle>
+                                                        <ngx-mat-datetime-picker #pickerLockAt [stepHour]="1"
+                                                            [stepMinute]="1" [stepSecond]="1" [showSeconds]="false"
+                                                            [enableMeridian]="true"
+                                                            [defaultTime]="[currentDate.getHours(), currentDate.getMinutes(), currentDate.getSeconds()]">
+                                                        </ngx-mat-datetime-picker> -->
+
+                                                        <input #ref matInput [ngxMatDatetimePicker]="pickerLockAt"
+                                                            placeholder="Choose date and time" formControlName="lockAt"
+                                                            [min]="currentDate">
+                                                        <mat-datepicker-toggle matSuffix
+                                                            [for]="pickerLockAt"></mat-datepicker-toggle>
+                                                        <ngx-mat-datetime-picker #pickerLockAt [stepHour]="1"
+                                                            [stepMinute]="1" [stepSecond]="1" [showSeconds]="false"
+                                                            [enableMeridian]="true"
+                                                            [defaultTime]="[currentDate.getHours(), currentDate.getMinutes(), currentDate.getSeconds()]">
+                                                        </ngx-mat-datetime-picker>
+                                                    </mat-form-field>
+                                                </div>
+
+                                                <div class="w-full">
+                                                    <mat-form-field floatLabel="always" class="w-full text-accent-600">
+                                                        <mat-label class="text-[#282B66]">Unlock At Date</mat-label>
+                                                        <input #ref matInput [ngxMatDatetimePicker]="pickerUnlockAt"
+                                                            placeholder="Choose date and time"
+                                                            formControlName="unlockAt" [min]="currentDate">
+                                                        <mat-datepicker-toggle matSuffix
+                                                            [for]="pickerUnlockAt"></mat-datepicker-toggle>
+                                                        <ngx-mat-datetime-picker #pickerUnlockAt [stepHour]="1"
+                                                            [stepMinute]="1" [stepSecond]="1" [showSeconds]="false"
+                                                            [enableMeridian]="true"
+                                                            [defaultTime]="[currentDate.getHours(), currentDate.getMinutes(), currentDate.getSeconds()]">
+                                                        </ngx-mat-datetime-picker>
+                                                    </mat-form-field>
+                                                </div>
+                                            </div>
+
+                                            <div class="w-full">
+                                                <mat-slide-toggle class="" [color]="'primary'"
+                                                    formControlName="workflowLocked">
+                                                    Is workflow locked?
+                                                </mat-slide-toggle>
+                                            </div>
+                                        </div>
+                                    </ng-template>
+                                </mat-tab>
+                            </mat-tab-group>
+
+                            <div class="w-full text-center">
+                                <button type="submit" class="fuse-mat-stroked-button-large mt-3" mat-flat-button
+                                    [color]="'primary'" [disabled]="workflowIdsForm.invalid "
+                                    [mat-dialog-close]="modifiedClassroomPr">
+                                    Save
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <ng-template #showloading>
+            <div class="flex justify-center items-center h-[62vh]">
+                <mat-spinner class="text-accent" diameter="50"></mat-spinner>
+            </div>
+        </ng-template>
+    </div>
+</div>

@@ -1,0 +1,112 @@
+.arrowBtn {
+    &:hover {
+        .arrowIcon {
+            animation: bounce 1s infinite;
+
+        }
+    }
+}
+.arrowBtnBack{
+    &:hover {
+        .arrowIconBack {
+            animation: bounceBack 1s infinite;
+        }
+    }
+}
+
+.ql-custom-textarea{
+    background-color: #F8F8F8;
+    border: 1px solid #CCC;
+    line-height: 19px;
+    padding: 6px 10px;
+    border-radius: 3px;
+    margin: 15px 0;
+    resize: both !important;
+}
+
+// @import '~quill/dist/quill.core.css';
+// @import '~quill/dist/quill.bubble.css';
+// @import '~quill/dist/quill.snow.css';
+
+
+// quill-editor {
+//   display: block;
+// }
+
+// [quill-editor-toolbar] .ql-font span[data-label="Aref Ruqaa"]::before {
+//     font-family: "Aref Ruqaa";
+//   }
+
+//   [quill-editor-toolbar] .ql-font span[data-label="Mirza"]::before {
+//     font-family: "Mirza";
+//   }
+
+//   [quill-editor-toolbar] .ql-font span[data-label="Roboto"]::before {
+//     font-family: "Roboto";
+//   }
+
+  /* Set content font-families */
+
+//   .ql-font-mirza {
+//     font-family: "Mirza";
+//   }
+
+//   .ql-font-aref {
+//     font-family: "Aref Ruqaa";
+//   }
+
+//   .ql-font-roboto {
+//     font-family: "Roboto";
+//   }
+
+
+
+@keyframes bounce {
+
+    0% {
+        transform: translateX(0%);
+        animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+    }
+
+    100% {
+        transform: translateX(0%);
+        animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+    }
+
+    50% {
+        transform: translateX(35%);
+        animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+    }
+}
+@keyframes bounceBack {
+
+    0% {
+        transform: translateX(0%);
+        animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+    }
+
+    100% {
+        transform: translateX(0%);
+        animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+    }
+
+    50% {
+        transform: translateX(-35%);
+        animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+    }
+}
+
+
+.plusIcon {
+    transition: transform .3s ease-in-out;
+
+    &:hover {
+        transform: rotate(90deg);
+    }
+}
+
+
+input[type="radio"] {
+    height: 18px;
+    width: 18px;
+}

@@ -1,0 +1,295 @@
+<div class="m-auto md:w-[40vw] xs:w-[55vw] md:px-8 xs:px-0 relative ">
+    <div class="">
+        <div class=" absolute -top-4 -right-2 ">
+            <button mat-dialog-close class="" *ngIf="data.canClose">
+                <mat-icon class=" hover:scale-110 transition duration-5000 transform" svgIcon="mat_outline:close">
+                </mat-icon>
+            </button>
+            <!-- <button 
+            *ngIf="data.canClose; else noClose" 
+            mat-dialog-close 
+            class="hover:scale-110 transition duration-5000 transform">
+            <mat-icon svgIcon="mat_outline:close"></mat-icon>
+          </button>
+          <ng-template #noClose>
+            <button 
+              (click)="onCloseDialog()" 
+              class="hover:scale-110 transition duration-5000 transform">
+              <mat-icon svgIcon="mat_outline:close"></mat-icon>
+            </button>
+          </ng-template> -->
+        </div>
+
+        <form *ngIf="infoForm" class="rounded-2xl overflow-hidden" [formGroup]="infoForm"
+            (ngSubmit)="onSubmit(infoForm)">
+            <div class="flex flex-row items-center justify-center w-full ">
+                <div class="flex flex-row justify-center w-full">
+                    <p class="text-2xl font-semibold mb-2 text-center text-accent">
+                        Update Profile
+                    </p>
+                </div>
+            </div>
+
+            <div class="">
+                <!-- First Name -->
+                <div class="">
+                    <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                        <mat-label class="text-[#282B66]">First Name</mat-label>
+                        <input matInput placeholder="First name" formControlName="firstName">
+                        <mat-icon class="icon-size-5" matPrefix [svgIcon]="'heroicons_solid:user-circle'"></mat-icon>
+                    </mat-form-field>
+                </div>
+
+                <!-- Last Name -->
+                <div class="">
+                    <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                        <mat-label class="text-[#282B66]">Last Name</mat-label>
+                        <input matInput placeholder="Last name" formControlName="lastName">
+                        <mat-icon class="icon-size-5" matPrefix [svgIcon]="'heroicons_solid:user-circle'"></mat-icon>
+                    </mat-form-field>
+                </div>
+
+                <!-- Email -->
+
+                <!--                 
+                <div class="w-full">
+                    <div [ngClass]="emailVerification.emailChanged ? 'shortEmail' : 'longEmail'">
+                       <div>
+
+                            <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                                <mat-label class="text-[#282B66]">Email</mat-label>
+                                <mat-icon class="icon-size-5" matPrefix [svgIcon]="'heroicons_solid:mail'"></mat-icon>
+                                <input matInput placeholder="Email Address" formControlName="email"
+                                    [readonly]="!isEmailEditable">
+                                <button *ngIf="!isEmailEditable" mat-icon-button type="button"
+                                    (click)="enableEmailEdit()" matSuffix>
+                                    <mat-icon class="icon-size-5" [svgIcon]="'mat_outline:mode_edit'"></mat-icon>
+                                </button>
+                                <mat-error
+                                    *ngIf="infoForm.get('email').hasError('email')&& infoForm.get('email').touched">
+                                    Enter valid email address
+                                </mat-error>
+                                <mat-icon *ngIf="emailVerification.editEmailAftersubmit" svgIcon="edit" class="absolute"
+                                    (click)="editEmailAfterSubmit()" class="mt-1.5 -ml-23"></mat-icon>
+                                    
+                            </mat-form-field>
+
+                           
+                            <mat-error *ngIf="isserverError" class="w-full mb-3">{{serverError.message}}</mat-error>
+                            <span *ngIf="emailVerification.isLinkSent" class="text-sky-500 mb-3">
+                                Verify your mail by clicking the link sent your updated mail
+                            </span>
+                        </div> 
+
+                
+
+                        <div class="text-center w-full pb-3  " [hidden]="emailVerification.hideEmailVerifybtn">
+                            <button class="fuse-mat-stroked-button-large w-max mt-1" mat-flat-button [color]="'primary'"
+                                type="button" (click)="updateEmail()"
+                                [disabled]="emailVerification.disableEmailVerify|| infoForm.get('email').hasError('email')">
+                                {{emailVerification.hideResendLinkbtn?'Send OTP':'Resend OTP'}}
+                            </button>
+                        </div>
+
+                        <div class="w-full ml-2">
+                            <div [hidden]="emailVerification.hideEmailVerification" class="sm:ml-0">
+                                <div class="verifyButtonPosition">
+                                    <mat-form-field class="text-accent-600 sm:w-full xs:w-full xs:pr-1 sm:px-0">
+                                        <input id="otp" matInput type="number" name="code" placeholder="Enter OTP"
+                                            [(ngModel)]="verificationEmailCode" [ngModelOptions]="{standalone: true}">
+                                        <mat-error>
+                                            OTP is required
+                                        </mat-error>
+                                    </mat-form-field>
+                                    <div class="w-full mt-1">
+                                        <button class="fuse-mat-stroked-button-large w-max  " type="button"
+                                            mat-flat-button [color]="'primary'" (click)="verifyEmail()">
+                                            Verify
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div> -->
+
+
+
+                <div class="w-full grid grid-cols-8 gap-2">
+                    <div [ngClass]="emailValueChanged ? 'col-span-4' : 'col-span-8'">
+                        <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                            <mat-label class="text-[#282B66]">Email</mat-label>
+                            <mat-icon class="icon-size-5" matPrefix [svgIcon]="'heroicons_solid:mail'"></mat-icon>
+                            <input matInput placeholder="Email Address" formControlName="email"
+                                (input)="onEmailInputChange($event)">
+                            <button *ngIf="!isEmailEditable" mat-icon-button type="button" (click)="enableEmailEdit()"
+                                matSuffix>
+                                <mat-icon class="icon-size-5" [svgIcon]="'mat_outline:mode_edit'"></mat-icon>
+                            </button>
+                            <mat-error *ngIf="infoForm.get('email').hasError('email')&& infoForm.get('email').touched">
+                                Enter valid email address
+                            </mat-error>
+                            <!-- <mat-error *ngIf="infoForm.get('email')?.hasError('required')">
+                                Email is required.
+                              </mat-error>
+                              <mat-error *ngIf="infoForm.get('email')?.hasError('email')">
+                                Enter a valid email address.
+                              </mat-error> -->
+                            <mat-error *ngIf="infoForm?.get('email')?.hasError('teacherEmailExistError')">
+                                This email address is already in use by another teacher. Please enter a different email
+                                address.
+                            </mat-error>
+                            <mat-error *ngIf="infoForm?.get('email')?.hasError('studentEmailExistError')">
+                                This email address is already in use by another student.
+                            </mat-error>
+                            <mat-error *ngIf="infoForm?.get('email')?.hasError('serverError')">
+                                An error occurred while validating the email. Please try again later.
+                            </mat-error>
+                        </mat-form-field>
+                        <mat-error *ngIf="isserverError" class="w-full mb-3">{{serverError.message}}</mat-error>
+
+                    </div>
+
+                    <div *ngIf="emailValueChanged  && !otpUiEmail" class="col-span-2 mt-7">
+                        <button [disabled]="infoForm?.get('email')?.hasError('pattern') || otpSpinnerForPhone"
+                            class="fuse-mat-stroked-button-large w-max " mat-flat-button [color]="'primary'"
+                            type="button" (click)="sendEmailOtp()">
+                            {{ otpSpinnerForPhone ? '' : sendOtpTextForPhone }}
+                            <mat-spinner *ngIf="otpSpinnerForPhone" [diameter]="20"></mat-spinner>
+                        </button>
+                    </div>
+
+                    <div class="w-full ml-2 col-span-4">
+                        <div *ngIf="emailValueChanged && otpUiEmail" class="sm:ml-0 mt-6">
+                            <div class="verifyButtonPosition">
+                                <mat-form-field class="text-accent-600 sm:w-full xs:w-full xs:pr-1 sm:px-0">
+                                    <input id="otp" matInput type="text" maxlength="6" name="code"
+                                        placeholder="Enter OTP" [(ngModel)]="userEmailInputOtp"
+                                        [ngModelOptions]="{standalone: true}">
+                                    <mat-error>
+                                        OTP is required
+                                    </mat-error>
+                                </mat-form-field>
+                                <div class="w-full mt-1">
+                                    <button class="fuse-mat-stroked-button-large w-max  " type="button"
+                                        [disabled]="userEmailInputOtp?.length < 6 || isUpdating" mat-flat-button
+                                        [color]="'primary'" (click)="verifyEmail()">
+                                        <ng-container
+                                            *ngIf="!verifySpinnerForPhone || !isUpdating ; else spinnerTemplate">
+                                            Verify
+                                        </ng-container>
+                                        <ng-template #spinnerTemplate>
+                                            <mat-spinner [diameter]="20" class="text-center"></mat-spinner>
+                                        </ng-template>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Phone Number -->
+                <div class="w-full grid grid-cols-8 gap-2 col-span-8">
+                    <div class="col-span-2">
+                        <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                            <mat-label class="text-[#282B66]">Phone</mat-label>
+                            <mat-select formControlName="countryCode" panelClass="dropDownPanel">
+                                <mat-select-trigger>
+                                    <div class="flex gap-2 items-center justify-between">
+                                        <span class="flex w-5 h-5 items-center">
+                                            <img class="h-full w-full rounded-md"
+                                                [src]="storagePath+getSelectedCountryCode(countryCodeMap, infoForm?.get('countryCode')?.value)?.iso+storageFormat" />
+                                        </span>
+                                        <span class="tracking-tighter text-sm">
+                                            {{getSelectedCountryCode(countryCodeMap,
+                                            infoForm?.get('countryCode')?.value)?.phone}}
+                                        </span>
+                                    </div>
+                                </mat-select-trigger>
+                                <mat-option [value]="option?.value?.phone"
+                                    *ngFor="let option of countryCodeMap | keyvalue" class="-mr-7">
+                                    {{option?.value?.displayName}} ({{option?.value?.phone}})
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+
+                    <div [ngClass]="phoneValueChanged ? 'col-span-2' : 'col-span-6'">
+                        <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                            <mat-label class="text-[#282B66]"></mat-label>
+                            <input id="phone" [maxLength]="10" pattern="^[0-9]{10}" class="ml-1" matInput
+                                placeholder="Enter a valid 10 digits phone number" formControlName="phoneNumber"
+                                (input)="onPhoneInputChange($event)">
+                            <button *ngIf="!isPhoneEditable" mat-icon-button type="button" (click)="enablePhoneEdit()"
+                                matSuffix>
+
+                                <mat-icon class="icon-size-5" [svgIcon]="'mat_outline:mode_edit'"></mat-icon>
+                            </button>
+                            <mat-error
+                                *ngIf="infoForm?.get('phoneNumber')?.hasError('teacherPhoneExistError')  && infoForm?.get('phoneNumber')?.value?.length === 10">{{numberExistsErrorMessage.teacher}}</mat-error>
+                            <mat-error
+                                *ngIf="infoForm?.get('phoneNumber')?.hasError('studentPhoneExistError')">{{numberExistsErrorMessage.student}}</mat-error>
+                        </mat-form-field>
+                    </div>
+
+                    <!-- <div *ngIf="phoneValueChanged && !otpUiPhone" class="col-span-4 mt-7"> -->
+                    <div *ngIf="showSendOtpButton && !otpUiPhone" class="col-span-4 mt-7">
+                        <button
+                            [disabled]="infoForm?.get('phoneNumber')?.hasError('pattern') || infoForm?.get('phoneNumber')?.value?.length < 10 || otpSpinnerForPhone"
+                            class="fuse-mat-stroked-button-large w-max " mat-flat-button [color]="'primary'"
+                            type="button" (click)="sendOtpToPhone()">
+                            {{ otpSpinnerForPhone ? '' : sendOtpTextForPhone }}
+                            <mat-spinner *ngIf="otpSpinnerForPhone" [diameter]="20"></mat-spinner>
+                        </button>
+                    </div>
+
+                    <div *ngIf="phoneValueChanged && otpUiPhone" class="col-span-4 grid grid-cols-2 gap-2 mt-6">
+                        <mat-form-field class="col-span-1">
+                            <input id="otp" matInput type="text" maxlength="6" placeholder="Enter OTP"
+                                [(ngModel)]="userInputOtp" [ngModelOptions]="{standalone: true}">
+                            <mat-error>
+                                OTP is required
+                            </mat-error>
+                        </mat-form-field>
+
+                        <button (click)="verifyOtpForPhone()"
+                            [disabled]="userInputOtp?.length < 6 || verifySpinnerForPhone || isUpdating"
+                            class="fuse-mat-stroked-button-large col-span-1" type="button" mat-flat-button
+                            [color]="'primary'">
+                            <ng-container *ngIf="!verifySpinnerForPhone || isUpdating; else spinnerTemplate">
+                                Verify
+                            </ng-container>
+                            <ng-template #spinnerTemplate>
+                                <mat-spinner [diameter]="20" class="text-center"></mat-spinner>
+                            </ng-template>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-full text-center">
+                <button type="submit" class="fuse-mat-stroked-button-large mt-6" mat-flat-button [color]="'primary'"
+                    [disabled]="btnDisabled || isUpdating">
+                    <ng-container *ngIf="!isUpdating; else spinnerTemplate">
+                        Update
+                    </ng-container>
+                    <ng-template #spinnerTemplate>
+                        <mat-spinner [diameter]="20" class="text-center"></mat-spinner>
+                    </ng-template>
+                </button>
+
+            </div>
+            <div class="w-full text-center mt-4">
+                <!-- <button *ngIf="environment.projectName === 'Jigyaasa'" (click)="deleteAccount()"
+                    class="fuse-mat-stroked-button-large bg-red-600 text-white px-4 py-2" mat-flat-button>
+                    Delete Profile
+                </button> -->
+                <button type="button" *ngIf="environment.projectName === 'Jigyaasa'" (click)="deleteAccount()"
+                    class="fuse-mat-stroked-button-large bg-red-600 text-white px-4 py-2" mat-flat-button>
+                    Delete Profile
+                </button>
+
+            </div>
+        </form>
+    </div>
+</div>

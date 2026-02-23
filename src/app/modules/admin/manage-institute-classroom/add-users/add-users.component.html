@@ -1,0 +1,46 @@
+<div class="bg-white w-[35vw] rounded p-6 relative">
+    <div class="absolute  top-0 right-0">
+        <button mat-dialog-close class="">
+            <mat-icon class=" hover:scale-110 transition duration-5000 transform" svgIcon="mat_outline:close">
+            </mat-icon>
+        </button>
+    </div>
+    <div class="flex flex-row w-full items-center justify-center">
+        <div class="w-full">
+            <h1 *ngIf="teacher; else student" class="text-3xl mb-6 w-full">Teacher Details</h1>
+            <ng-template #student>
+                <h1 class="text-3xl mb-6 w-full">Student Details</h1>
+            </ng-template>
+        </div>
+
+    </div>
+    <form [formGroup]="userForm" (ngSubmit)="onSubmit()" #Form class="flex flex-col items-center w-full">
+        <mat-form-field appearance="fill" class="w-full text-accent-600">
+            <mat-label>Name</mat-label>
+            <input matInput formControlName="name">
+        </mat-form-field>
+        <mat-form-field appearance="fill" class="w-full text-accent-600">
+            <mat-label>Phone</mat-label>
+            <span>{{countryCode}}</span>
+            <input id="phone" [maxLength]="10" pattern="^[0-9]{10}" matInput class="ml-4"
+                placeholder="Enter valid 10 digits phone number" formControlName="phone">
+            <mat-error *ngIf="(
+                        userForm.get('phone').dirty ||
+                        userForm.get('phone').touched
+                       )">Please enter 10 digit valid phone number</mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="fill" class="w-full text-accent-600">
+            <mat-label>Email (optional)</mat-label>
+            <input matInput formControlName="email">
+        </mat-form-field>
+        <mat-form-field class="w-full text-accent-600 ">
+            <mat-label class="text-[#282B66]">Select a classroom</mat-label>
+            <mat-select formControlName="classroom" placeholder="Select a classroom">
+                <mat-option value="" disabled selected> Select a classroom </mat-option>
+                <mat-option *ngFor="let cls of classrooms" [value]="cls.classroomName+', '+cls.institutionName                " (click)="selectClassroom(cls)">
+                    {{cls.classroomName}} , {{cls.institutionName}} </mat-option>
+            </mat-select>
+        </mat-form-field>
+        <button color="primary" mat-raised-button class="w-1/2 mt-3" [disabled]="!userForm.valid">Submit</button>
+    </form>
+</div>

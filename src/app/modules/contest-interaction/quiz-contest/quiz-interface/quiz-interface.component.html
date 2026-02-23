@@ -1,0 +1,21 @@
+<div [ngSwitch]="quizInfo.questionType">
+    <div *ngSwitchCase="'MCQ'" class="p-2">
+        <app-mcq [quizData]="quizInfo" [lastStep]="lastStep"  (emitter)="onEmitter($event)"  [qusBehaviorSub]="qusBehaviorSub"></app-mcq>
+    </div>
+    <div *ngSwitchCase="'TEXT'" class="p-2">
+        <app-text [quizData]="quizInfo"  [qusBehaviorSub]="qusBehaviorSub"></app-text>
+    </div>
+    <div *ngSwitchCase="'FILL_IN_THE_BLANKS'" class="p-2">
+        <app-fill-blanks [quizData]="quizInfo"  [qusBehaviorSub]="qusBehaviorSub"></app-fill-blanks>
+    </div>
+    <div *ngSwitchCase="'RICH_BLANKS'" class="p-2">
+        <app-rich-blanks [quizData]="quizInfo"  [qusBehaviorSub]="qusBehaviorSub"></app-rich-blanks>
+    </div>
+
+    <!-- <div *ngSwitchCase="'TEXT'" class="p-2">
+        <div>
+            {{quizInfo|json}}
+        </div>
+    </div> -->
+
+</div>

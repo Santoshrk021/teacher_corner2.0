@@ -1,0 +1,117 @@
+
+<div class=" overflow-y-auto bg-[#f0f5fa] border--300 p-4 mt-2">
+    <div>
+        <div class="flex items-center w-full">
+            <div class="w-1/2">
+                <mat-form-field class="w-full">
+                    <mat-label class="font-bold">Category</mat-label>
+                    <mat-select
+                        class="innerInput"
+                        [(value)]="selectedLanguage"
+                        (selectionChange)="filterPrograms()"
+                    >
+
+                    <mat-option value="" >Select Category</mat-option>
+                        <mat-option value="Metal">Metal</mat-option>
+                        <mat-option value="Agri">Agri</mat-option>
+                        <mat-option value="Chemical">Chemical</mat-option>
+                        <mat-option value="Electrical">Electrical</mat-option>
+                        <mat-option value="Fibre">Fibre</mat-option>
+                        <mat-option value="Glass">Glass</mat-option>
+                        <mat-option value="Metal">Metal</mat-option>
+                        <mat-option value="Electrical">Template</mat-option>
+                        <mat-option value="Organic">Organic</mat-option>
+                        <mat-option value="Plastic">Plastic</mat-option>
+                        <mat-option value="Paper Products">Paper Products</mat-option>
+                        <mat-option value="Rubber">Rubber</mat-option>
+                        <mat-option value="Wood">Wood</mat-option>
+                        <mat-option value="Heat/Cool">Heat/Cool</mat-option>
+                        <mat-option value="Cutting Tools">Cutting Tools</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <div class="w-1/2 ml-2">
+                <mat-form-field class="w-full">
+                    <mat-label class="font-bold mt-6 p-1 text-[#1e293b]">
+                        Search component
+                    </mat-label>
+
+                    <input
+                        matInput
+                        placeholder="Search here..."
+                        [(ngModel)]="searchTerm"
+                        (input)="filterPrograms()"
+                        class="mat-input-element mat-form-field-autofill-control ng-tns-c30-5 cdk-text-field-autofill-monitored"
+                    />
+
+                    <mat-icon matSuffix style="color: #93a2b8">search</mat-icon>
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+    <div>
+        <mat-label class="font-bold mt-6 p-1 text-[#1e293b]"
+            >component List</mat-label
+        >
+        <div class="bg-white rounded-xl shadow-md">
+            <div class="grid grid-cols-2">
+                <!-- Left Side -->
+                <div
+                    cdkDropList
+                    #leftList="cdkDropList"
+                    id="leftList"
+                    [cdkDropListData]="filteredPrograms"
+                    [cdkDropListConnectedTo]="[rightList]"
+                    (cdkDropListDropped)="drop($event)"
+                    class="border-y border-l border-gray-300 h-72 overflow-y-auto scrollbar-hide rounded"
+                >
+                    <div
+                        *ngFor="let program of filteredPrograms"
+                        cdkDrag
+                        class="flex justify-start bg-white border-b border-gray-400 text-sm font-semibold p-3 cursor-move"
+                        matTooltip="{{ program }}"
+                    >
+                        {{ program }}
+                    </div>
+                </div>
+
+                <!-- Right Side -->
+                <div
+                    cdkDropList
+                    #rightList="cdkDropList"
+                    id="rightList"
+                    [cdkDropListData]="assignedPrograms"
+                    [cdkDropListConnectedTo]="[leftList]"
+                    (cdkDropListDropped)="drop($event)"
+                    class="border-2 border-gray-300 h-72 overflow-scroll scrollbar-hide rounded"
+                >
+                    <div
+                        *ngFor="let program of assignedPrograms"
+                        cdkDrag
+                        class="flex justify-start bg-white border-b border-gray-400 text-sm font-semibold p-2 cursor-move"
+                        matTooltip="{{ program }}"
+                    >
+                        <div class="flex justify-start w-full">
+                            {{ program }}
+                        </div>
+                        <div class="flex justify-end">
+                            <button
+                                matTooltip="Enter edit mode"
+                                (click)="openEditDialog(program)"
+                            >
+                                <mat-icon
+                                    aria-label="Edit icon"
+                                    fontIcon="edit"
+                                    class="text-black text-md"
+                                ></mat-icon>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="flex items-center justify-center mt-4">
+            <button mat-raised-button color="primary" class="btn" (click)="saveComponent()">Submit</button>
+          </div>
+    </div>
+</div>

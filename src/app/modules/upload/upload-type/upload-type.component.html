@@ -1,0 +1,7 @@
+<mat-step>
+    <ng-template matStepLabel>{{assignment?.title}}</ng-template>
+    <ng-template matStepContent>
+        <app-assignment-step [assignmentData]="assignment" [asgnId]="assignments.docId"
+            [workflowId]="workflowId" [currentWorkflow]="currentWorkflow"></app-assignment-step>
+    </ng-template>
+</mat-step>

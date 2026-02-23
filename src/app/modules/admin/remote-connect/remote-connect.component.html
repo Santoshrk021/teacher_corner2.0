@@ -1,0 +1,96 @@
+<!-- Fullscreen Flex Container -->
+<div class="w-full h-full flex items-center justify-center bg-white overflow-hidden relative">
+  <!-- Background overlay on hover -->
+  <div class="absolute inset-0 bg-primary-100 opacity-0 hover:opacity-40 transition-opacity duration-300 pointer-events-none z-0"></div>
+
+  <!-- Horizontal Flex Wrapper for Both Cards -->
+  <div class="relative z-10 flex gap-10">
+
+
+    <!-- <div class="bg-white rounded-2xl shadow-xl p-6 w-[360px] text-center transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl">
+      <h2 class="text-xl font-semibold mb-4">Register USB Receiver</h2>
+
+      <mat-form-field class="w-full mb-3" appearance="fill">
+        <mat-label>Label</mat-label>
+        <input matInput disabled [(ngModel)]="this.currentUserName">
+      </mat-form-field>
+
+      <mat-form-field class="w-full mb-3" appearance="fill">
+        <mat-label>Vendor ID</mat-label>
+        <input matInput [(ngModel)]="vendorId" required="vendor id is required" type="string">
+      </mat-form-field>
+
+      <mat-form-field class="w-full mb-4" appearance="fill">
+        <mat-label>Product ID</mat-label>
+        <input matInput [(ngModel)]="productId" required="productId is requied" type="string">
+      </mat-form-field>
+
+      <button mat-raised-button color="primary" (click)="saveReceiverConfig()">
+        Save USB Receiver
+      </button>
+    </div> -->
+
+
+    <!-- Instructions Card -->
+    <div
+      class="bg-white shadow-xl p-2 w-[360px] text-center transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl">
+      <h2 class="text-3xl font-bold mb-2">Register New Remotes...</h2>
+      <h2 class="text-lg font-semibold mb-2">Start by connecting the receiver</h2>
+      <p class="text-sm text-red-600 mb-4">Note: Ensure the receiver is properly inserted</p>
+
+      <div class="rounded-lg overflow-hidden shadow-md mb-6">
+        <img src="assets/imageslist/usbConnectionImage.jpg" alt="USB Insertion" class="w-full h-40 object-cover" />
+      </div>
+
+      <button
+        mat-raised-button
+        (click)="connect()"
+        class="bg-primary text-white font-semibold py-2 px-6 rounded-full hover:bg-primary-700 transition-shadow shadow-md">
+        Connect Remote Receiver
+      </button>
+
+      <div *ngIf="connected" class="mt-4 text-green-600 font-medium">🟢 Connected</div>
+    </div>
+
+    <!-- ✅ NEW: Live Remotes Card -->
+    <div class="bg-white shadow-xl p-4 w-[420px] rounded-2xl">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-xl font-bold">Triggered Remotes (Live)</h2>
+
+        <span class="text-xs px-2 py-1 rounded-full"
+          [ngClass]="latestRemoteEvents ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'">
+          {{ latestRemoteEvents ? 'Listening' : 'Not connected' }}
+        </span>
+      </div>
+
+      <p class="text-xs text-gray-500 mb-3">
+        This list updates in realtime from Firestore: <b>SnappyRemoteEventsLatest</b>
+      </p>
+
+      <div *ngIf="latestRemoteEvents.length === 0" class="text-center text-gray-400 py-8">
+        No remote events yet. Press any remote button…
+      </div>
+
+      <div *ngIf="latestRemoteEvents.length > 0" class="space-y-2 max-h-[360px] overflow-auto pr-1">
+        <div
+          *ngFor="let e of latestRemoteEvents; trackBy: trackByMacId"
+          class="border rounded-xl p-3 flex items-center justify-between">
+          <div class="min-w-0">
+            <div class="font-semibold truncate">{{ e.macId }}</div>
+            <div class="text-xs text-gray-500">
+              Latency: <b>{{ e.latencyMs }}</b> ms
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <div class="text-2xl font-bold text-primary-700">{{ e.button }}</div>
+            <div class="text-xs text-gray-400 whitespace-nowrap">
+              {{ e.serverReceiveMs | date:'shortTime' }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

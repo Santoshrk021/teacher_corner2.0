@@ -1,0 +1,12 @@
+.history-grid {
+  display: grid;
+  grid-template-columns: 150px 1fr 100px 80px 80px 100px 80px;
+  align-items: center;
+}
+
+@media (max-width: 768px) {
+  .history-grid {
+    grid-template-columns: 120px 1fr 80px 60px 60px 80px 60px;
+    font-size: 0.75rem;
+  }
+}

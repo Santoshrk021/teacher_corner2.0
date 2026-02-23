@@ -1,0 +1,41 @@
+:host::ng-deep.mat-form-field.mat-form-field-appearance-fill .mat-form-field-wrapper .mat-form-field-flex {
+    padding: 0 10px !important;
+}
+
+:host::ng-deep.dropDownPanel {
+    max-height: calc(43px * 4) !important; // limit panel to 4 entries before scroll
+    margin-top: 16% !important; // position the panel below drop down button
+    float: right !important;
+
+    @media only screen and (max-width: 640px) {
+        margin-top: 18% !important;
+    }
+}
+
+:host::ng-deep .cdk-overlay-pane {
+    left: 0 !important;
+    transform: none !important;
+}
+
+:host::ng-deep .cdk-overlay-container {
+    left: 5.5vw !important;
+    // bottom: 10vw !important;
+
+    @media (max-width: 640px) {
+        left: 16vw !important;
+    }
+
+    @media only screen and (min-width: 640px) and (max-width: 1200px) {
+        left: 8vw !important;
+    }
+
+    @media only screen and (min-width: 640px) and (max-width: 1200px) and (orientation: landscape) {
+        left: 4vw !important;
+    }
+
+}
+
+.phone_placeholder {
+    // #phone::placeholder {
+    font-size: 12px;
+}

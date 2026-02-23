@@ -1,0 +1,93 @@
+<div class="py-6 h-screen w-screen overflow-hidden relative">
+    <button (click)="drawerClose()" class="m-3  absolute top-0 right-0 z-40">
+        <mat-icon class=" hover:scale-110 transition duration-5000 transform" svgIcon="mat_outline:close">
+        </mat-icon>
+    </button>
+    <div class="pl-4 pr-22 h-10 flex justify-between">
+        <p Class=" font-bold text-lg text-accent-600">{{viewAllRequest?'View All Requests':'View All Approval / Reject Requests'}}
+        </p>
+        <div>
+            <mat-slide-toggle (change)="toggleList($event)" [color]="'primary'">
+                <p class="text-primary-600 pl-2 font-medium">View Previous Requests</p>
+            </mat-slide-toggle>
+        </div>
+    </div>
+
+    <!-- Approval Request for access classroom  -->
+    <div class="grid overflow-scroll" *ngIf="viewAllRequest">
+        <div class="">
+            <div class="inventory-grid grid  gap-12 py-4 px-1  shadow text-md font-semibold text-secondary bg-gray-50 dark:bg-black dark:bg-opacity-5 w-full"
+                matSort matSortDisableClear>
+                <div class="pl-2">First Name</div>
+                <div>Last Name</div>
+                <div>Email ID</div>
+                <div>Mobile No</div>
+                <div>Registered Date</div>
+                <div>Institution Name</div>
+                <div>Classroom Name</div>
+                <div class="text-center">Action</div>
+                <!-- <div>Approve</div>
+                <div>Reject</div> -->
+
+            </div>
+        </div>
+        <div class="h-[calc(100vh_-_120px)]  overflow-auto ">
+            <div *ngFor="let user of allpendingNotification;let i=index"
+                class="inventory-grid grid items-center text-secondary  gap-12 py-4 px-1  border-b border-gray-300 ">
+                <div class="pl-2" [matTooltip]="user?.lastName">{{user?.firstName}}</div>
+                <div class="truncate" [matTooltip]="user?.lastName">{{user?.lastName}}</div>
+                <div class="truncate" [matTooltip]="user?.email">{{user?.email}}</div>
+                <div [matTooltip]="user?.countryCode + user?.phoneNumber">{{user?.countryCode + user?.phoneNumber}}</div>
+                <div>{{user?.time?.seconds *1000| date :'medium'}}</div>
+                <div class="truncate" [matTooltip]="user?.instituteName">{{user?.instituteName}}</div>
+                <div class="truncate" [matTooltip]="user?.classroomName">{{user?.classroomName}}</div>
+                <div class="flex">
+                    <button mat-stroked-button class="bg-primary-600 p-4 mt-2 mr-1 mb-2 text-white"
+                        (click)="approveRequest(user,i)">Approve</button>
+                    <button mat-stroked-button class="bg-primary-600 p-4 mt-2 mr-1 mb-2 text-white"
+                        (click)="rejectRequest(user,i)">Deny</button>
+                </div>
+                <!-- <div>
+                </div> -->
+            </div>
+        </div>
+    </div>
+
+    <!-- All accepted Approval Request for access classroom  -->
+    <div class="grid overflow-scroll" *ngIf="!viewAllRequest">
+        <div class="">
+            <div class="inventory-grid10 grid  gap-12 py-4 px-1  shadow text-md font-semibold text-secondary bg-gray-50 dark:bg-black dark:bg-opacity-5 w-full"
+                matSort matSortDisableClear>
+                <div class="pl-2">First Name</div>
+                <div>Last Name</div>
+                <div>Email ID</div>
+                <div>Mobile No</div>
+                <div>Registered Date</div>
+                <div>Institution Name</div>
+                <div>Classroom Name</div>
+                <div>Action date</div>
+                <div>Action taken by</div>
+                <div>Comments</div>
+
+            </div>
+        </div>
+        <div class="h-[calc(100vh_-_120px)]  overflow-auto">
+            <div *ngFor="let user of allNotificationActionsTaken"
+                class="inventory-grid10 grid items-center text-secondary  gap-12 py-4 px-1  border-b border-gray-300 ">
+                <div class="pl-2" [matTooltip]="user?.firstName">{{user?.firstName}}</div>
+                <div class="truncate" [matTooltip]="user?.lastName">{{user?.lastName}}</div>
+                <div class="truncate" [matTooltip]="user?.email">{{user?.email}}</div>
+                <div [matTooltip]="user?.phoneNumber">{{user?.phoneNumber}}</div>
+                <div>{{user?.time?.seconds *1000| date :'medium'}}</div>
+                <div class="truncate" [matTooltip]="user?.instituteName">{{user?.instituteName}}</div>
+                <div class="truncate" [matTooltip]="user?.classroomName">{{user?.classroomName}}</div>
+                <div>{{user?.actionDate?.seconds?(user?.actionDate.seconds *1000 | date :'medium'):(user?.actionDate|
+                    date
+                    :'medium')}}</div>
+                <div class="truncate" [matTooltip]="user?.actionTakenBy">{{user?.actionTakenBy}}</div>
+                <div class="truncate" [matTooltip]="user?.rejectionReason">{{user?.rejectionReason}}</div>
+
+            </div>
+        </div>
+    </div>
+</div>

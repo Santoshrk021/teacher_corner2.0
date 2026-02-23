@@ -1,0 +1,30 @@
+<div class="w-[60vw] h-[79vh] relative ">
+    <button mat-dialog-close class=" absolute -top-4 -right-4 z-40">
+        <mat-icon class=" hover:scale-110 transition duration-5000 transform" svgIcon="mat_outline:close">
+        </mat-icon>
+    </button>
+
+    <mat-stepper [linear]="true" #stepper class="bg-transparent h-full w-full ">
+        <mat-step>
+            <ng-template matStepLabel>Basic Info</ng-template>
+            <ng-template matStepContent>
+                <app-basic-info-textblock-type [assignmentInfo]="data?.assignmentInfo"
+                    (assignmentBasicInfo)="catchBasicInfoEvent($event)"></app-basic-info-textblock-type>
+            </ng-template>
+        </mat-step>
+        <mat-step>
+            <ng-template matStepLabel>Fill Out Textblock</ng-template>
+            <ng-template matStepContent>
+                <app-create-textblock-type [assignmentInfo]="data?.assignmentInfo" [basicInfo]="basicInfo"
+                    (qusInfo)="catchQusInfoEvent($event)"></app-create-textblock-type>
+            </ng-template>
+        </mat-step>
+        <mat-step>
+            <ng-template matStepLabel>Review</ng-template>
+            <ng-template matStepContent>
+                <app-review-textblock-type [assignmentInfo]="data?.assignmentInfo" [qusInfo]="qusInfo"
+                    [basicInfo]="basicInfo"></app-review-textblock-type>
+            </ng-template>
+        </mat-step>
+    </mat-stepper>
+</div>

@@ -1,0 +1,56 @@
+<div class="relative h-[250px] sm:w-[30vw]">
+    <button mat-dialog-close class="m-4 sm:m-6 sm:mx-7 absolute -top-10 -right-10 z-40">
+        <mat-icon class=" hover:scale-110 transition duration-5000 transform" svgIcon="mat_outline:close">
+        </mat-icon>
+    </button>
+    <!-- form -->
+    <form [formGroup]="newSubmissionForm" (ngSubmit)="onSubmit(newSubmissionForm)">
+
+        <div class="w-full  py-4 px-4 mb-6 sm:rounded-2xl  sm:bg-card">
+
+            <!-- displayName -->
+            <mat-form-field class="w-full text-accent-600">
+                <mat-label class="text-[#282B66]">Display Name</mat-label>
+                <input matInput [formControlName]="'displayName'" type="text" placeholder="Enter Display Name">
+                <mat-error *ngIf="newSubmissionForm.get('displayName').invalid ">
+                    Display Name is required
+                </mat-error>
+            </mat-form-field>
+
+           
+            <div class="mt-6">
+                <div class="flex flex-col bg-grey-lighter">
+                    <label matRipple class=" border border-primary relative  right-0 
+                               flex flex-col items-center  rounded-lg p-2 h-12 cursor-pointer
+                                 bg-white text-primary-600 hover:bg-slate-200">
+                        <span class="absolute left-0 mt-1 ml-2">
+                            <mat-icon class="text-primary" svgIcon="heroicons_outline:arrow-circle-down"></mat-icon>
+                        </span>
+                        <div class="flex items-center mt-1 ">
+                            <span class=" md:text-base relative sm:text-[10px]">
+                                {{newSubmissionForm?.get('imagePath').value?'Re-Upload':'Upload'}}
+                            </span>
+                        </div>
+                        <input type='file' class="hidden " #logoFileInputRef accept=".png,.jpeg,.jpg"
+                            (change)="selectFile($event)" />
+                    </label>
+                    <span *ngIf="filename" class="text-xs text-secondary line-clamp-1 ml-1">{{filename}}
+                    </span>
+                    <div class="pl-4 mt-3 " [style.visibility]="loader ? 'visible' : 'hidden'">
+                        <span class="loader ml-32"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-center">
+                <div>
+                    <button type="submit"
+                        class="fuse-mat-stroked-button-large  bg-primary text-white disabled:bg-slate-300"
+                        mat-flat-button [color]="'primary'" [disabled]="newSubmissionForm.invalid">
+                        {{data.submissionId?'Update':'Submit'}}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

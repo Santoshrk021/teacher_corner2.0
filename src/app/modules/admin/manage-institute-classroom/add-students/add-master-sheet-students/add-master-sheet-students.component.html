@@ -1,0 +1,149 @@
+<div class="relative flex items-center justify-between -mt-2">
+  <h2 class="text-lg font-semibold">Upload Master Sheet</h2>
+
+  <button class="-mt-4 -mr-4" (click)="closeDialog()" [disabled]="uploading">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+
+<!-- ✅ Make dialog body a flex column so only file list scrolls -->
+<div class="p-4 flex flex-col gap-4 max-h-[80vh]">
+
+  <!-- Dropzone (stays fixed) -->
+  <div
+    class="w-full rounded-2xl border-2 border-dashed p-6 cursor-pointer transition-all select-none flex-shrink-0"
+    [ngClass]="isDragging ? 'border-primary-500 bg-primary-50' : 'border-gray-300 bg-white hover:border-primary-400'"
+    (click)="fileInput.click()"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave($event)"
+    (drop)="onDrop($event)"
+  >
+    <div class="flex flex-col items-center justify-center text-center gap-2">
+      <mat-icon class="text-4xl">cloud_upload</mat-icon>
+
+      <p class="text-base font-medium">Drop your file(s) here</p>
+
+      <p class="text-sm text-gray-500">
+        or <span class="text-primary-600 font-medium underline">browse</span>
+      </p>
+
+      <p class="text-xs text-gray-400">
+        Accepted: PDF, images (jpg/png/webp/tiff) • max {{ maxFileSizeMB }}MB each
+      </p>
+    </div>
+
+    <input
+      #fileInput
+      type="file"
+      class="hidden"
+      multiple
+      accept=".pdf,image/*,.tiff"
+      (change)="onFileSelected($event)"
+    />
+  </div>
+
+  <!-- Error (stays fixed) -->
+  <div *ngIf="errorMsg" class="rounded-xl bg-red-50 border border-red-200 p-3 text-red-700 text-sm flex-shrink-0">
+    {{ errorMsg }}
+  </div>
+
+  <!-- ✅ Selected files list: ONLY THIS AREA SCROLLS -->
+  <div
+    *ngIf="files.length"
+    class="space-y-3 overflow-y-auto overflow-x-hidden pr-2 flex-1 min-h-0"
+  >
+    <div
+      *ngFor="let f of files; let i = index"
+      class="rounded-2xl border bg-white shadow-sm overflow-hidden"
+    >
+      <div class="p-4 flex items-start justify-between gap-3">
+        <!-- ✅ min-w-0 is critical for truncation in flex -->
+        <div class="min-w-0 flex-1">
+          <div class="flex items-center gap-2 min-w-0">
+            <mat-icon *ngIf="f.kind === 'pdf'">picture_as_pdf</mat-icon>
+            <mat-icon *ngIf="f.kind === 'image'">image</mat-icon>
+
+            <!-- ✅ Truncate long filenames without expanding dialog -->
+            <p class="font-semibold truncate min-w-0 flex-1" [title]="f.file.name">
+              {{ f.file.name }}
+            </p>
+          </div>
+
+          <p class="text-xs text-gray-500 mt-1">
+            {{ f.file.type || 'Unknown type' }} • {{ formatBytes(f.file.size) }}
+          </p>
+
+          <!-- status -->
+          <div class="mt-2 text-xs">
+            <span
+              class="inline-flex items-center px-2 py-1 rounded-full"
+              [ngClass]="{
+                'bg-gray-100 text-gray-700': f.status === 'pending',
+                'bg-blue-50 text-blue-700': f.status === 'uploading' || f.status === 'processing',
+                'bg-green-50 text-green-700': f.status === 'done',
+                'bg-red-50 text-red-700': f.status === 'error'
+              }"
+            >
+              <mat-progress-spinner
+                *ngIf="f.status === 'uploading' || f.status === 'processing'"
+                class="mr-2"
+                mode="indeterminate"
+                diameter="14"
+              ></mat-progress-spinner>
+
+              {{ f.statusLabel }}
+            </span>
+          </div>
+
+          <!-- extracted preview -->
+          <div *ngIf="f.extractedStudent" class="mt-3 text-sm">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+              <div class="p-2 rounded-lg bg-slate-50 border">
+                <span class="text-xs text-gray-500">Extracted Name</span>
+                <div class="font-semibold">{{ f.extractedStudent.name || '-' }}</div>
+              </div>
+              <div class="p-2 rounded-lg bg-slate-50 border">
+                <span class="text-xs text-gray-500">Extracted Roll No</span>
+                <div class="font-semibold">{{ f.extractedStudent.rollNumber || '-' }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ✅ Prevent buttons from stretching / wrapping -->
+        <div class="flex items-center gap-2 flex-shrink-0 whitespace-nowrap">
+          <button mat-stroked-button color="primary" type="button" (click)="viewFile(f)" [disabled]="!f.previewUrl">
+            <mat-icon class="mr-1">visibility</mat-icon>
+            View
+          </button>
+
+          <button mat-stroked-button color="warn" type="button" (click)="removeFile(i)" [disabled]="uploading">
+            <mat-icon class="mr-1">delete</mat-icon>
+            Remove
+          </button>
+        </div>
+      </div>
+
+      <!-- error message -->
+      <div *ngIf="f.error" class="px-4 pb-4 text-sm text-red-600">
+        {{ f.error }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Actions (stays fixed) -->
+  <div class="flex justify-end gap-2 pt-2 flex-shrink-0">
+    <button mat-button type="button" (click)="closeDialog()" [disabled]="uploading">Cancel</button>
+
+    <button
+      mat-raised-button
+      color="primary"
+      type="button"
+      (click)="uploadAll()"
+      [disabled]="!files.length || uploading"
+    >
+      {{ uploading ? 'Uploading...' : 'Upload & Create Students' }}
+    </button>
+  </div>
+
+</div>

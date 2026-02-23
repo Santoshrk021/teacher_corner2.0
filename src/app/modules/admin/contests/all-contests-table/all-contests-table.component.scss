@@ -1,0 +1,54 @@
+/* base look */
+.inventory-grid {
+  display: grid;
+  align-items: center;
+  gap: 2rem; /* matches your gap-8 */
+}
+
+/* ===== DEFAULT (non-level9) =====
+   Columns (11): Title | Subtitle | Id | Participant | Type | Created | Edit | Share | Reg | Sub | Delete
+*/
+.grid:not(.is-level9) .inventory-grid {
+  grid-template-columns:
+    3fr     /* title */
+    2fr     /* subtitle */
+    1.2fr   /* id */
+    1.6fr   /* participant */
+    1.2fr   /* type */
+    1.4fr   /* created */
+    0.8fr   /* edit icon */
+    0.8fr   /* share icon */
+    1.2fr   /* reg btn */
+    1.2fr   /* sub btn */
+    0.6fr;  /* delete icon */
+}
+
+/* ===== RESTRICTED (level9) =====
+   Columns (4): Title | Subtitle | Reg | Sub
+*/
+.grid.is-level9 .inventory-grid {
+  grid-template-columns:
+    3fr  /* title */
+    2fr  /* subtitle */
+    1.2fr /* reg btn */
+    1.2fr /* sub btn */;
+}
+
+/* Responsive tweaks (optional) */
+@media (max-width: 900px) {
+  .grid:not(.is-level9) .inventory-grid {
+    grid-template-columns: 2.5fr 2fr 1fr 1.2fr 1fr 1.2fr .7fr .7fr 1fr 1fr .6fr;
+  }
+  .grid.is-level9 .inventory-grid {
+    grid-template-columns: 2.5fr 2fr 1fr 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .grid:not(.is-level9) .inventory-grid {
+    grid-template-columns: 2fr 1.6fr 1fr 1fr 1fr 1fr .6fr .6fr .9fr .9fr .6fr;
+  }
+  .grid.is-level9 .inventory-grid {
+    grid-template-columns: 2fr 1.6fr .9fr .9fr;
+  }
+}

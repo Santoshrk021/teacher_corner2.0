@@ -1,0 +1,82 @@
+<div class="w-full h-full overflow-y-auto  py-3 ">
+    <div class="w-full flex justify-between  mb-3">
+        <a class="inline-flex items-center leading-6 text-primary hover:underline cursor-pointer" (click)="goBack()">
+            <span class="inline-flex items-center">
+                <mat-icon class="icon-size-5 text-current" [svgIcon]="'heroicons_solid:arrow-sm-left'">
+                </mat-icon>
+                <span class="ml-1.5 font-medium leading-5">Back</span>
+            </span>
+        </a>
+    </div>
+    <!-- </div> -->
+
+
+<div class="w-full">
+  <div class="w-full grid">
+    <!-- Header -->
+    <div
+      class="inventory-grid grid gap-4 py-4 px-10 md:px-8 shadow text-md font-semibold text-secondary bg-gray-50 dark:bg-black dark:bg-opacity-5 w-full"
+      matSort
+      matSortDisableClear
+    >
+      <div>Name</div>
+      <div>Phone</div>
+      <div>Email</div>
+      <div>Gender</div>
+      <div>Age</div>
+      <div>Nominated By</div>
+      <div *ngIf="['Raman Award special contest'].includes(currentContest?.contestTitle)">Submit</div>
+      <div>Update</div>
+      <div>Delete</div>
+    </div>
+
+    <!-- Body -->
+    <div *ngIf="studentsInfoArr?.length; else noNominee" class="overflow-x-auto">
+      <div
+        *ngFor="let st of studentsInfoArr"
+        class="inventory-grid grid items-center text-secondary gap-4 py-3 px-10 md:px-8 border-b border-gray-300"
+      >
+        <div>{{ st?.studentMeta?.firstName + ' ' + st?.studentMeta?.lastName }}</div>
+        <div class="truncate">{{ st?.studentMeta?.countryCode + st?.studentMeta?.phoneNumber }}</div>
+        <div [matTooltip]="st.studentMeta.email" class="truncate">{{ st?.studentMeta?.email }}</div>
+        <div class="ml-2">{{ st?.studentMeta?.gender }}</div>
+        <div class="ml-2">{{ st?.studentMeta?.age }}</div>
+        <div>{{ st?.nominateMeta?.firstName + ' ' + st?.nominateMeta?.lastName }}</div>
+
+        <div *ngIf="['Raman Award special contest'].includes(currentContest?.contestTitle)" class="ml-2">
+          <mat-icon
+            class="text-primary-600 cursor-pointer transition duration-500 transform hover:scale-[115%]"
+            svgIcon="heroicons_outline:information-circle"
+            (click)="openSubmissionStepDialog(st)"
+            matTooltip="View submission step"
+          ></mat-icon>
+        </div>
+                    <div class="ml-2" [matTooltip]="matTooltip('edits')">
+                        <mat-icon class="cursor-pointer" (click)="onClickEdit(st)"
+                            [ngClass]="{
+                                'text-primary icon-size-5 cursor-pointer transition duration-500 transform  hover:scale-[115%] ml-2': (today > nominationStartDate && today < nominationEndDate ),
+                                'text-gray-400 icon-size-5 pointer-events-none ml-2': (today < nominationStartDate && today > nominationEndDate) }"
+                            svgIcon="feather:edit"></mat-icon>
+                        <!-- class="text-primary icon-size-5 cursor-pointer transition duration-500 transform  hover:scale-[115%] ml-2" -->
+                    </div>
+                    <div [matTooltip]="matTooltip('deletions')" class="ml-2">
+                        <mat-icon class="cursor-pointer" (click)="onDelete(st)
+                            "
+                            [ngClass]="{
+                                'text-red-500 cursor-pointer transition duration-500 transform  hover:scale-[115%] ml-2': (today > nominationStartDate && today < nominationEndDate),
+                                'text-gray-400 icon-size-5 pointer-events-none ml-2': (today < nominationStartDate && today > nominationEndDate) }"
+                            svgIcon="delete_outline"></mat-icon>
+                        <!-- class="text-red-500  cursor-pointer transition duration-500 transform  hover:scale-[115%] ml-2" -->
+                    </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<ng-template #noNominee>
+    <div class="text-center mt-3">
+        <p class="text-accent font-semibold ">You Dont Have Any Nomination</p>
+    </div>
+</ng-template>

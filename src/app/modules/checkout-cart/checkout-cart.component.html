@@ -1,0 +1,76 @@
+<div class="md:w-[45vw] h-[70vh]  overflow-auto relative pr-5">
+    <button mat-dialog-close class=" absolute top-0 right-0 z-40">
+        <mat-icon class=" hover:scale-110 transition duration-5000 transform" svgIcon="mat_outline:close">
+        </mat-icon>
+    </button>
+    <form [formGroup]="checkOutForm" *ngIf="checkOutForm" (ngSubmit)="onSubmit(checkOutForm)">
+
+        <div class="grid md:grid-cols-5 md:gap-4 bg-primary-50 p-2 rounded-lg md:w-[90%]">
+            <div class="col-span-1 h-20 w-20 border border-primary-400 rounded-lg bg-white">
+                <img [src]="data.image.src" alt="">
+            </div>
+            <div class="col-span-4  ">
+                <div class="flex items-center"> <p class="text-md font-semibold text-primary-600">{{data.title}}</p> <span class="ml-3"> &#8377;{{data.variants[0].price * quantity}}</span></div>
+               <div class="flex items-center mt-2">
+                <span class="text-accent-600 font-medium">Quantity&nbsp;:&nbsp;</span>
+                <div class="flex items-center">
+                    <div class="cursor-pointer -mb-1 mx-2 " (click)="quantityCounter(false)"><mat-icon  svgIcon="heroicons_outline:minus-circle" class="text-primary active:text-primary-400"></mat-icon></div>
+                    <div class="h-7 w-7 bg-white border border-primary-300 rounded-md flex items-center justify-center"> {{quantity}}</div>
+                    <div class="cursor-pointer -mb-1 mx-2" (click)="quantityCounter(true)"><mat-icon  svgIcon="heroicons_outline:plus-circle" class="text-primary active:text-primary-400"></mat-icon></div>
+                </div>
+               </div>
+            </div>
+        </div>
+
+        <p class="mb-3 mt-5 text-lg font-medium text-accent-500">Shipping address</p>
+        <div class="grid md:grid-cols-2 md:gap-4">
+            <mat-form-field class="w-full text-accent-600">
+                <mat-label class="text-[#282B66]">First Name</mat-label>
+                <input  id="firstName" matInput [formControlName]="'firstName'" type="text" placeholder="Enter First Name">
+            </mat-form-field>
+            <mat-form-field class="w-full text-accent-600">
+                <mat-label class="text-[#282B66]">Last Name</mat-label>
+                <input id="lastName" matInput [formControlName]="'lastName'" type="text" placeholder="Enter Last Name">
+            </mat-form-field>
+        </div>
+        <mat-form-field class="w-full text-accent-600">
+            <mat-label class="text-[#282B66]">Email Address</mat-label>
+            <input id="email" matInput [formControlName]="'email'" type="email" placeholder="Enter Email Address">
+        </mat-form-field>
+        <mat-form-field class="w-full text-accent-600">
+            <mat-label class="text-[#282B66]">Address</mat-label>
+            <input id="address2" matInput [formControlName]="'address1'" type="text" placeholder="Enter Last Name">
+        </mat-form-field>
+        <mat-form-field class="w-full text-accent-600">
+            <mat-label class="text-[#282B66]">Apartment,Suite,etc. (optional)</mat-label>
+            <input id="address2" matInput [formControlName]="'address2'" type="text" placeholder="Enter Last Name">
+        </mat-form-field>
+
+        <div class="grid md:grid-cols-2 md:gap-4">
+            <mat-form-field class="w-full text-accent-600">
+                <mat-label class="text-[#282B66]">City</mat-label>
+                <input id="city" matInput [formControlName]="'city'" type="text" placeholder="Enter City Name">
+            </mat-form-field>
+            <!-- <mat-form-field class="w-full text-accent-600">
+                <mat-label class="text-[#282B66]">State</mat-label>
+                <mat-select formControlName="state" placeholder="Select State">
+                    <mat-option value="" disabled selected>Select</mat-option>
+                    <mat-option *ngFor="let state of states " [value]="state?.state_name">
+                        <span class="text-sm">{{state?.state_name}}</span>
+                    </mat-option>
+                </mat-select>
+            </mat-form-field> -->
+            <mat-form-field class="w-full text-accent-600">
+                <mat-label class="text-[#282B66]">Pin Code</mat-label>
+                <input id="pin"  maxlength="9" matInput [formControlName]="'pin'"  type="text" placeholder="Enter Pin Code">
+            </mat-form-field>
+        </div>
+
+        <div class="flex justify-center items-center">
+            <button mat-dialog-close type="submit" color="primary" class="fuse-mat-stroked-button-large w-26 mt-2 cursor-pointer "
+                mat-flat-button>
+                Buy Now
+            </button>
+        </div>
+    </form>
+</div>

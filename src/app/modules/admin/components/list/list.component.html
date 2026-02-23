@@ -1,0 +1,148 @@
+<div class="w-full overflow-y-auto">
+    <div class="dynamicwidth">
+        <div class="w-full grid d-flex">
+            <div class="inventory-grid grid py-5 gap-3 px-8 md:px-8 shadow text-md font-semibold text-secondary bg-gray-50 dark:bg-black dark:bg-opacity-5 "
+                matSort matSortDisableClear (matSortChange)="sortData($event)">
+
+                <div [mat-sort-header]="'image'">Image</div>
+                <div [mat-sort-header]="'componentCode'" class="">Component Code</div>
+                <div [mat-sort-header]="'componentName'">Component Name</div>
+                <div [mat-sort-header]="'groupName'">Group Name</div>
+                <div [mat-sort-header]="'category'">Category</div>
+                <div [mat-sort-header]="'subCategory'">Sub category</div>
+                <!-- <div [mat-sort-header]="'attribute'">Attribute</div> -->
+                <div [mat-sort-header]="'componentSize'">Component Size</div>
+                <div [mat-sort-header]="'quantity'">Quantity</div>
+                <div [mat-sort-header]="'createdAt'">Creation Date</div>
+                <div class="ml-2">View More</div>
+                <div class="ml-2">Delete</div>
+            </div>
+
+            <div class=" h-[calc(100vh_-_268px)]  overflow-scroll" infiniteScroll [infiniteScrollDistance]="1"
+                [infiniteScrollUpDistance]="2" [infiniteScrollThrottle]="300" [scrollWindow]="false"
+                (scrolled)="onScroll($event)">
+
+                <ng-container *ngFor="let item of filteredComponents; let i = index; trackBy: trackByFn">
+                    <div class=" inventory-grid grid items-center text-secondary gap-3 py-3 px-8 md:px-8 border-b border-gray-300 "
+                        matSort matSortDisableClear>
+                        <div class="flex items-center">
+                            
+                            <div
+                                class="relative flex flex-0 items-center justify-center w-12 h-12 mr-6 rounded overflow-hidden border">
+
+                                <img class="w-12" *ngIf="item?.imageUrl?.[0]" [alt]="'component thumbnail image'"
+                                    [src]="item?.imageUrl[0] | getDownloadURL" loading="lazy" />
+
+                                <div *ngIf="!item?.imageUrl?.[0]"
+                                    class="flex items-center justify-center w-full h-full text-xs font-semibold leading-none text-center uppercase">
+                                    No Thumb
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="truncate" [matTooltip]="item?.componentCode || 'Not Available'"
+                            matTooltipPosition="above" [cdkCopyToClipboard]="item?.componentCode"
+                            (click)="copyToClipboard(item?.componentCode)">
+                            {{item?.componentCode || 'Not Available'}}
+                        </div>
+
+                        <div [matTooltip]="item?.componentName || 'Not Available'" matTooltipPosition="above"
+                            [cdkCopyToClipboard]="item?.componentName" (click)="copyToClipboard(item?.componentName)">
+                            {{item?.componentName || 'Not Available'}}
+                        </div>
+
+                         <div class="truncate ml-1 " [matTooltip]="item?.groupName || 'Not Available'"
+                            matTooltipPosition="above" [cdkCopyToClipboard]="item?.groupName"
+                            (click)="copyToClipboard(item?.groupName)">
+                            {{item?.groupName || 'Not Available'}}
+                        </div>
+
+                        <div class="truncate ml-1 " [matTooltip]="item?.category || 'Not Available'"
+                            matTooltipPosition="above" [cdkCopyToClipboard]="item?.category"
+                            (click)="copyToClipboard(item?.category)">
+                            {{item?.category || 'Not Available'}}
+                        </div>
+
+                        <div class="truncate ml-1 " [matTooltip]="item?.subCategory || 'Not Available'"
+                            matTooltipPosition="above" [cdkCopyToClipboard]="item?.subCategory"
+                            (click)="copyToClipboard(item?.subCategory)">
+                            {{item?.subCategory || 'Not Available'}}
+                        </div>
+
+                        <!-- <div class="truncate ml-3 " [matTooltip]="item?.attribute"
+                            matTooltipPosition="above" [cdkCopyToClipboard]="item?.attribute"
+                            (click)="copyToClipboard(item?.attribute)">
+                            {{item?.attribute || 'Not Available'}}
+                        </div> -->
+
+
+                        <div class=" ml-2" [matTooltip]="item.componentSize || 'Not Available'"
+                            matTooltipPosition="above" [cdkCopyToClipboard]="item?.sizeUnit"
+                            (click)="copyToClipboard(item?.componentSize)" >
+                            {{item?.componentSize || item?.componentSize?.displayName || 'Not Available'}}
+                        </div>
+
+                        <div class=" ml-1" [matTooltip]="item?.quantity || 'Not Available'"
+                            matTooltipPosition="above" [cdkCopyToClipboard]="item?.quantity"
+                            (click)="copyToClipboard(item?.quantity)" >
+                            {{item?.quantity || 'Not Available'}}
+                        </div>
+
+
+                        <div class="truncate ml-2 " [matTooltip]="item?.createdAt?(item?.createdAt?.seconds*1000| date: 'dd/MM/yyyy' ):''"
+                            matTooltipPosition="above" (click)="copyToClipboardDate(item?.createdAt)">
+                            {{item?.createdAt?.seconds*1000| date: 'dd/MM/yyyy'}}
+                        </div>
+
+                        <div class="sm:ml-5  xs:ml-1">
+                            <button class="min-w-10 min-h-7 h-7 px-2 leading-6 " mat-stroked-button
+                                (click)="toggleDetails(item)"
+                                [ngClass]="{'bg-slate-200':selectedComponent?.docId==item?.docId}">
+                                <mat-icon class="icon-size-5"
+                                    [svgIcon]="selectedComponent?.docId==item?.docId ? 'heroicons_solid:chevron-up' : 'heroicons_solid:chevron-down'"></mat-icon>
+
+
+                            </button>
+                        </div>
+
+                        <div class="sm:ml-3 xs:ml-4">
+
+                            <mat-icon
+                                class="text-red-500  cursor-pointer transition duration-500 transform  hover:scale-[115%]"
+                                svgIcon="delete_outline" matTooltip="Delete" (click)="deleteComponent(item)"></mat-icon>
+
+                        </div>
+                    </div>
+
+                    <div class="grid">
+                        <ng-container *ngIf="selectedComponent?.docId === item?.docId">
+                            <ng-container *ngTemplateOutlet="rowDetailsTemplate;context: {$implicit: item}">
+                            </ng-container>
+                        </ng-container>
+                    </div>
+                </ng-container>
+            </div>
+
+            <p class="px-2 pt-3 text-secondary">
+                {{loadingMessage}}
+            </p>
+        </div>
+    </div>
+</div>
+
+<ng-template #rowDetailsTemplate let-learningunit>
+    <div class=" border-b border-slate-300 overflow-scroll bg-blue-100 p-1 pt-4">
+        <mat-tab-group [linear]="true" #stepper>
+            <mat-tab>
+                <ng-template matTabLabel>Basic Info</ng-template>
+                <ng-template matTabContent>
+                    <div>
+                        <app-edit [componentDetails]="selectedComponentDetails"></app-edit>
+                    </div>
+                </ng-template>
+            </mat-tab>
+        </mat-tab-group>
+    </div>
+</ng-template>

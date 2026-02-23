@@ -1,0 +1,237 @@
+<div class="w-screen h-full overflow-y-auto  py-3 ">
+    <div class="dynamicwidth flex justify-between">
+        <div class=" w-[300px] text-3xl font-bold ml-1 mt-1 pl-2 ">Classrooms</div>
+        <div class="mt-0 flex flex-row justify-center w-full h-[40px] ml-45 mb-1">
+
+            <mat-form-field appearance="fill" class="w-[300px] ml-4">
+                <input matInput [(ngModel)]="searchTerm" placeholder="Search">
+                <mat-icon matPrefix svgIcon="heroicons_solid:search"></mat-icon>
+            </mat-form-field>
+            <button (click)="search(searchTerm)" mat-raised-button color="primary" class=" ml-2 mt-1 w-max">
+                Search
+            </button>
+        </div>
+        <div class="flex flex-row justify-end w-max  mt-1 mr-5">
+            <div class="mr-4">
+                <button (click)="addClassroom()" mat-raised-button color="primary" class="w-full">
+                    <mat-icon class="mr-0" svgIcon="heroicons_outline:plus-circle"></mat-icon>
+                    <p class="ml-1">Add</p>
+                </button>
+            </div>
+            <div class="">
+                <button mat-raised-button color="primary" class="w-full" (click)="goToTrash()">
+                    <mat-icon class="mr-1" svgIcon="heroicons_outline:trash"></mat-icon>Trash
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="dynamicwidth ">
+        <div class="grid mt-4 ">
+            <div matSort matSortDisableClear (matSortChange)="sortData($event)"
+                class="inventory-grid z-10 sticky top-0 grid gap-4 py-4 px-10 md:px-8 shadow text-md font-semibold text-secondary bg-gray-50 dark:bg-black dark:bg-opacity-5">
+                <div [mat-sort-header]="'classroomName'">Classroom Name</div>
+                <div [mat-sort-header]="'type'">Classroom Type</div>
+                <div [mat-sort-header]="'classroomId'">Classroom Id</div>
+
+                <!-- <div [mat-sort-header]="'subject'">Subject</div> -->
+                <!-- <div [mat-sort-header]="'classroomId'">classroomId</div> -->
+
+                <!-- <div>Section </div> -->
+                <div [mat-sort-header]="'institutionName'">School Name</div>
+                <div [mat-sort-header]="'institutionId'">InstitutionId</div>
+
+                <div [mat-sort-header]="'creationDate'">Created At</div>
+                <div class="text-center" [mat-sort-header]="'studentCounter'">Student Count</div>
+
+                <!-- <div [mat-sort-header]="'studentCounter'">Student Strength</div> -->
+                <!-- <div [mat-sort-header]="'creationDate'">Student strength</div> -->
+                <!-- <div>Updated At</div> -->
+                <div class="" [mat-sort-header]="'viewProgrammes'">Programmes</div>
+                <div class="">Student Credentials</div>
+                <div class="">View More</div>
+                <div class="">Delete</div>
+                <!-- <div class="">Add Students</div> -->
+            </div>
+
+
+            <div class="overflow-y-auto h-[calc(100vh_-_256px)] " infiniteScroll [infiniteScrollDistance]="1"
+                [infiniteScrollUpDistance]="2" [infiniteScrollThrottle]="300" [scrollWindow]="false"
+                (scrolled)="onScroll()">
+                <ng-container *ngIf="classrooms?.length;else loader">
+                    <ng-container *ngFor="let cls of classrooms">
+
+                        <!-- <div class="" [matTooltip]="program?.programmeName" matTooltipPosition="above"
+                            [cdkCopyToClipboard]="program?.programmeName" (click)="copyToClipboard(program?.programmeName)">
+                            {{program?.programmeName}}
+                          </div> -->
+                        <div
+                            class="inventory-grid grid items-center text-secondary gap-4 py-3 px-10 md:px-8 border-b border-gray-400 ">
+
+                            <div [matTooltip]="cls?.classroomName ? cls?.classroomName : cls?.stemClubName"
+                                class="truncate ml-4" matTooltipPosition="above"
+                                [cdkCopyToClipboard]="cls?.classroomName ? cls?.classroomName : cls?.stemClubName"
+                                (click)="copyToClipboard(cls?.classroomName ? cls?.classroomName : cls?.stemClubName)">
+                                {{cls?.classroomName ? cls?.classroomName : cls?.stemClubName}}</div>
+                            <!-- <div [matTooltip]="cls?.subject" class="truncate">{{cls?.subject}}</div> -->
+                            <div [matTooltip]="cls?.type" class="truncate" matTooltipPosition="above"
+                                [cdkCopyToClipboard]="cls?.type" (click)="copyToClipboard(cls?.type)">
+                                {{cls?.type}}</div>
+
+
+                            <div [matTooltip]="cls?.classroomId" class="truncate ml-2" matTooltipPosition="above"
+                                [cdkCopyToClipboard]="cls?.classroomId" (click)="copyToClipboard(cls?.classroomId)">
+                                {{cls?.classroomId | slice:0:4}}...</div>
+
+
+                            <div [matTooltip]="cls?.institutionName" class="truncate" matTooltipPosition="above"
+                                [cdkCopyToClipboard]="cls?.institutionName"
+                                (click)="copyToClipboard(cls?.institutionName)">
+                                {{cls?.institutionName}}</div>
+
+                          
+
+                            <div [matTooltip]="cls?.institutionId" class="truncate ml-0" matTooltipPosition="above"
+                                [cdkCopyToClipboard]="cls?.institutionId" (click)="copyToClipboard(cls?.institutionId)">
+                                {{cls?.institutionId}}</div>
+                            <!-- <div>{{cls?.representativePhone}}</div> -->
+                            <div [title]="cls.creationDate"
+                                [matTooltip]="cls?.creationDate?(cls?.creationDate?.seconds*1000| date: 'dd/MM/yyyy'):''"
+                                matTooltipPosition="above"
+                                [cdkCopyToClipboard]="cls?.creationDate?(cls?.creationDate?.seconds*1000| date: 'dd/MM/yyyy'):''"
+                                (click)="copyToClipboardDate(cls?.creationDate)" class="ml-1">
+                                {{cls?.creationDate?(cls?.creationDate?.seconds*1000| date: 'dd/MM/yyyy'):''}}</div>
+
+                            <div [matTooltip]="cls?.studentCounter" class="truncate ml-6" matTooltipPosition="above"
+                                [cdkCopyToClipboard]="cls?.studentCounter" (click)="copyToClipboard(cls?.studentCounter)">
+                                {{cls?.studentCounter}}</div>
+
+                            <div [matTooltip]="cls?.viewProgrammes" class="truncate" matTooltipPosition="above"
+                                [cdkCopyToClipboard]="cls?.viewProgrammes"
+                                (click)="copyToClipboard(cls?.viewProgrammes)">
+                                {{cls?.viewProgrammes}}</div>
+
+                            <!-- <div>
+                                            <mat-slide-toggle class="ml-2" [color]="'primary'">
+                                            </mat-slide-toggle>
+                                        </div> -->
+
+                            <div *ngIf="cls?.studentCredentialStoragePath?.length; else noStoragePath">
+                                <!-- <a mat-stroked-button target="_blank" [href]="cls?.studentCredentialStoragePath | getDownloadURL">View</a>
+                                  -->
+
+
+                                  <a mat-stroked-button target="_blank" [href]="cls?.studentCredentialStoragePath | getDownloadURL" class="!h-7 !text-xs !px-2 !py-0 !min-w-0 !text-center !ml-1">View</a>
+
+
+
+                                
+                            </div>
+
+                            <ng-template #noStoragePath>
+                                <div></div>
+                            </ng-template>
+
+                            <div class="lg:ml-0 xs:ml-0">
+                                <button class="min-w-10 min-h-7 h-7 px-2 leading-6" mat-stroked-button
+                                    (click)="toggleDetails(cls)"
+                                    [ngClass]="{'bg-slate-200':selectedclsSub?.value?.docId==cls?.docId}">
+                                    <mat-icon class="icon-size-5"
+                                        [svgIcon]="selectedclsSub?.value?.docId==cls?.docId ? 'heroicons_solid:chevron-up' : 'heroicons_solid:chevron-down'">
+                                    </mat-icon>
+
+                                </button>
+                            </div>
+                            <div class="ml-2">
+                                <mat-icon (click)="onDeletecls(cls)"
+                                    class="text-red-500  cursor-pointer transition duration-500 transform  hover:scale-[115%]"
+                                    svgIcon="delete_outline">
+                                </mat-icon>
+                            </div>
+                        </div>
+                        <div class="grid">
+                            <ng-container *ngIf="selectedclsSub?.value?.docId === cls?.docId">
+                                <!-- <ng-container *ngTemplateOutlet="rowDetailsTemplate;context: {$implicit: cls}"> -->
+                                <ng-container *ngTemplateOutlet="rowDetailsTemplate">
+                                </ng-container>
+                            </ng-container>
+                        </div>
+                    </ng-container>
+                </ng-container>
+            </div>
+            <p class="px-2 pt-4 text-secondary">
+                {{loadingMessage}}
+            </p>
+        </div>
+    </div>
+</div>
+
+<ng-template #rowDetailsTemplate let-institute>
+    <div class=" border-b border-slate-300 overflow-scroll bg-blue-100 p-4 pt-10 ">
+        <!-- <form [formGroup]="clsForm" (ngSubmit)="formSubmit(clsForm)"> -->
+        <mat-tab-group disablePagination="false">
+            <mat-tab label="Manage Programmes">
+
+                <app-select-programmes [inputSelectedClsSub]="selectedclsSub" [allProgrammes]="allProgrammes"
+                    [allClassrooms]="classroomsSub.value" (onSubmitAlert)="onEditCls($event)"></app-select-programmes>
+
+
+                <!-- <form [formGroup]="userForm" (ngSubmit)="onSubmit(userForm)" #Form
+                        class="flex flex-col items-center w-full">
+
+                        <mat-form-field appearance="fill" class="w-1/3 text-accent-600 col-span-3">
+                            <mat-label>Phone</mat-label>
+                            <span>{{countryCode}}</span>
+                            <input id="phone" [maxLength]="10" pattern="^[0-9]{10}" matInput class="ml-4"
+                                placeholder="Enter valid 10 digits phone number" formControlName="phone">
+                            <mat-error *ngIf="(userForm.get('phone').dirty ||userForm.get('phone').touched)">Please
+                                enter 10
+                                digit valid phone number</mat-error>
+                        </mat-form-field>
+                        <mat-form-field appearance="fill" class=" w-1/3 w-full text-accent-600 col-span-4">
+                            <mat-label>Email (optional)</mat-label>
+                            <input matInput formControlName="email"
+                                [attr.disabled]="userForm.value.isEmailAutoField? '' : null">
+                        </mat-form-field>
+
+
+                        <mat-form-field appearance="fill" class="w-1/3 w-full text-accent-600">
+                            <mat-label>First Name</mat-label>
+                            <input matInput formControlName="fName"
+                                [attr.disabled]="userForm.value.isFNameAutoField? '' : null">
+                        </mat-form-field>
+
+                        <mat-form-field appearance="fill" class="w-1/3 w-full text-accent-600">
+                            <mat-label>Last Name</mat-label>
+                            <input matInput formControlName="lName"
+                                [attr.disabled]="userForm.value.isLNameAutoField? '' : null">
+                        </mat-form-field>
+
+
+                        <button color="primary" mat-raised-button class="w-1/4 mt-3"
+                            [disabled]="!userForm.valid">Submit</button>
+                    </form> -->
+
+            </mat-tab>
+        </mat-tab-group>
+        <!-- </form> -->
+    </div>
+</ng-template>
+
+<fuse-drawer class="w-screen min-w-screen" [opened]="drawerOpened" fixed [mode]="'over'" [position]="'left'">
+    <div>
+        <ng-container *ngComponentOutlet="component"></ng-container>
+    </div>
+</fuse-drawer>
+
+<ng-template #loader>
+    <div *ngIf="disableLoader;else showMessage"
+        class="flex flex-auto flex-col items-center justify-center mt-30 bg-gray-100 dark:bg-transparent scale-50">
+        <mat-spinner></mat-spinner>
+    </div>
+    <ng-template #showMessage>
+        <div
+            class="w-[calc(100vw_-_290px)] h-[calc(100vh_-_300px)] flex items-center justify-center text-3xl font-bold changeNosearchresult">
+            No results found for the search term "{{searchTermUpdated}}"
+        </div>
+    </ng-template>
+</ng-template>

@@ -1,0 +1,148 @@
+<div class="flex flex-col sm:flex-row items-center md:items-start sm:justify-center md:justify-start flex-auto min-w-0 ">
+    <div id="waChat--container" class="hidden sm:block" cdkDrag (cdkDragStarted)="onDragStarted()" (cdkDragEnded)="onDragEnded()">
+        <a id="waChat--button" [href]="disableButtonClick ? null :
+        'https://wa.me/' + environment.whatsAppSender + '?text=Greetings%21+I+have+a+question+regarding+Teacher+Corner'
+    " target="_blank" (click)="onLinkClick($event)"></a>
+        <span id="waChat--text">Need Help? Chat with us</span>
+    </div>
+
+    <div class="my-auto md:flex md:items-center md:justify-end w-full sm:w-auto md:h-full md:w-1/2 py-8 px-4 sm:p-12 md:p-16 sm:rounded-2xl md:rounded-none sm:shadow md:shadow-none sm:bg-card">
+        <div class="w-full max-w-80 sm:w-80 mx-auto sm:mx-0">
+            <div class="w-72 sm:w-50 mx-auto flex items-center justify-center">
+                <ng-container *ngFor="let logo of environment.whiteBackgroundLogos">
+                    <img [class]="logo.class" [src]="logo.src" [alt]="logo.alt" />
+                </ng-container>
+            </div>
+
+            <div class="grid justify-content-center mb-5">
+                <div class="mt-8 text-center text-3xl text-accent-600 font-extrabold tracking-tight leading-tight">
+                    Teacher onboarding
+                </div>
+                <div class="text-accent-600 text-center font-medium" *ngIf="outreach?.institutionName">
+                    {{outreach?.institutionName}}
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 gap-3">
+                <mat-form-field>
+                    <input matInput placeholder="First name" [(ngModel)]="firstName" (ngModelChange)="onchangeInputs()" />
+                </mat-form-field>
+
+                <mat-form-field>
+                    <input matInput placeholder="Last name" [(ngModel)]="lastName" (ngModelChange)="onchangeInputs()" />
+                </mat-form-field>
+
+                <mat-form-field>
+                    <input matInput placeholder="Designation" [(ngModel)]="designation" (ngModelChange)="onchangeInputs()" />
+                </mat-form-field>
+            </div>
+
+            <div class="grid grid-cols-6 gap-4 items-center justify-center mt-2">
+                <mat-form-field class="col-span-2">
+                    <mat-select [(value)]="selectedCountryCode" panelClass="dropDownPanel" (selectionChange)="onchangeInputs()">
+                        <mat-select-trigger>
+                            <div class="flex gap-2 items-center justify-between">
+                                <span class="flex w-5 h-5 items-center">
+                                    <img class="h-full w-full rounded-md" [src]="storagePath+selectedCountryCode?.iso+storageFormat" />
+                                </span>
+                                <span class="tracking-tighter text-sm">{{selectedCountryCode?.phone}}</span>
+                            </div>
+                        </mat-select-trigger>
+                        <mat-option [value]="option?.value" *ngFor="let option of countryCodes|keyvalue" class="-mr-7">
+                            {{option?.key}} ({{option?.value?.phone}})
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <mat-form-field class="col-span-4">
+                    <input id="phone" [maxLength]="10" pattern="^[0-9]{10}" matInput placeholder="Enter valid number" [(ngModel)]="phoneNumber" (ngModelChange)="onchangeInputs()" />
+                </mat-form-field>
+            </div>
+
+            <div class="mb-1" [hidden]="sendOTPBtnHide">
+                <div class="mb2 d-flex">
+                    <span>
+                        <input type="checkbox" [(ngModel)]="consentInput">
+                        <small class="text-muted">{{environment.consentText}}</small>
+                    </span>
+                </div>
+
+                <button class="fuse-mat-button-large w-full mt-6" mat-flat-button [color]="'primary'" [disabled]="sendOTPBtnTimeDisabled || !consentInput" (click)="sendLoginCode()" [matTooltip]="otpExceedError?'You have exceeded the number of allowed attempts for today. Please try again tomorrow':''" [matTooltipPosition]="'above'">
+                    {{resendOTPBtnHide?'Send OTP':'Resend OTP'}}
+                </button>
+                <div class="error text-center fw-bold pt-2" *ngIf="otpExceedError">
+                    You have exceeded the number of allowed attempts for today. Please try again tomorrow.
+                </div>
+            </div>
+
+            <div [hidden]="hideVerification" class="mt-6">
+                <mat-form-field class="w-full text-accent-600">
+                    <mat-label class="text-accent-600">Enter your Verification Code</mat-label>
+                    <input id="otp" placeholder="Enter verification code" matInput type="text" name="code" [maxLength]="6" pattern="^[0-9]{6}" [(ngModel)]="verificationCode">
+                    <mat-error>OTP is required</mat-error>
+                </mat-form-field>
+
+                <button class="mt-1 fuse-mat-button-large w-full" mat-flat-button [color]="'primary'" (click)="verifyLoginCode()" [disabled]="verificationCode?.length != 6">
+                    <p *ngIf="!loginSpinner">Continue</p>
+                    <mat-spinner *ngIf="loginSpinner" [diameter]="20"></mat-spinner>
+                </button>
+
+                <p [hidden]="!resendCount" class="p-4 ml-15"><span>Resend OTP in</span>&nbsp;<span class="text-[#049CD8] text-lg font-bold">{{transform(timeLeft)}}</span></p>
+                <div class="error text-center fw-bold pt-2" *ngIf="invalidOtp">The OTP that you entered is invalid. Please enter the correct OTP to proceed.</div>
+            </div>
+        </div>
+    </div>
+
+    <div
+        class="relative hidden md:flex flex-auto items-center justify-center w-1/2 h-full p-16 lg:px-28 overflow-hidden bg-[#282A65] dark:border-l">
+        <!-- Background - @formatter:off -->
+        <!-- Rings -->
+        <svg class="absolute inset-0 pointer-events-none" viewBox="0 0 960 540" width="100%" height="100%"
+            preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
+            <g class="text-gray-700 opacity-25" fill="none" stroke="currentColor" stroke-width="100">
+                <circle r="234" cx="196" cy="23"></circle>
+                <circle r="234" cx="790" cy="491"></circle>
+            </g>
+        </svg>
+        <!-- Dots -->
+        <svg class="absolute -top-16 -right-16 text-gray-700" viewBox="0 0 220 192" width="220" height="192"
+            fill="none">
+            <defs>
+                <pattern id="837c3e70-6c3a-44e6-8854-cc48c737b659" x="0" y="0" width="20" height="20"
+                    patternUnits="userSpaceOnUse">
+                    <rect x="0" y="0" width="4" height="4" fill="currentColor"></rect>
+                </pattern>
+            </defs>
+            <rect width="220" height="192" fill="url(#837c3e70-6c3a-44e6-8854-cc48c737b659)"></rect>
+        </svg>
+        <!-- @formatter:on -->
+        <!-- Content -->
+        <div class="z-10 relative w-full max-w-2xl">
+            <div class="text-7xl font-bold leading-none text-gray-100">
+                <div>
+                    {{environment.landingPageSubheading}}
+                    <span class="text-primary"></span>
+                </div>
+                <!-- <div class="text-sm text-center">Powered by Think<span class="text-primary">TAC</span></div> -->
+            </div>
+            <div class="mt-6 text-lg tracking-tight leading-6 text-gray-400">
+                {{environment.landingPageTagline1}}
+            </div>
+            <div class="flex items-center mt-8">
+                <div class="flex flex-0 items-center -space-x-1.5">
+                    <img class="flex-0 w-10 h-10 rounded-full ring-4 ring-offset-1 ring-gray-800 ring-offset-gray-800 object-cover"
+                        src="https://ui-avatars.com/api/?bold=true&color=049BD8&format=svg&size=512&rounded=true&name=chandra+shekhar">
+                    <img class="flex-0 w-10 h-10 rounded-full ring-4 ring-offset-1 ring-gray-800 ring-offset-gray-800 object-cover"
+                        src="https://ui-avatars.com/api/?bold=true&color=A168D2&format=svg&size=512&rounded=true&name=J+H">
+                    <img class="flex-0 w-10 h-10 rounded-full ring-4 ring-offset-1 ring-gray-800 ring-offset-gray-800 object-cover"
+                        src="https://ui-avatars.com/api/?bold=true&color=9C27F1&format=svg&size=512&rounded=true&name=M+A">
+                    <img class="flex-0 w-10 h-10 rounded-full ring-4 ring-offset-1 ring-gray-800 ring-offset-gray-800 object-cover"
+                        src="https://ui-avatars.com/api/?bold=true&color=7D905E&format=svg&size=512&rounded=true&name=S+R">
+                </div>
+                <div class="ml-4 font-medium tracking-tight text-gray-400">
+                    {{environment.landingPageTagline2}}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

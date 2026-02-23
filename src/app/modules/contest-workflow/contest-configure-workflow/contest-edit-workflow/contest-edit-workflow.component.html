@@ -1,0 +1,458 @@
+<div class=" w-full flex items-end justify-end -my-3 ">
+    <button mat-dialog-close class="">
+        <mat-icon class=" hover:scale-110 transition duration-5000 transform" svgIcon="mat_outline:close">
+        </mat-icon>
+    </button>
+</div>
+
+<div class="h-[75vh] w-[60vw]">
+    <form [formGroup]="workFlowContents">
+        <div class="grid sm:grid-cols-2 grid-cols-1">
+            <div class=" border-r h-[70vh] pr-4 overflow-y-auto">
+                <p class="mb-2  font-semibold text-lg text-accent-500">
+                    {{data?.selectedStageSubm?.submissionName}} :
+                    {{workFlowContents?.get('contestStepName')?.value}}
+                </p>
+
+                <mat-form-field class="w-full text-accent-600 scale-90">
+                    <mat-label class="text-[#282B66]">Step Name</mat-label>
+                    <input id="contestStepName" matInput [formControlName]="'contestStepName'" type="text"
+                        placeholder="Enter workflowStep Name">
+                </mat-form-field>
+
+                <mat-form-field class="w-full text-accent-600 scale-90">
+                    <mat-label class="text-[#282B66]">Sequence Number</mat-label>
+                    <input id="sequenceNumber" matInput [formControlName]="'sequenceNumber'" type="number"
+                        placeholder="Enter workflowStep Sequence Number" [max]="maxValue" [min]="1">
+                </mat-form-field>
+
+                <mat-form-field class="w-full text-accent-600 scale-90">
+                    <mat-label class="text-[#282B66]">Step Sub-Title</mat-label>
+                    <input id="contestStepSubtitle" matInput [formControlName]="'contestStepSubtitle'" type="text"
+                        placeholder="Enter contest Step Subtitle">
+                </mat-form-field>
+
+                <mat-form-field class="w-full text-accent-600 scale-90">
+                    <mat-label class="text-[#282B66]">Step Description</mat-label>
+                    <input id="contestStepDescription" matInput [formControlName]="'contestStepDescription'" type="text"
+                        placeholder="Enter workflow Step Description">
+                </mat-form-field>
+                <mat-form-field class="w-full text-accent-600 scale-90">
+                    <mat-label class="text-[#282B66]">Step Duration</mat-label>
+                    <input id="contestStepDuration" matInput [formControlName]="'contestStepDuration'" type="number"
+                        placeholder="Enter Workflow Step Duration">
+                </mat-form-field>
+
+                <mat-form-field class="w-full text-accent-600 scale-90">
+                    <mat-label class="text-[#282B66]">Location</mat-label>
+                    <input id="contestLocation" matInput [formControlName]="'contestLocation'" type="text"
+                        placeholder="Enter Workflow Location">
+                </mat-form-field>
+
+                <mat-form-field class="w-full text-accent-600 scale-90">
+                    <mat-label class="text-accent-600">Access Level</mat-label>
+                    <input type="number" formControlName="allowAccess" [max]="10" [min]="1" matInput
+                        placeholder="Enter access level" />
+                </mat-form-field>
+
+                <mat-form-field class="w-full text-accent-600 scale-90">
+                    <mat-label class="text-accent-600">Can Skip Step</mat-label>
+                    <mat-select formControlName="canSkipContestStep" placeholder="Select True or False">
+                        <mat-option value="" disabled selected>Select</mat-option>
+                        <mat-option [value]="true">True</mat-option>
+                        <mat-option [value]="false">False</mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <mat-form-field class="w-full text-accent-600 scale-90">
+                    <mat-label class="text-accent-600">Show Step in Submission Dashboard</mat-label>
+                    <mat-select formControlName="showStepInSubmissionDashboard" placeholder="Select True or False">
+                        <mat-option value="" disabled selected>Select</mat-option>
+                        <mat-option [value]="true">True</mat-option>
+                        <mat-option [value]="false">False</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+
+            <div formArrayName="contents" class="ml-2 h-[70vh]  overflow-y-auto">
+                <p class="mb-1 font-semibold text-lg text-accent-500">Contents</p>
+                <!-- content to be use in ng for-->
+                <div *ngFor="let content of contents.controls; let i=index">
+                    <div [formGroupName]="i" class="mb-3">
+                        <p class="text-primary-600  w-max  bg-primary-50 rounded-lg p-1 px-3 rounded-b-none">content :
+                            {{i+1}}</p>
+                        <div class="bg-primary-50 rounded-lg rounded-tl-none">
+                            <mat-form-field class="w-full text-accent-600 scale-90">
+                                <mat-label class="text-[#282B66]">Content Name</mat-label>
+                                <input id="contentName" matInput [formControlName]="'contentName'" type="text"
+                                    placeholder="Enter Content Name">
+                                <mat-error *ngIf="content.get('contentName').invalid ">
+                                    Enter Content Name
+                                </mat-error>
+                            </mat-form-field>
+
+                            <mat-form-field class="w-full text-accent-600 scale-90">
+                                <mat-label class="text-accent-600">Content Type</mat-label>
+                                <mat-select formControlName="contentType" placeholder="Select Content Type">
+                                    <mat-option value="" disabled selected>Select</mat-option>
+                                    <mat-option *ngFor="let c of contentsTypes"
+                                        [value]="c.type">{{c.displayName}}</mat-option>
+                                </mat-select>
+                                <mat-error *ngIf="content.get('contentType').invalid ">
+                                    Select Content Type
+                                </mat-error>
+                            </mat-form-field>
+
+                            <!-- textblock -->
+                            <!-- <div *ngIf="content.value.contentType=='TEXTBLOCK'" class="w-full text-accent-600 scale-90">
+                                <quill-editor [modules]="quillConfig" formControlName="contentTextBlock"
+                                    [styles]="{height: '60px'}"></quill-editor>
+                            </div> -->
+
+                            <!-- Select Asssignmentsd -->
+                            <mat-form-field *ngIf="content.value.contentType==='ASSIGNMENT'"
+                                class="w-full text-accent-600 scale-90">
+                                <mat-label class="text-accent-600">Assignment Type</mat-label>
+                                <mat-select formControlName="assignmentType" placeholder="Select Assignment Type">
+                                    <mat-option value="" disabled selected>Select</mat-option>
+                                    <mat-option *ngFor="let assignmentType of assignmentsObject.assignmentsTypes"
+                                        [value]="assignmentType.type"
+                                        (click)="selectAssignmentType(assignmentType.type,i)">{{assignmentType.displayName}}</mat-option>
+                                </mat-select>
+                            </mat-form-field>
+
+                            <div *ngIf="content.value?.contentType==='ASSIGNMENT'">
+                                <mat-form-field *ngIf="content.value?.assignmentType==='GAME'"
+                                    class="w-full text-accent-600 scale-90">
+                                    <mat-label class="text-accent-600">Select the Game</mat-label>
+                                    <mat-select formControlName="gameName" placeholder="Select games from the list">
+                                        <mat-option value="" disabled selected>Select</mat-option>
+                                        <mat-option *ngFor="let game of allGames" [value]="game?.name"
+                                            (click)="selectedGames(game,i)">{{game?.name}}</mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+
+                            <!-- fetch Asssignments Name -->
+                            <mat-form-field *ngIf="content.value.contentType==='ASSIGNMENT'&&
+                                 content.value.assignmentType!=='GAME' &&
+                                 content.value.assignmentType!=='TEXTBLOCK'" class="w-full text-accent-600 scale-90">
+                                <mat-label class="text-accent-600">Assignment Name</mat-label>
+                                <mat-select formControlName="assignmentName" placeholder="Select assignment Name">
+                                    <mat-option value="" disabled selected>Select</mat-option>
+                                    <mat-option *ngFor="let assigntName of content.value.fetchAssignmentsNames"
+                                        [value]="assigntName.displayName"
+                                        (click)="selectedAssignment(assigntName,i)">{{assigntName.displayName}}</mat-option>
+                                </mat-select>
+                            </mat-form-field>
+
+
+                            <div *ngIf="content.value.contentType==='ASSIGNMENT'&& content.value.assignmentType==='TEXTBLOCK'"
+                                class="w-full text-accent-600 scale-90">
+                                <quill-editor [modules]="quillConfig" formControlName="contentTextBlock"
+                                    [styles]="{height: '60px'}"></quill-editor>
+                            </div>
+
+                            <mat-form-field *ngIf="content.value.contentType==='RESOURCES'"
+                                class="w-full text-accent-600 scale-90">
+                                <mat-label class="text-accent-600">Resource Type</mat-label>
+                                <mat-select formControlName="resourceType"
+                                    placeholder="Select Resource Type">
+                                    <mat-option value="" disabled selected>Select</mat-option>
+                                    <mat-option [value]="ar.type"
+                                        *ngFor="let ar of additionalResType">{{ar.name}}</mat-option>
+                                </mat-select>
+                            </mat-form-field>
+
+
+
+                            <div class="flex items-start mr-4 ml-1"
+                                [ngClass]="content.value.contentType!=='ASSIGNMENT' ? 'flex items-start mr-4 ml-1' : ''">
+                                <!-- upload -->
+                                <div class="w-full scale-90 mb-3"
+                                    *ngIf="content.value.contentType !=='VIDEO' && content.value.contentType !=='ASSIGNMENT'&& content.value.contentType !=='RESOURCES' && content.value.contentType !=='TEXTBLOCK';else youTubeTemplate">
+                                    <!-- <div class="w-full scale-90" *ngIf="false;else youTubeTemplate"> -->
+                                    <mat-label class="text-accent-600  font-medium">
+                                        {{content.value.resourcePath?'Re-Upload PDF file':'Upload PDF file'}}
+                                    </mat-label>
+                                    <div class="flex items-base w-full">
+                                        <div class="flex flex-col   bg-grey-lighter w-full">
+                                            <label matRipple
+                                                class=" border h-12 border-primary relative w-full flex flex-col items-center  rounded-md p-2  cursor-pointer bg-primary-200 text-primary-600 hover:bg-slate-200">
+                                                <span class="mx-2 absolute left-0  mt-[2px]">
+                                                    <mat-icon class="text-primary"
+                                                        svgIcon="heroicons_outline:arrow-circle-down"></mat-icon>
+
+                                                </span>
+                                                <div class="flex items-center">
+
+                                                    <span class=" mr-2 text-base mt-[2px]">
+                                                        {{content.value.resourcePath?'Re-Upload file':'Choose File'}}
+                                                    </span>
+                                                </div>
+                                                <input type='file' class="hidden" accept=".pdf"
+                                                    (change)="onChooseFile($event,i,'pdf')" #elementRef />
+                                            </label>
+                                            <span
+                                                class="text-xs text-secondary line-clamp-1 ml-1 ">{{inputFileName}}</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Upload Progress -->
+                                    <div *ngIf="content.value.uploadProgress !=0 && content.value.uploadProgress <100;else succfullyUpladed"
+                                        class="pl-2 grid grid-cols-1 gap-1 justify-center">
+                                        <mat-progress-bar mode="buffer" [value]="content.value.uploadProgress">
+                                        </mat-progress-bar>
+                                        <p class="mb-3" class="text-yellow-500">
+                                            {{content.value.uploadProgress}}% uploaded</p>
+                                    </div>
+
+                                    <ng-template #succfullyUpladed>
+                                        <p *ngIf="content.value.uploadProgress==100" class="mb-3"
+                                            class="text-green-500">
+                                            Successfully Uploaded</p>
+                                    </ng-template>
+
+                                    <!-- isDownloadable Toggle -->
+                                    <div class="mt-4 -mb-4 -ml-4">
+                                        <mat-form-field class="w-full text-accent-600 scale-90">
+                                            <mat-label class="text-accent-600">Downloadable in
+                                                Unlab?</mat-label>
+                                            <mat-slide-toggle class="w-full" [color]="'primary'"
+                                                formControlName="isDownloadable">Downloadable in
+                                                Unlab?
+                                            </mat-slide-toggle>
+                                            <input matInput hidden>
+                                        </mat-form-field>
+                                    </div>
+
+                                </div>
+
+                                <div *ngIf="content.value.resourcePath" class="pt-[34px]">
+                                    <div *ngIf="content.value.contentType !=='RESOURCES'">
+                                        <a target="_blank" [href]="content.value.resourcePath | getDownloadURL"
+                                            *ngIf="content.value.contentType !=='VIDEO'&& content.value.contentType !=='ASSIGNMENT';else videoBtn"
+                                            class=" bg-primary-600 text-white rounded-lg p-[11px] mt-[22px] hover:bg-primary-500 active:bg-primary-700"
+                                            [ngClass]="{'bg-primary-100 border  mt-[22px] border-primary-200 text-slate-400 pointer-events-none cursor-default': !content.value.resourcePath}">
+                                            view
+                                        </a>
+                                    </div>
+
+                                    <div *ngIf="content.value.contentType ==='RESOURCES'">
+                                        <a target="_blank" [href]="content.value.resourcePath | getDownloadURL"
+                                            *ngIf="content.value.resourceType ==='PPT' || content.value.resourceType ==='PDF';else videoBtn"
+                                            class=" bg-primary-600 text-white rounded-lg p-[11px] mt-[22px] hover:bg-primary-500 active:bg-primary-700"
+                                            [ngClass]="{'bg-primary-100 border  mt-[22px] border-primary-200 text-slate-400 pointer-events-none cursor-default': !content.value.resourcePath}">
+                                            view
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <ng-template #videoBtn>
+                                    <a target="_blank" [href]="content.value.resourcePath"
+                                        *ngIf="content.value.contentType !=='ASSIGNMENT';else gameBtn"
+                                        class=" bg-primary-600 text-white rounded-lg p-[11px] mt-[26px] hover:bg-primary-500 active:bg-primary-700"
+                                        [ngClass]="{'bg-primary-100 border border-primary-200 text-slate-400 pointer-events-none cursor-default': !content.value.resourcePath}">
+                                        view
+                                    </a>
+                                </ng-template>
+
+
+                                <ng-template #gameBtn>
+                                    <a target="_blank" [href]="content.value.resourcePath"
+                                        *ngIf="content.value.assignmentType==='GAME'"
+                                        class=" bg-primary-600 text-white rounded-lg p-[11px] mt-[26px] hover:bg-primary-500 active:bg-primary-700"
+                                        [ngClass]="{'bg-primary-100 border border-primary-200 text-slate-400 pointer-events-none cursor-default': !content.value.resourcePath}">
+                                        view
+                                    </a>
+                                </ng-template>
+
+                                <ng-template #youTubeTemplate>
+                                    <div *ngIf="content.value.contentType==='VIDEO';else gamesTemplate" class="w-full">
+                                        <mat-form-field class="w-full text-accent-600 scale-90">
+                                            <mat-label class="text-[#282B66]">YouTube Link</mat-label>
+                                            <input id="contentName" formControlName="resourcePath" matInput type="text"
+                                                placeholder="Type YouTube Link...">
+                                        </mat-form-field>
+                                    </div>
+                                </ng-template>
+
+                                <ng-template #gamesTemplate>
+                                    <div *ngIf="content.value.assignmentType==='GAME';else checkAssignmentTemplate"
+                                        class="w-full">
+                                        <mat-form-field class="w-full text-accent-600 scale-90">
+                                            <mat-label class="text-[#282B66]">Game Link</mat-label>
+                                            <input id="contentName" formControlName="resourcePath" matInput type="text"
+                                                placeholder="Type Game Link...">
+                                            <!-- <mat-error *ngIf="workFlowContents.get('contentName').invalid ">
+                                            </mat-error> -->
+                                        </mat-form-field>
+                                    </div>
+                                </ng-template>
+
+                                <ng-template #checkAssignmentTemplate>
+                                    <div *ngIf="content.value.contentType==='ASSIGNMENT';else adResourceTemplate"
+                                        class="w-full">
+                                        <mat-form-field class="w-full text-accent-600 scale-90">
+                                            <mat-label class="text-accent-600">Due Date</mat-label>
+                                            <input type="date" formControlName="assignmentDueDate" matInput
+                                                placeholder="Select due date" class="mt-3" />
+                                        </mat-form-field>
+                                    </div>
+                                </ng-template>
+
+                                <ng-template #adResourceTemplate>
+                                    <div class="w-full scale-90 mb-3"
+                                        *ngIf="content.value.contentType ==='RESOURCES' && content.value.resourceType ==='PPT' ;else pdfTemplate">
+                                        <!-- <div class="w-full scale-90" *ngIf="false;else youTubeTemplate"> -->
+                                        <mat-label class="text-accent-600  font-medium">
+                                            {{content.value.resourcePath?'Re-Upload PPT file':'Upload PPT file'}}
+                                        </mat-label>
+                                        <div class="flex items-base w-full">
+                                            <div class="flex flex-col   bg-grey-lighter w-full">
+                                                <label matRipple
+                                                    class=" border h-12 border-primary relative w-full flex flex-col items-center  rounded-md p-2  cursor-pointer bg-primary-200 text-primary-600 hover:bg-slate-200">
+                                                    <span class="mx-2 absolute left-0  mt-[2px]">
+                                                        <mat-icon class="text-primary"
+                                                            svgIcon="heroicons_outline:arrow-circle-down"></mat-icon>
+                                                    </span>
+                                                    <div class="flex items-center ">
+                                                        <span class=" mr-2 text-base mt-[2px]">
+                                                            {{
+                                                            content.value.resourcePath?'Re-Upload File':'Choose File'
+                                                            }}
+                                                        </span>
+                                                    </div>
+                                                    <input type='file' class="hidden" accept=".ppt,.pptx"
+                                                        (change)="onChooseFile($event,i,'ppt')" #elementRef />
+                                                </label>
+                                                <span
+                                                    class="text-xs text-secondary line-clamp-1 ml-1 ">{{inputFileName}}</span>
+                                            </div>
+                                        </div>
+
+                                        <!-- Upload Progress -->
+                                        <div *ngIf="content.value.uploadProgress !=0 && content.value.uploadProgress <100;else succfullyUpladed"
+                                            class="pl-2 grid grid-cols-1 gap-1 justify-center">
+                                            <mat-progress-bar mode="buffer" [value]="content.value.uploadProgress">
+                                            </mat-progress-bar>
+                                            <p class="mb-3" class="text-yellow-500">
+                                                {{content.value.uploadProgress}}% uploaded
+                                            </p>
+                                        </div>
+
+                                        <ng-template #succfullyUpladed>
+                                            <p *ngIf="content.value.uploadProgress==100" class="mb-3"
+                                                class="text-green-500">
+                                                Successfully Uploaded</p>
+                                        </ng-template>
+
+                                    </div>
+
+                                </ng-template>
+
+                                <ng-template #pdfTemplate>
+                                    <div class="w-full scale-90 mb-3"
+                                        *ngIf="content.value.contentType ==='RESOURCES' && content.value.resourceType ==='PDF' ;else additionalResVideo">
+                                        <!-- <div class="w-full scale-90" *ngIf="false;else youTubeTemplate"> -->
+                                        <mat-label class="text-accent-600  font-medium">
+                                            {{content.value.resourcePath?'Re-Upload PDF file':'Upload PDF file'}}
+                                        </mat-label>
+                                        <div class="flex items-base w-full">
+                                            <div class="flex flex-col   bg-grey-lighter w-full">
+                                                <label matRipple
+                                                    class=" border h-12 border-primary relative w-full flex flex-col items-center  rounded-md p-2  cursor-pointer bg-primary-200 text-primary-600 hover:bg-slate-200">
+                                                    <span class="mx-2 absolute left-0  mt-[2px]">
+                                                        <mat-icon class="text-primary"
+                                                            svgIcon="heroicons_outline:arrow-circle-down"></mat-icon>
+                                                    </span>
+                                                    <div class="flex items-center ">
+                                                        <span class=" mr-2 text-base mt-[2px]">
+                                                            {{
+                                                            content.value.resourcePath?"Re-Upload file":"Choose File"
+                                                            }}
+                                                        </span>
+                                                    </div>
+                                                    <input type='file' class="hidden" accept=".pdf"
+                                                        (change)="onChooseFile($event,i,'pdf')" #elementRef />
+                                                </label>
+                                                <span
+                                                    class="text-xs text-secondary line-clamp-1 ml-1 ">{{inputFileName}}</span>
+                                            </div>
+                                        </div>
+                                        <!-- Upload Progress -->
+                                        <div *ngIf="content.value.uploadProgress !=0 && content.value.uploadProgress <100;else succfullyUpladed"
+                                            class="pl-2 grid grid-cols-1 gap-1 justify-center">
+                                            <mat-progress-bar mode="buffer" [value]="content.value.uploadProgress">
+                                            </mat-progress-bar>
+                                            <p class="mb-3" class="text-yellow-500">
+                                                {{content.value.uploadProgress}}% uploaded</p>
+                                        </div>
+
+                                        <ng-template #succfullyUpladed>
+                                            <p *ngIf="content.value.uploadProgress==100" class="mb-3"
+                                                class="text-green-500">
+                                                Successfully Uploaded</p>
+                                        </ng-template>
+
+                                        <!-- isDownloadable Toggle -->
+                                        <div class="mt-4 -mb-4 -ml-4">
+                                            <mat-form-field class="w-full text-accent-600 scale-90">
+                                                <mat-label class="text-accent-600">Downloadable in
+                                                    Unlab?</mat-label>
+                                                <mat-slide-toggle class="w-full" [color]="'primary'"
+                                                    formControlName="isDownloadable">Downloadable in
+                                                    Unlab?
+                                                </mat-slide-toggle>
+                                                <input matInput hidden>
+                                            </mat-form-field>
+                                        </div>
+
+                                    </div>
+                                </ng-template>
+                                <ng-template #additionalResVideo>
+                                    <div class="w-full" *ngIf="content.value.contentType !=='TEXTBLOCK'">
+                                        <mat-form-field class="w-full text-accent-600 scale-90">
+                                            <mat-label class="text-[#282B66]">YouTube Link</mat-label>
+                                            <input id="contentName" formControlName="resourcePath" matInput type="text"
+                                                placeholder="Type YouTube Link...">
+                                        </mat-form-field>
+                                    </div>
+                                </ng-template>
+                            </div>
+
+                            <mat-form-field class="w-full text-accent-600 scale-90">
+                                <mat-label class="text-accent-600">Access Level</mat-label>
+                                <input type="number" formControlName="contentIsLocked" [max]="10" [min]="1" matInput
+                                    placeholder="Enter access level" />
+                            </mat-form-field>
+
+                            <div (click)="deletElements(i)" matRipple matTooltipPosition="above"
+                                matTooltip="Delete content from this step"
+                                class="w-full bg-red-100 hover:bg-red-200 rounded-br-lg rounded-bl-lg border text-center border-red-100 py-2 text-red-600 flex justify-center items-center cursor-pointer">
+                                <mat-icon class="text-red-500" svgIcon="mat_outline:delete_outline"></mat-icon>
+                                <p class="-mb-1">Delete Content</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div (click)="addNewContent()" matRipple matTooltipPosition="above" matTooltip="Add a new step"
+                    class="h-10 w-full bg hover:bg-primary-200 bg-primary-100 font-semibold cursor-pointer text-sm text-primary-600 rounded-lg border-2 border-dashed border-primary-400 flex justify-center items-center">
+                    <p>ADD NEW CONTENT </p>
+                    <mat-icon class="text-primary-600 ml-2" svgIcon="heroicons_outline:plus-circle"></mat-icon>
+                </div>
+
+            </div>
+        </div>
+        <div class="-mt-4 text-center">
+            <button (click)="onSubmit()" type="button" [disabled]="workFlowContents.invalid"
+                class="fuse-mat-stroked-button-large disabled:bg-primary-200 text-center mt-6 bg-primary-600 text-white hover:bg-primary-500"
+                mat-stroked-button>
+                Save Changes
+            </button>
+        </div>
+    </form>
+
+</div>

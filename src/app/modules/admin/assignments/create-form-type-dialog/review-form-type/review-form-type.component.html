@@ -1,0 +1,48 @@
+<div class="h-[57vh]">
+    <div class="pt-1 h-full">
+        <div class=" h-full overflow-auto bg-primary-50  rounded-xl p-4">
+            <!-- quiz info -->
+            <div class="grid grid-cols-5 mb-6">
+                <div class="col-span-2 text-accent font-semibold">
+                    <p class="mb-2  ">Assignment Name</p>
+                    <p class="mb-2 ">Creator</p>
+                    <p class="mb-2 ">Author</p>
+                </div>
+                <div class="col-span-3 text-accent font-medium">
+                    <p class="mb-2 ">{{basicInfo?.displayName}}</p>
+                    <p class="mb-2 ">{{basicInfo?.creator}}</p>
+                    <p class="mb-2 ">{{basicInfo?.author}}</p>
+                </div>
+            </div>
+            <!-- preview  qus info -->
+            <table class="mt-3">
+                <tr>
+                    <th class="w-1/3 pb-4 text-primary text-left">Instructions</th>
+                    <td class="pb-4 pl-4 text-secondary">{{qusInfo?.instructions}}</td>
+                    <td class="pb-4 pl-4 text-primary font-semibold">Question Type</td>
+                </tr>
+                <tr *ngFor="let question of qusInfo?.questions; let i = index">
+                    <th class="w-1/3  text-primary text-left">Question {{i + 1}}</th>
+                    <td class="pl-4 text-secondary">{{question?.question}}</td>
+                    <td class="pl-4 text-secondary">{{questionTypes[question?.questionType]}}</td>
+
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="flex justify-between pt-3">
+    <button matStepperPrevious mat-stroked-button type="submit"
+        class="bg-primary text-white  arrowBtnBack disabled:bg-primary-100">
+        <mat-icon class="mr-2 icon-size-5  text-white arrowIconBack"
+            [svgIcon]="'heroicons_solid:arrow-sm-left'"></mat-icon>
+        Back
+    </button>
+    <button [disabled]="btnDisable" (click)="onSave(assignmentInfo?.docId)" matStepperNext mat-stroked-button
+        type="submit" class=" bg-primary text-white arrowBtn disabled:bg-primary-100">
+        {{this.assignmentInfo?.assignments?'Update Form':'Save Form'}}
+        <mat-icon class="ml-2 icon-size-5  text-white arrowIcon"
+            [svgIcon]="'heroicons_solid:arrow-sm-right'"></mat-icon>
+    </button>
+</div>

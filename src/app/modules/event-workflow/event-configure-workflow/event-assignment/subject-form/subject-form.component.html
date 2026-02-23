@@ -1,0 +1,88 @@
+<div class="flex flex-col flex-auto min-w-0">
+    <div class="flex-auto p-6 sm:p-10">
+        <div class="max-w-3xl">
+            <form [formGroup]="formGroup" class="flex flex-col px-8 pt-10 bg-card shadow rounded overflow-hidden">
+                <p class="text-lg font-medium">Innovation submission</p>
+                <p class="text-secondary mb-6">
+                    These include: Name of Innovation; Subject/Topic/Subtopic; Materials Used; Description etc
+                </p>
+                <div class="flex flex-col gt-xs:flex-row">
+                    <mat-form-field class="flex-auto gt-xs:pr-3">
+                        <mat-select [placeholder]="'Selected Subject'" formControlName="subject"
+                            (selectionChange)="subjectChange($event.value)">
+                            <mat-option label="Select" value="" selected>Select</mat-option>
+                            <mat-option label="All" value="A">All</mat-option>
+                            <mat-option label="Biology" value="B">Biology</mat-option>
+                            <mat-option label="Chemistry" value="C">Chemistry</mat-option>
+                            <mat-option label="Earth Science" value="E">Earth Science</mat-option>
+                            <mat-option label="Others" value="O">Others</mat-option>
+                            <mat-option label="Physics" value="P">Physics</mat-option>
+                        </mat-select>
+                        <!-- <mat-icon class="icon-size-5" matPrefix
+                            [svgIcon]="'heroicons_solid:location-marker'"></mat-icon> -->
+                        <mat-icon class="icon-size-5" matPrefix svgIcon="subject"></mat-icon>
+                    </mat-form-field>
+
+                    <mat-form-field class="flex-auto gt-xs:pr-3">
+                        <mat-select [placeholder]="'Choose Category'" formControlName="category"
+                            (selectionChange)="categoryChange($event.value)">
+                            <mat-option label="Select" value="" selected>Select</mat-option>
+                            <mat-option [value]="kv.key" *ngFor="let kv of selectedCategoryArr |keyvalue">
+                                {{kv.key}}</mat-option>
+                        </mat-select>
+                        <mat-icon class="icon-size-5" matPrefix svgIcon="subject"></mat-icon>
+                    </mat-form-field>
+
+                    <mat-form-field class="flex-auto gt-xs:pr-3">
+                        <mat-select [placeholder]="'Sub Topic'" formControlName="topic"
+                            (selectionChange)="topicChange($event.value)">
+                            <mat-option [value]="kv.key"
+                                *ngFor="let kv of selectedTopicArr |keyvalue">{{kv.key}}</mat-option>
+
+                        </mat-select>
+                        <mat-icon class="icon-size-5" matPrefix svgIcon="subject"></mat-icon>
+                    </mat-form-field>
+
+                    <mat-form-field class="flex-auto">
+                        <input matInput [placeholder]="'Title '">
+                        <mat-icon class="icon-size-5" matPrefix svgIcon="subject"></mat-icon>
+                    </mat-form-field>
+
+                    <mat-form-field class="fuse-mat-textarea flex-auto">
+                        <textarea matInput [placeholder]="'Description'" [rows]="3">
+                        </textarea>
+                    </mat-form-field>
+
+                    <div class="flex">
+                        <mat-form-field class="fuse-mat-textarea flex-auto">
+                            <textarea matInput [placeholder]="'Material Used'" [rows]="3">
+                            </textarea>
+                        </mat-form-field>
+                    </div>
+
+                    <mat-form-field class="flex-auto gt-xs:pr-3">
+                        <mat-select formControlName="additionalLanguage" [placeholder]="'Additional Language'"
+                            (selectionChange)="languageChange($event.value)">
+                            <mat-option [value]="lang.id"
+                                *ngFor="let lang of selectedLangArr">{{lang.language}}</mat-option>
+                        </mat-select>
+                        <mat-icon class="icon-size-5" matPrefix svgIcon="subject"></mat-icon>
+                    </mat-form-field>
+                </div>
+
+                <!-- <mat-divider class="mt-6 mb-10"></mat-divider> -->
+                <!-- <div class="flex items-center justify-end border-t -mx-8 mt-8 px-8 py-5 bg-gray-50 dark:bg-gray-700">
+                    <button mat-button>
+                        Cancel
+                    </button>
+                    <button
+                        class="px-6 ml-3"
+                        mat-flat-button
+                        [color]="'primary'">
+                        Save
+                    </button>
+                </div> -->
+            </form>
+        </div>
+    </div>
+</div>

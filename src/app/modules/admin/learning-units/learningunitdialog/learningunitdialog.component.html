@@ -1,0 +1,27 @@
+<div class="w-[25vw]">
+  <header class="sticky top-0 z-50">
+    <mat-form-field appearance="fill" class="w-4/5">
+      <mat-label> Select Learning Units</mat-label>
+      <mat-icon matPrefix>search</mat-icon>
+      <input type="text" matInput (keyup)="tactivitySearchInput($event)" placeholder="Search Learning unit">
+    </mat-form-field>
+
+    <button mat-dialog-close class="absolute right-2 -top-3" type="button" (click)="close()">
+      <mat-icon class=" hover:scale-110 transition duration-5000 transform" svgIcon="mat_outline:close">
+      </mat-icon>
+    </button>
+  </header>
+
+  <div class="relative overflow-scroll h-[20vw]">
+    <mat-list role="list">
+      <mat-list-item *ngFor="let elem of filteredData" role="listitem" class="">
+        <div matListItemTitle>
+          <mat-checkbox color="primary" class="text-primary-900" [checked]="checkSelected(elem)"
+            (change)=" toggleSelection($event, elem)">
+            <div matListItemLine>{{elem.learningUnitName}} ({{elem.version}})</div>
+          </mat-checkbox>
+        </div>
+      </mat-list-item>
+    </mat-list>
+  </div>
+</div>

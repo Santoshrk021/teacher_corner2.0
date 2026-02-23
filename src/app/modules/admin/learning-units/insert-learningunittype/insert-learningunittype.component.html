@@ -1,0 +1,52 @@
+<div class="h-[48vh] sm:w-[27vw] p-3 relative">
+    <div class=" h-[calc(50vh_-_27px)] overflow-auto ">
+        <div class="flex flex-row mt-4 mb-2 w-full">
+            <button mat-dialog-close class="m-4 sm:m-6 sm:mx-7 absolute -top-9 -right-9 z-40" type="button" (click)="close()">
+                <mat-icon class=" hover:scale-110 transition duration-5000 transform" svgIcon="mat_outline:close">
+                </mat-icon>
+              </button>
+            <h1 class="text-2xl text-left">Add a New Learning Unit type</h1>
+
+          </div>
+        <form [formGroup]="LutypeForm" (ngSubmit)="submitForm(LutypeForm)">
+            <div class="flex flex-col w-full  rounded-xl px-6 mt-4">
+
+                <mat-form-field appearance="fill" floatLabel="always">
+                    <mat-label>Name</mat-label>
+                    <input type="text" matInput formControlName="name" placeholder="Enter the learning unit name type" minlength="2">
+
+                </mat-form-field>
+                <mat-error *ngIf="LutypeForm.get('name').hasError('minlength')" class="-mt-4">
+                    Name must be at least 2 characters long
+                </mat-error>
+
+                <mat-form-field appearance="fill" floatLabel="always">
+                    <mat-label>Code</mat-label>
+                    <input type="text" matInput formControlName='code' pattern="[A-Z]{2}$" maxlength="2" placeholder="Enter the learning unit code name"
+                   >
+
+                    <!-- <mat-icon  *ngIf="LutypeForm.get('code').hasError('pattern')|| LutypeForm.get('code').hasError('maxlength') || codeError"
+                    [svgIcon]="'heroicons_outline:information-circle'" matSuffix
+                      [matTooltip]="message" class="text-warn-400"></mat-icon> -->
+
+
+
+                </mat-form-field>
+                <mat-error *ngIf="LutypeForm.get('code').hasError('pattern')|| LutypeForm.get('code').hasError('maxlength')" class="-mt-4">
+                    Enter a valid learning unit type code
+                </mat-error>
+                <mat-error *ngIf="codeError" class="-mt-4">
+                    The learning unit type code {{LutypeForm.get('code').value}} already exists
+                </mat-error>
+                <!-- <div >
+
+                  </div> -->
+                <button type="submit" class="w-1/2 m-auto" [disabled]="!LutypeForm?.valid" mat-raised-button
+                    color="primary">
+                    Save
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+

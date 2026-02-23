@@ -1,0 +1,49 @@
+<div class="h-full">
+    <div class="absolute h-full w-full grid grid-cols-5 overflow-auto">
+        <div class="col-span-1 mt-4 ml-4">
+            <!-- Back to courses -->
+            <button mat-stroked-button
+                class="inline-flex items-center leading-6 text-white bg-primary-600 hover:underline cursor-pointer"
+                (click)="goBack()">
+                <span class="inline-flex items-center">
+                    <mat-icon class="icon-size-5 text-current" [svgIcon]="'heroicons_solid:arrow-sm-left'">
+                    </mat-icon>
+                    <span class="ml-1.5 font-medium leading-5">Back</span>
+                </span>
+            </button>
+        </div>
+
+        <ng-container *ngIf="isAssignmentUi;else assignmentDeleted">
+            <div *ngIf="assignment?.type === 'QUIZ'" class="col-span-3 mt-4">
+                <app-quiz [contentInfo]="assignment" [quizId]="assignment.docId" [workflowId]=""
+                    parent="AssignmentSubmitComponent"></app-quiz>
+            </div>
+
+            <div *ngIf="assignment?.type === 'UPLOAD'" class="col-span-3 mt-4">
+                <app-upload [contentInfo]="assignment"></app-upload>
+            </div>
+        </ng-container>
+
+        <ng-template #assignmentDeleted>
+            <div class="text-slate-600 font-medium text-lg h-[300px] w-full flex justify-center items-center">
+                <div>
+                    <p>The assignment has been
+                        deleted.</p>
+                    <div class="mt-3 flex flex-wrap ">
+                        <span>Please&nbsp;contact&nbsp;us&nbsp;at</span>
+                        <span class="text-primary">&nbsp;+{{environment.whatsAppSender}}</span>
+                        <span>&nbsp;or&nbsp;</span>
+                        <span class="flex  items-center bg-white h-max w-max px-1 py-0.5 rounded shadow">
+                            <img class="h-4 w-4 mr-1 "
+                                src="https://static.whatsapp.net/rsrc.php/v3/yz/r/ujTY9i_Jhs1.png">
+                            <a class="text-[#049CD8] text-base hover:underline underline-offset-2 " target="_blank"
+                                [href]="'https://api.whatsapp.com/send/?phone=' + environment.whatsAppSender + '&text=Greetings%21+I+have+a+question+regarding+Teacher+Corner&type=phone_number&app_absent=0'">{{environment.projectName}}</a>
+                        </span>
+                        <span>&nbsp;,&nbsp;</span>
+                        <span>for&nbsp;further assistance.</span>
+                    </div>
+                </div>
+            </div>
+        </ng-template>
+    </div>
+</div>

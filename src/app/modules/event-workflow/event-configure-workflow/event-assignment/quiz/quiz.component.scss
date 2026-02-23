@@ -1,0 +1,115 @@
+// :host::ng-deep .mat-tab-label-container {
+//     @media (max-width:600px) {
+//         display: flex;
+//         flex-grow: 1;
+//         overflow: hidden;
+//         z-index: 1;
+//         overflow-x: scroll !important;
+//     }
+
+// }
+
+:host::ng-deep.mat-tab-group .mat-tab-header .mat-tab-label-container .mat-tab-list .mat-tab-labels .mat-tab-label.mat-tab-label-active {
+    background-color: #049cd800 !important;
+}
+
+:host::ng-deep .mat-tab-group .mat-tab-body-content {
+    @media (max-width:600px) {
+        padding: 0;
+    }
+}
+:host::ng-deep.mat-tab-group .mat-tab-header .mat-tab-label-container .mat-tab-list .mat-tab-labels .mat-tab-label.mat-tab-label-active{
+    color: #049BD8 !important;
+    border-bottom: 2px solid #049BD8;
+    border-radius: 0px !important;
+}
+.white-icon {
+    color: white !important
+}
+
+.bg-primary {
+    background-color: #049BD8 !important;
+}
+
+.mainBtn {
+    &:hover {
+        .arrowIcon {
+            animation: bounce 1s infinite;
+
+            @keyframes bounce {
+
+                0% {
+                    transform: translateX(0%);
+                    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+                }
+                100% {
+                    transform: translateX(0%);
+                    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+                }
+
+                50% {
+                    transform: translateX(35%);
+                    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+                }
+            }
+        }
+    }
+
+
+}
+
+
+
+:host ::ng-deep.mat-step-label.mat-step-label-active {
+    border-top-color: #049cd8 !important;
+}
+
+:host ::ng-deep.mat-step-header {
+    color: #fff !important;
+}
+
+:host ::ng-deep.mat-step-header[aria-selected="true"] {
+    background-color: rgba(0, 168, 206, 0.105) !important;
+    border-radius: 32px;
+
+    & div.mat-step-label.mat-step-label-active.mat-step-label-selected {
+        color: #0080b3;
+    }
+}
+
+:host ::ng-deep.mat-step-header {
+    &:hover {
+        border-radius: 32px !important;
+    }
+}
+
+// ===================== TEXT ANSWER QUILL EDITOR STYLING =====================
+:host ::ng-deep .quiz-text-answer-editor {
+  .ql-container {
+    border: 1px solid #e5e7eb;
+    border-radius: 0.375rem;
+    min-height: 100px;
+    font-family: inherit;
+  }
+
+  .ql-editor {
+    min-height: 100px;
+    padding: 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+
+    &.ql-blank::before {
+      color: #9ca3af;
+      font-style: normal;
+    }
+  }
+
+  .ql-editor:focus {
+    outline: none;
+  }
+
+  &:focus-within .ql-container {
+    border-color: #049BD8;
+    box-shadow: 0 0 0 2px rgba(4, 155, 216, 0.1);
+  }
+}

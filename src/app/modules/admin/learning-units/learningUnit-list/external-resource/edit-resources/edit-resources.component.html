@@ -1,0 +1,91 @@
+<div class=" m-auto relative bg-white  rounded-2xl w-600px sm:w-[30vw] p-6 ">
+    <button mat-dialog-close class=" absolute -top-4 -right-4 z-40">
+        <mat-icon class=" hover:scale-110 transition duration-1000 transform" svgIcon="mat_outline:close">
+        </mat-icon>
+    </button>
+
+    <form [formGroup]="editResource" (ngSubmit)="onSave(editResource)">
+        <mat-form-field class="w-full" appearance="fill" floatLabel="always">
+            <mat-label>Select Boards</mat-label>
+
+            <!-- <mat-select formControlName="boards" multiple placeholder="Select board">
+                <mat-option *ngFor="let b of boards" [value]="b.code">{{b.code}}</mat-option>
+            </mat-select> -->
+
+            <input matInput type="text" [matAutocomplete]="autoBoards" formControlName="boards"
+                placeholder="Type board name">
+
+            <mat-autocomplete #autoBoards>
+                <mat-option *ngFor="let b of filteredBoards | async" [value]="selectedBoards">
+                    <div (click)="optionClicked($event, b)">
+                        <mat-checkbox [checked]="b.selected" (change)="toggleSelection(b)" color="primary"
+                            (click)="$event.stopPropagation()">{{b.code}}</mat-checkbox>
+                    </div>
+                </mat-option>
+            </mat-autocomplete>
+        </mat-form-field>
+
+        <mat-form-field class="w-full" appearance="fill" floatLabel="always">
+            <mat-label>Select Grade</mat-label>
+            <mat-select formControlName="grade" multiple placeholder="Select grade">
+                <mat-option *ngFor="let g of grades" [value]="g">{{g}}</mat-option>
+            </mat-select>
+        </mat-form-field>
+
+        <div class="mt-4">
+            <div class="flex flex-col bg-grey-lighter" [matTooltip]="reuploadBoolean?tooltipMessage:''"
+                matTooltipPosition="right">
+                <label matRipple class=" border relative right-0 flex flex-col items-center  rounded-lg p-2 h-12"
+                    [ngClass]="{
+                        'bg-white text-primary-600 hover:bg-slate-200 border-primary cursor-pointer': editResource.get('storagePath').enabled,
+                        'bg-slate-100 text-slate-400 border-slate-400': editResource.get('storagePath').disabled
+                    }">
+
+                    <ng-container *ngIf="this.data?.componentDetails?.type === 'file'">
+                        <span class="absolute left-0 mt-1 ml-2">
+                            <mat-icon [ngClass]="{
+                                'text-primary': editResource.get('storagePath').enabled,
+                                'text-slate-400': editResource.get('storagePath').disabled
+                            }" svgIcon="heroicons_outline:arrow-circle-down"></mat-icon>
+                        </span>
+
+                        <div class="flex items-center mt-1 ">
+                            <span class=" md:text-base relative sm:text-[10px]">
+                                {{ reuploadBoolean ? 'Re-Upload' : 'Upload' }}
+                            </span>
+                        </div>
+
+                        <input type='file' class="hidden " #logoFileInputRef
+                            [disabled]="editResource.get('storagePath').disabled" (change)="uploadFile($event)" />
+                    </ng-container>
+
+                    <ng-container *ngIf="this.data?.componentDetails?.type === 'video'">
+                        <input [readonly]="trashUINotEditable==true?true:false" class="w-full"
+                            (keyup)="onInputModify($event)"
+                            [value]="editResource?.get('storagePath')?.value"
+                            placeholder="Paste video URL">
+                    </ng-container>
+                </label>
+
+                <!-- <span *ngIf="filename" class="text-xs text-secondary line-clamp-1 ml-1">
+                    {{filename}}
+                </span>
+                <div class="pl-4 mt-3 " [style.visibility]="loader ? 'visible' : 'hidden'">
+                    <span class="loader ml-32"></span>
+                </div> -->
+            </div>
+        </div>
+
+        <div class="mt-4 flex justify-center">
+            <button type="submit" class="w-1/2 m-auto" [mat-dialog-close]="gradeDependentResources"
+                [disabled]="!submitBtnActive" mat-raised-button mat-dialog-close color="primary">
+
+                <mat-spinner *ngIf="loader; else showSubmit" [diameter]="20" class="mt-[2px]"></mat-spinner>
+
+                <ng-template #showSubmit>
+                    <p>Submit</p>
+                </ng-template>
+            </button>
+        </div>
+    </form>
+</div>

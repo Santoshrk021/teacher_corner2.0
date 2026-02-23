@@ -1,0 +1,121 @@
+<div class="bg-slate-100 h-screen w-screen overflow-hidden ">
+    <button (click)="drawerClose()" class="m-3 absolute top-0 right-0 z-40">
+        <mat-icon class="hover:scale-110 transition duration-5000 transform" svgIcon="mat_outline:close">
+        </mat-icon>
+    </button>
+    <div class="px-4 py-3 flex justify-between items-center w-full  ">
+        <div class="font-bold text-lg text-accent-600 flex items-center py-3">
+            <p class="">{{eventInfo.eventTitle}}</p>
+        </div>
+        <mat-form-field appearance="fill" class="w-60  fuse-mat-dense">
+            <mat-label>Select Batch</mat-label>
+            <mat-select [(ngModel)]="batchInfo" (selectionChange)="onBatchSelect($event.value)"
+                placeholder="Select Stage">
+                <mat-option *ngFor="let batch of eventInfo.batches" [value]="batch">{{batch?.batchName}}</mat-option>
+            </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" floatLabel="always" class="w-80 ml-2 px-2 fuse-mat-dense">
+            <mat-label>Search </mat-label>
+            <input (keyup)="search($event)" matInput placeholder="Search event submissions" />
+            <mat-icon matPrefix svgIcon="heroicons_solid:search"></mat-icon>
+        </mat-form-field>
+
+        <div class="h-full  flex flex-col mt-0.5 ml-5">
+            <mat-label class="text-base mb-2 font-medium">Final event submissions</mat-label>
+            <div class="w-full">
+                <p class="mt-1" *ngIf="!finalSubSpinner">{{finalSubsNo}}</p>
+                <mat-spinner *ngIf="finalSubSpinner" [diameter]="23"></mat-spinner>
+            </div>
+        </div>
+        <div class="h-full  flex flex-col mt-0.5 ml-5">
+            <mat-label class="text-base mb-2 pr-6 font-medium">Final submissions for this batch</mat-label>
+            <div class="w-full">
+                <p class="mt-1" *ngIf="!totalSubsOfBatchSpinner">{{totalSubsOfBatch}}</p>
+                <mat-spinner *ngIf="totalSubsOfBatchSpinner" [diameter]="23"></mat-spinner>
+            </div>
+        </div>
+
+
+    </div>
+
+    <div>
+        <div class="">
+            <!-- <div class="inventory-grid grid gap-12 py-4 px-1  shadow text-md font-semibold text-secondary bg-gray-50 dark:bg-black dark:bg-opacity-5 w-full" -->
+            <div matSort matSortDisableClear (matSortChange)="sortData($event)" [ngStyle]="calculateGridColumnStyle()"
+                class="grid  gap-3 py-4 px-1 shadow text-md font-semibold text-secondary bg-gray-50 dark:bg-black dark:bg-opacity-5 w-full">
+                <div [mat-sort-header]="'name'" class="pl-3 ">Name{{6+submissionPath?.length}}</div>
+                <div [mat-sort-header]="'phone'">Phone</div>
+                <div [mat-sort-header]="'email'">Email</div>
+                <div [mat-sort-header]="'gender'">Gender</div>
+                <div [mat-sort-header]="'age'">Age</div>
+
+                <div *ngFor="let subn of batchInfo?.submissions;let i=index" class="w-full">
+                    <div class="flex justify-center w-full">
+                        <div class="grid px-2 py-1 w-max rounded-full bg-primary-100 text-primary">
+                            Submission {{i+1}}
+                        </div>
+                    </div>
+                    <div *ngFor="let h of headings[i]" class="grid grid-cols-{{headings[i]?.length}} gap-10 pt-2">
+                        <div class="text-center">
+                            {{h}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="!totalSubsOfBatchSpinner" class="h-[calc(100vh_-_210px)] overflow-scroll">
+                <div *ngFor="let doc of allSubsInBatch" [ngStyle]="calculateGridColumnStyle()"
+                    class=" grid items-center text-secondary gap-3 py-4 px-1 border-b border-gray-300">
+                    <div (click)="copyToClipboard(doc?.teacherMeta?.firstName+ ' '+doc?.teacherMeta?.lastName)"
+                        [matTooltip]="doc?.teacherMeta?.firstName+ ' '+doc?.teacherMeta?.lastName" class="pl-3 ">
+                        {{textSlice(doc?.teacherMeta?.firstName+ ' '+doc?.teacherMeta?.lastName)}}</div>
+                    <div (click)="copyToClipboard(doc?.teacherMeta?.countryCode+doc?.teacherMeta?.phoneNumber)"
+                        [matTooltip]="doc?.teacherMeta?.countryCode+doc?.teacherMeta?.phoneNumber" class="truncate">
+                        {{doc?.teacherMeta?.countryCode+doc?.teacherMeta?.phoneNumber}}</div>
+                    <div>
+                        <span class="text-red-600 font-medium" *ngIf="!doc?.teacherMeta?.email">Not Available</span>
+                        <span (click)="copyToClipboard(doc?.teacherMeta?.email)" [matTooltip]="doc?.teacherMeta?.email"
+                            *ngIf="doc?.teacherMeta?.email">{{textSlice(doc?.teacherMeta?.email)}}</span>
+
+                    </div>
+                    <div>
+                        <span class="text-red-600 font-medium" *ngIf="!doc?.teacherMeta?.gender">Not Available</span>
+                        <span *ngIf="doc?.teacherMeta?.gender">{{doc?.teacherMeta?.gender}}</span>
+                    </div>
+                    <div>
+                        <span class="text-red-600 font-medium" *ngIf="!doc?.teacherMeta?.age">Not Available</span>
+                        <span *ngIf="doc?.teacherMeta?.age">{{doc?.teacherMeta?.age}}</span>
+                    </div>
+                    <div class="flex justify-center items-center" *ngFor="let sp of submissionPath">
+                        <span *ngFor="let path of sp">
+
+                            <span
+                                *ngIf="!doc[path?.batch]?.[path?.submId]?.[path?.assignmentId]?.hasOwnProperty('videoLink')">
+                                <span matTooltip="View Submission" class="ml-1"><a target="_blank"
+                                        *ngIf="doc[path?.batch]?.[path?.submId]?.hasOwnProperty(path?.assignmentId)"
+                                        [href]="doc[path?.batch]?.[path?.submId]?.[path?.assignmentId]?.[path?.folderPath]?.[path?.submissionPath] |getDownloadURL"><mat-icon
+                                            svgIcon="mat_outline:remove_red_eye"
+                                            class="text-primary -mb-3"></mat-icon></a>
+                                </span>
+                            </span>
+
+                            <span *ngIf="doc[path?.batch]?.[path?.submId]?.[path?.assignmentId]?.hasOwnProperty('videoLink')">
+                                <span matTooltip="View Submission" class="ml-1"><a target="_blank"
+                                        *ngIf="doc[path?.batch]?.[path?.submId]?.hasOwnProperty(path?.assignmentId)"
+                                        [href]="doc[path?.batch]?.[path?.submId]?.[path?.assignmentId]?.['videoLink']"><mat-icon
+                                            svgIcon="mat_outline:remove_red_eye"
+                                            class="text-primary -mb-3"></mat-icon></a>
+                                </span>
+                            </span>
+                        </span>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="w-full flex justify-center items-center mt-3" *ngIf="totalSubsOfBatchSpinner">
+                <mat-spinner [diameter]="40"></mat-spinner>
+            </div>
+        </div>
+    </div>
+</div>

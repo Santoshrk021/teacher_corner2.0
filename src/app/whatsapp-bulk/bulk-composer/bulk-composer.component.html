@@ -1,0 +1,539 @@
+<div class="flex flex-col w-full bg-[#F1F5F9] ">
+    <div class="flex items-center justify-between bg-gray-100 px-4">
+        <!--  Title -->
+        <div class="text-3xl font-bold pt-2">WhatsApp Manager</div>
+
+        <!-- Buttons -->
+        <div class="flex gap-2 justify-end font-semibold pt-2">
+            <!-- <button class="flex items-center gap-2 bg-primary-500 text-white px-4 py-2 rounded-full shadow-md"
+                (click)="new()">
+                <mat-icon svgIcon="heroicons_outline:plus-circle" aria-hidden="false" class="text-white scale-110">
+                </mat-icon>Add
+            </button> -->
+            <button class="flex items-center gap-2 bg-primary-500 text-white px-4 py-2 rounded-full shadow-md"
+                (click)="openHistoryDrawer()">
+                <mat-icon svgIcon="heroicons_outline:clock" aria-hidden="false" class="text-white scale-110">
+                </mat-icon>History
+            </button>
+        </div>
+    </div>
+
+    <div class="w-full mt-2">
+      <div class="p-2">
+        <mat-horizontal-stepper
+        class="w-full"
+        (selectionChange)="onTemplateChange()">
+
+        <!-- ========== 1. Choose Template (with live preview) ========== -->
+        <mat-step label="Choose Template">
+        <!-- inner container centered, two columns on md+ -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+          <!-- Left: form -->
+          <div>
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Template name</mat-label>
+              <mat-select
+                [formControl]="templateForm.controls.templateKey"
+                (selectionChange)="onTemplatePicked()">
+                <mat-option *ngFor="let t of templateOptions" [value]="t.templateName">
+                  {{ t.templateName }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Language</mat-label>
+              <input matInput [formControl]="templateForm.controls.language" />
+            </mat-form-field>
+
+            <div class="flex flex-col md:flex-row md:gap-3">
+              <mat-form-field appearance="outline" class="w-full md:w-1/2">
+                <mat-label>Header</mat-label>
+                <mat-select
+                  [formControl]="templateForm.controls.mediaType"
+                  (selectionChange)="updatePreview()">
+                  <mat-option value="text">Text</mat-option>
+                  <mat-option value="image">Image</mat-option>
+                  <mat-option value="video">Video</mat-option>
+                  <mat-option value="document">Document</mat-option>
+                  <mat-option value="none">None</mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="w-full md:w-1/2">
+                <mat-label>Header URL</mat-label>
+                <input
+                  matInput
+                  [formControl]="templateForm.controls.headerUrl"
+                  (input)="updatePreview()" />
+              </mat-form-field>
+            </div>
+
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Body</mat-label>
+              <textarea
+                matInput
+                rows="6"
+                [formControl]="templateForm.controls.body"
+                [attr.placeholder]="examplePlaceholder"
+                (input)="onBodyInput()"
+              ></textarea>
+            </mat-form-field>
+
+            <!-- <mat-form-field appearance="outline" class="w-full">
+              <mat-label>CTA / Link (optional)</mat-label>
+              <input
+                matInput
+                [formControl]="templateForm.controls.ctaUrl"
+                (input)="updatePreview()" />
+            </mat-form-field> -->
+
+            <!-- Auto Params (no add/remove buttons) -->
+            <div class="mt-3" *ngIf="paramsArray.length">
+              <div class="font-medium mb-1">
+                Params (auto-detected, order matters)
+              </div>
+              <div *ngFor="let c of paramsArray.controls; let i = index"
+                   class="flex items-center gap-2 mb-2">
+                <mat-form-field class="w-full" appearance="outline">
+                  <mat-label>param {{ i + 1 }}</mat-label>
+                  <input matInput [formControl]="paramsArray.at(i)"
+                         (input)="updatePreview()" />
+                </mat-form-field>
+              </div>
+            </div>
+          </div>
+          <!-- Right: WhatsApp-style live preview -->
+          <div class="flex items-start justify-center h-[400px] overflow-y-auto hide-scrollbar">
+            <!-- Show preview only when template is selected -->
+            <div class="wa-phone-frame" *ngIf="selectedTemplate">
+              <!-- Chat bubble -->
+              <div class="wa-chat-bubble">
+                <!-- Header media inside bubble -->
+                <ng-container [ngSwitch]="templateForm.value.mediaType">
+                  <img *ngSwitchCase="'image'"
+                       class="wa-header-image"
+                       [src]="templateForm.value.headerUrl || selectedTemplate?.header || ''"
+                       alt="header" />
+                  <ng-container *ngSwitchCase="'video'">
+                    <video *ngIf="templateForm.value.headerUrl || selectedTemplate?.header"
+                           class="wa-header-video"
+                           [src]="templateForm.value.headerUrl || selectedTemplate?.header || ''"
+                           controls
+                           preload="metadata">
+                    </video>
+                    <a *ngIf="templateForm.value.headerUrl || selectedTemplate?.header"
+                       class="wa-header-link-button"
+                       [href]="templateForm.value.headerUrl || selectedTemplate?.header"
+                       target="_blank">
+                      <mat-icon svgIcon="heroicons_outline:play"></mat-icon>
+                      Open Video
+                    </a>
+                  </ng-container>
+                  <ng-container *ngSwitchCase="'document'">
+                    <a *ngIf="templateForm.value.headerUrl || selectedTemplate?.header"
+                       class="wa-header-link-button wa-document-button"
+                       [href]="templateForm.value.headerUrl || selectedTemplate?.header"
+                       target="_blank">
+                      <mat-icon svgIcon="heroicons_outline:document"></mat-icon>
+                      Open Document
+                    </a>
+                  </ng-container>
+                </ng-container>
+
+                <!-- Message body -->
+                <div class="wa-message-body" [innerText]="renderedBody"></div>
+
+                <!-- Timestamp -->
+                <div class="wa-timestamp">
+                  <span>{{ currentTime }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Placeholder when no template selected -->
+            <div *ngIf="!selectedTemplate" class="wa-preview-placeholder">
+              <mat-icon svgIcon="heroicons_outline:chat-alt-2"></mat-icon>
+              <span>Select a template to preview</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Next button centered below -->
+        <div class="flex justify-center gap-3 mt-6">
+
+          <button mat-raised-button matStepperNext color="primary"
+            [disabled]="!selectedTemplate">
+            Next
+            <mat-icon class="ml-2 icon-size-5 text-white transition-transform duration-300"
+            [ngClass]="{'animate-bounce-x': selectedTemplate}"
+            [svgIcon]="'heroicons_solid:arrow-sm-right'"></mat-icon>
+          </button>
+        </div>
+      </mat-step>
+
+      <!-- ========== 2. Upload Excel/CSV ========== -->
+      <mat-step label="Upload Excel/CSV">
+        <div class="mb-4">
+          <h3 class="m-0 text-base font-semibold mb-3">Add Recipients</h3>
+
+          <!-- Action buttons row -->
+          <div class="flex flex-wrap items-center gap-3">
+            <!-- Download Template -->
+            <button
+              mat-raised-button
+              color="primary"
+              [disabled]="!selectedTemplate"
+              (click)="downloadTemplate()">
+              <mat-icon class="mr-1" svgIcon="heroicons_outline:download"></mat-icon>
+              Download Template
+            </button>
+
+            <!-- Upload Excel/CSV -->
+            <input
+              #fileInput
+              type="file"
+              accept=".xlsx,.xls,.csv"
+              class="hidden"
+              (change)="onFileChosen($event)" />
+            <button mat-raised-button color="primary"
+                    [disabled]="isFileUploaded"
+                    (click)="fileInput.click()">
+              <mat-icon class="mr-1" svgIcon="heroicons_outline:upload"></mat-icon>
+              Upload xlsx/csv
+            </button>
+
+            <!-- Clear/Re-upload button (shown after successful upload) -->
+            <button *ngIf="isFileUploaded"
+                    mat-raised-button
+                    color="warn"
+                    (click)="clearUploadedFile()"
+                    matTooltip="Clear uploaded data and start fresh">
+              <mat-icon class="mr-1" svgIcon="heroicons_outline:x-circle"></mat-icon>
+              Clear & Re-upload
+            </button>
+
+            <!-- Add Entry Manually (Plus button) -->
+            <button
+              mat-mini-fab
+              color="primary"
+              [disabled]="!canAddEntry"
+              (click)="addRecipientEntry()"
+              [matTooltip]="!canAddEntry && recipientEntries.length > 0 ? 'Fill all fields in current entry first' : 'Add recipient manually'">
+              <mat-icon svgIcon="heroicons_outline:plus"></mat-icon>
+            </button>
+
+            <div class="text-sm text-gray-600 truncate" *ngIf="fileName">
+              {{ fileName }}
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg" *ngIf="fileError">
+          <div class="flex items-center gap-2 text-red-600">
+            <mat-icon class="text-red-500" svgIcon="heroicons_outline:exclamation-circle"></mat-icon>
+            <span class="font-medium">{{ fileError }}</span>
+          </div>
+        </div>
+
+        <div class="mt-3 text-sm text-gray-700" *ngIf="rowsLoaded > 0">
+          Entries: <strong>{{ rowsLoaded }}</strong>
+        </div>
+
+        <!-- Editable recipient entries -->
+        <div class="mt-4" *ngIf="recipientEntries.length">
+          <div class="font-medium mb-2 flex flex-wrap items-center gap-3">
+            <span>Recipients</span>
+            <span *ngIf="invalidEntryCount > 0" class="text-red-600 text-sm font-normal">
+              ({{ invalidEntryCount }} invalid entr{{ invalidEntryCount > 1 ? 'ies' : 'y' }} - please fix before continuing)
+            </span>
+            <span *ngIf="duplicatePhoneCount > 0" class="text-orange-600 text-sm font-normal">
+              ({{ duplicatePhoneCount }} duplicate number{{ duplicatePhoneCount > 1 ? 's' : '' }} found)
+            </span>
+          </div>
+
+          <div class="space-y-3">
+            <div *ngFor="let entry of recipientEntries; let i = index"
+                 class="flex items-start gap-2 p-3 bg-white rounded-lg shadow-sm border">
+              <!-- Dynamic form fields based on headers -->
+              <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                <!-- Phone field with +91 prefix -->
+                <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic"
+                                [class.mat-form-field-invalid]="getPhoneError(entry) || getDuplicatePhoneError(entry, i)">
+                  <mat-label>Phone Number</mat-label>
+                  <span matPrefix class="text-gray-600 font-medium pr-1">+91</span>
+                  <input matInput
+                         [formControl]="entry.get('phone')"
+                         maxlength="10"
+                         pattern="[0-9]*"
+                         inputmode="numeric"
+                         (input)="onPhoneInput($event, entry)"
+                         (keypress)="onPhoneKeypress($event)"
+                         placeholder="10 digit number" />
+                  <mat-hint *ngIf="getPhoneError(entry)" class="text-red-600">
+                    {{ getPhoneError(entry) }}
+                  </mat-hint>
+                  <mat-hint *ngIf="!getPhoneError(entry) && getDuplicatePhoneError(entry, i)" class="text-orange-600">
+                    {{ getDuplicatePhoneError(entry, i) }}
+                  </mat-hint>
+                </mat-form-field>
+
+                <!-- Other fields -->
+                <ng-container *ngFor="let h of getTemplateHeaders()">
+                  <mat-form-field *ngIf="h !== 'phone'"
+                                  appearance="outline"
+                                  class="w-full"
+                                  subscriptSizing="dynamic"
+                                  [class.mat-form-field-invalid]="getFieldError(entry, h)">
+                    <mat-label>{{ h }}</mat-label>
+                    <input matInput [formControl]="entry.get(h)"
+                           (input)="updateRowsFromEntries()" />
+                    <mat-hint *ngIf="getFieldError(entry, h)" class="text-red-600">
+                      {{ getFieldError(entry, h) }}
+                    </mat-hint>
+                  </mat-form-field>
+                </ng-container>
+              </div>
+
+              <!-- Remove button -->
+              <button mat-icon-button
+                      color="warn"
+                      (click)="removeRecipientEntry(i)"
+                      matTooltip="Remove entry">
+                <mat-icon svgIcon="heroicons_outline:trash"></mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty state -->
+        <div *ngIf="!recipientEntries.length && selectedTemplate"
+             class="mt-4 p-6 text-center text-gray-500 border-2 border-dashed border-gray-300 rounded-lg">
+          <mat-icon class="text-gray-400 mb-2" style="transform: scale(2);"
+                    svgIcon="heroicons_outline:users"></mat-icon>
+          <p class="mt-4">No recipients added yet.</p>
+          <p class="text-sm">Click the <strong>+</strong> button to add manually or upload an Excel/CSV file.</p>
+        </div>
+
+        <div class="flex justify-end">
+          <button class="mt-4" mat-raised-button matStepperNext color="primary"
+            [disabled]="!canProceedStep2">
+            Next
+            <mat-icon class="ml-2 icon-size-5 text-white transition-transform duration-300"
+              [ngClass]="{'animate-bounce-x': canProceedStep2}"
+              [svgIcon]="'heroicons_solid:arrow-sm-right'"></mat-icon>
+          </button>
+        </div>
+
+        <!-- Validation message -->
+        <div *ngIf="recipientEntries.length > 0 && !allEntriesComplete"
+             class="mt-2 text-sm text-orange-600 text-right">
+          Please fill all fields in each entry to proceed.
+        </div>
+      </mat-step>
+
+      <!-- ========== 3. Preview & Send ========== -->
+      <mat-step label="Preview & Send">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Left: Summary in single box -->
+          <div class="p-5 bg-gray-50 rounded-lg border">
+            <h3 class="text-lg font-semibold mb-4 pb-3 border-b">Message Summary</h3>
+
+            <div class="space-y-4">
+              <!-- Template Name -->
+              <div class="flex justify-between items-start">
+                <span class="text-sm text-gray-500">Template Name</span>
+                <span class="font-medium text-gray-900 text-right">{{ selectedTemplate?.templateName || '-' }}</span>
+              </div>
+
+              <!-- Media Type -->
+              <div class="flex justify-between items-start">
+                <span class="text-sm text-gray-500">Media Type</span>
+                <span class="font-medium text-gray-900 text-right">
+                  {{ selectedTemplate?.mediaType || 'None' }}
+                </span>
+              </div>
+
+              <!-- Header -->
+              <div class="flex justify-between items-start">
+                <span class="text-sm text-gray-500">Header</span>
+                <div class="text-right">
+                  <span *ngIf="!selectedTemplate?.header" class="font-medium text-gray-400">None</span>
+                  <a *ngIf="selectedTemplate?.header" [href]="selectedTemplate?.header" target="_blank">
+                    <img *ngIf="selectedTemplate?.header"
+                         [src]="selectedTemplate?.header"
+                         alt="Header"
+                         class="max-h-20 rounded-md object-cover ml-auto" />
+                  </a>
+                </div>
+              </div>
+
+              <!-- Params -->
+              <div class="flex justify-between items-start">
+                <span class="text-sm text-gray-500">Parameters</span>
+                <div class="text-right">
+                  <span *ngIf="!selectedTemplate?.params?.length" class="font-medium text-gray-400">None</span>
+                  <div *ngIf="selectedTemplate?.params?.length" class="flex flex-wrap gap-1 justify-end">
+                    <span *ngFor="let param of selectedTemplate?.params"
+                          class="px-2 py-0.5 bg-primary-100 text-primary-700 rounded-full text-xs font-medium">
+                      {{ param }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Recipients Count -->
+              <div class="flex justify-between items-center pt-3 mt-3 border-t">
+                <span class="text-sm text-gray-500">Recipients</span>
+                <div class="text-right">
+                  <span class="font-bold text-primary-600 text-xl">{{ rowsLoaded }}</span>
+                  <span class="text-sm text-gray-500 ml-1">phone numbers</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Progress Counter (shown when sending) -->
+          <div class="flex flex-col items-center justify-center">
+            <!-- Sending Progress -->
+            <div *ngIf="isSending" class="p-4 bg-blue-50 rounded-lg border border-blue-200 w-full max-w-xs">
+              <div class="flex items-center gap-3 mb-2">
+                <mat-spinner diameter="20"></mat-spinner>
+                <span class="text-blue-700 font-medium">Sending messages...</span>
+              </div>
+              <div class="text-sm text-blue-600">
+                Progress: {{ sendingProgress }} / {{ totalToSend }}
+              </div>
+              <div class="mt-2 h-2 bg-blue-200 rounded-full overflow-hidden">
+                <div class="h-full bg-blue-600 transition-all duration-300"
+                     [style.width.%]="(sendingProgress / totalToSend) * 100"></div>
+              </div>
+            </div>
+
+            <!-- Success Message -->
+            <div *ngIf="sendingComplete && !isSending" class="p-4 bg-green-50 rounded-lg border border-green-200 w-full max-w-xs">
+              <div class="flex items-center gap-2 text-green-700">
+                <mat-icon class="text-green-500" svgIcon="heroicons_outline:check-circle"></mat-icon>
+                <span class="font-medium">Successfully sent {{ sendingProgress }} messages!</span>
+              </div>
+            </div>
+
+            <!-- Status Check Progress -->
+            <div *ngIf="isCheckingStatus" class="p-4 bg-yellow-50 rounded-lg border border-yellow-200 w-full max-w-xs mt-3">
+              <div class="flex items-center gap-3">
+                <mat-spinner diameter="20"></mat-spinner>
+                <span class="text-yellow-700 font-medium">Checking message status...</span>
+              </div>
+            </div>
+
+            <!-- Status Check Complete with Counts -->
+            <div *ngIf="statusCheckComplete && !isCheckingStatus" class="p-4 bg-blue-50 rounded-lg border border-blue-200 w-full max-w-xs mt-3">
+              <div class="flex items-center gap-2 text-blue-700 mb-3">
+                <mat-icon class="text-blue-500" svgIcon="heroicons_outline:clipboard-check"></mat-icon>
+                <span class="font-medium">Status check complete!</span>
+              </div>
+              <!-- Success/Failed Counts -->
+              <div class="flex justify-between text-sm">
+                <div class="flex items-center gap-2">
+                  <span class="w-3 h-3 rounded-full bg-green-500"></span>
+                  <span class="text-gray-700">Success:</span>
+                  <span class="font-bold text-green-600">{{ successCount }}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="w-3 h-3 rounded-full bg-red-500"></span>
+                  <span class="text-gray-700">Failed:</span>
+                  <span class="font-bold text-red-600">{{ failedCount }}</span>
+                </div>
+              </div>
+              <div class="text-xs text-gray-500 mt-2 text-center">
+                Total: {{ messageLog.length }} messages
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Send button centered below -->
+        <div class="flex justify-center gap-3 mt-6">
+          <button
+            mat-raised-button
+            color="primary"
+            class="py-3 px-8"
+            [disabled]="!canSubmit || isSending"
+            (click)="openConfirmDialog()">
+            {{ isSending ? 'Sending...' : 'Send Now' }}
+          </button>
+
+          <!-- Check Status button (shown after sending complete) -->
+          <button
+            *ngIf="sendingComplete && !isSending && messageLog.length > 0"
+            mat-raised-button
+            color="primary"
+            class="py-3 px-6"
+            [disabled]="isCheckingStatus"
+            (click)="checkMessageStatus()">
+            <mat-icon class="mr-1" svgIcon="heroicons_outline:refresh"></mat-icon>
+            {{ isCheckingStatus ? 'Checking...' : 'Check Status' }}
+          </button>
+
+          <!-- Download Log button (shown after sending complete) -->
+          <button
+            *ngIf="sendingComplete && !isSending && messageLog.length > 0"
+            mat-raised-button
+            color="primary"
+            class="py-3 px-6"
+            (click)="downloadMessageLog()">
+            <mat-icon class="mr-1" svgIcon="heroicons_outline:download"></mat-icon>
+            Download Log
+          </button>
+        </div>
+      </mat-step>
+    </mat-horizontal-stepper>
+  </div>
+</div>
+
+<!-- Confirmation Dialog Overlay -->
+<div *ngIf="showConfirmDialog"
+     class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div class="bg-white rounded-2xl shadow-xl max-w-sm w-full mx-4 p-6">
+    <!-- Icon and Content -->
+    <div class="flex items-start gap-4">
+      <!-- Phone Icon -->
+      <div class="flex-shrink-0 w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
+        <mat-icon class="text-primary-500" svgIcon="heroicons_outline:phone"></mat-icon>
+      </div>
+
+      <!-- Text Content -->
+      <div class="flex-1">
+        <h3 class="text-lg font-semibold text-gray-900 m-0">Send Messages</h3>
+        <p class="text-sm text-gray-500 mt-1 m-0">
+          Are you sure you want to send {{ rowsLoaded }} message{{ rowsLoaded > 1 ? 's' : '' }}?
+        </p>
+      </div>
+    </div>
+
+    <!-- Dialog Actions -->
+    <div class="flex justify-end gap-3 mt-6">
+      <button
+        mat-stroked-button
+        class="px-6"
+        (click)="closeConfirmDialog()">
+        Cancel
+      </button>
+      <button
+        mat-raised-button
+        class="px-6 bg-primary-500 text-white"
+        (click)="confirmSend()">
+        Confirm
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- History Drawer -->
+<fuse-drawer *ngIf="showDrawer" class="w-screen min-w-screen" [opened]="drawerOpened" fixed [mode]="'over'"
+    [position]="'left'">
+    <div>
+        <ng-container *ngComponentOutlet="drawerComponent"></ng-container>
+    </div>
+</fuse-drawer>

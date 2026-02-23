@@ -1,0 +1,308 @@
+<div class="h-full relative">
+  <!-- Close (X) button only in dialog mode -->
+  <button
+    *ngIf="isDialog"
+    mat-dialog-close
+    (click)="close()"
+    class="absolute -mt-6 -mr-6 right-1 top-1 z-50 flex items-center"
+    aria-label="Close dialog"
+  >
+    <mat-icon class="hover:scale-110 transition duration-300 transform"
+              svgIcon="mat_outline:close"></mat-icon>
+  </button>
+
+  <!-- Root container: absolute full-bleed when routed, normal flow when dialog -->
+  <div
+    [ngClass]="isDialog
+      ? 'flex flex-col min-w-0 overflow-hidden h-full'
+      : 'absolute inset-0 flex flex-col min-w-0 overflow-hidden'">
+
+    <mat-drawer-container class="flex-auto h-full">
+
+      <!-- LEFT: step list -->
+      <mat-drawer class="w-90 dark:bg-gray-900"
+                  [autoFocus]="false"
+                  [mode]="drawerMode"
+                  [opened]="drawerOpened"
+                  #matDrawer>
+        <div class="flex flex-col items-start p-8 border-b">
+          <!-- Back links appear only when NOT in dialog -->
+          <a *ngIf="!isDialog && contestInfo?.type!=='classroomStemClubdependent'; else gotoClassroom"
+             class="inline-flex items-center leading-6 text-primary hover:underline cursor-pointer"
+             (click)="goBack()">
+            <span class="inline-flex items-center">
+              <mat-icon class="icon-size-5 text-current" [svgIcon]="'heroicons_solid:arrow-sm-left'"></mat-icon>
+              <span class="ml-1.5 font-medium leading-5">Back</span>
+            </span>
+          </a>
+
+          <ng-template #gotoClassroom>
+            <a *ngIf="!isDialog"
+               class="inline-flex items-center leading-6 text-primary hover:underline cursor-pointer"
+               (click)="goBacktoClassroom()">
+              <span class="inline-flex items-center">
+                <mat-icon class="icon-size-5 text-current" [svgIcon]="'heroicons_solid:arrow-sm-left'"></mat-icon>
+                <span class="ml-1.5 font-medium leading-5">Back</span>
+              </span>
+            </a>
+          </ng-template>
+
+          <!-- Drawer header -->
+          <div>
+            <div class="my-3 py-0.5 px-3 rounded-full text-md font-semibold w-max text-primary-700 bg-blue-100">
+              {{ submissionInfo?.displayName }}
+            </div>
+            <div class="text-secondary">
+              {{ workflowInfo?.displayName }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Drawer step list -->
+        <div class="py-2 px-8 relative">
+          <ol *ngIf="steps.length > 0">
+            <ng-container *ngFor="let step of steps; let last = last; trackBy: trackByFn">
+              <li class="relative group py-6" [class.current-step]="step?.sequenceNumber === currentStep">
+                <ng-container *ngIf="!last">
+                  <div class="absolute top-6 left-4 w-0.5 h-full -ml-px"
+                       [ngClass]="{
+                         'bg-primary': step?.sequenceNumber < currentStep,
+                         'bg-gray-300 dark:bg-gray-600': step.sequenceNumber >= currentStep
+                       }"></div>
+                </ng-container>
+
+                <!-- Free navigation -->
+                <div *ngIf="!contestInfo?.isContestStepsLocked"
+                     class="relative flex items-start cursor-pointer"
+                     (click)="goToStep(step?.sequenceNumber)">
+                  <div class="flex flex-0 items-center justify-center w-8 h-8 rounded-full ring-2 ring-inset bg-card dark:bg-default"
+                       [ngClass]="{
+                         'bg-primary dark:bg-primary text-on-primary group-hover:bg-primary-800 ring-transparent': step.sequenceNumber < currentStep,
+                         'ring-primary': step?.sequenceNumber === currentStep,
+                         'ring-gray-300 dark:ring-gray-600 group-hover:ring-gray-400': step.sequenceNumber > currentStep
+                       }">
+                    <ng-container *ngIf="step?.sequenceNumber < currentStep">
+                      <mat-icon class="icon-size-5 text-current" [svgIcon]="'heroicons_solid:check'"></mat-icon>
+                    </ng-container>
+                    <ng-container *ngIf="step?.sequenceNumber === currentStep">
+                      <div class="text-md font-semibold text-primary dark:text-primary-500">
+                        {{ step?.sequenceNumber }}
+                      </div>
+                    </ng-container>
+                    <ng-container *ngIf="step?.sequenceNumber > currentStep">
+                      <div class="text-md font-semibold text-hint group-hover:text-secondary">
+                        {{ step?.sequenceNumber }}
+                      </div>
+                    </ng-container>
+                  </div>
+
+                  <div class="ml-4">
+                    <div class="flex items-center">
+                      <div class="font-medium leading-4" [ngClass]="{ 'text-primary': step.sequenceNumber == currentStep }">
+                        {{ step?.contestStepName }}
+                      </div>
+                    </div>
+
+                    <div *ngIf="step?.contestStepDuration"
+                         class="pt-2 text-md leading-4 text-secondary flex items-center">
+                      <mat-icon class="icon-size-5 text-hint" [svgIcon]="'heroicons_solid:clock'"></mat-icon>
+                      <div class="ml-1.5 ">{{ step?.contestStepDuration }} minutes</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Progressive flow: unlocked -->
+                <div *ngIf="step.isStepUnlocked && contestInfo?.isContestStepsLocked"
+                     class="relative flex items-start cursor-pointer"
+                     (click)="goToStep(step.sequenceNumber)"
+                     [ngClass]="{ 'pointer-events-none': step.sequenceNumber > currentStep + 1 }">
+                  <!-- (use same inner markup as above if you need the exact visuals) -->
+                  <div class="flex flex-0 items-center justify-center w-8 h-8 rounded-full ring-2 ring-inset bg-card dark:bg-default"
+                       [ngClass]="{
+                         'bg-primary dark:bg-primary text-on-primary ring-transparent': step.sequenceNumber < currentStep,
+                         'ring-primary': step.sequenceNumber === currentStep,
+                         'ring-gray-300 dark:ring-gray-600': step.sequenceNumber > currentStep
+                       }">
+                    <ng-container *ngIf="step.sequenceNumber < currentStep">
+                      <mat-icon class="icon-size-5 text-current" [svgIcon]="'heroicons_solid:check'"></mat-icon>
+                    </ng-container>
+                    <ng-container *ngIf="step.sequenceNumber === currentStep">
+                      <div class="text-md font-semibold text-primary dark:text-primary-500">
+                        {{ step.sequenceNumber }}
+                      </div>
+                    </ng-container>
+                    <ng-container *ngIf="step.sequenceNumber > currentStep">
+                      <div class="text-md font-semibold text-hint">
+                        {{ step.sequenceNumber }}
+                      </div>
+                    </ng-container>
+                  </div>
+                  <div class="ml-4">
+                    <div class="font-medium leading-4" [ngClass]="{ 'text-primary': step.sequenceNumber == currentStep }">
+                      {{ step.contestStepName }}
+                    </div>
+                    <div *ngIf="step?.workflowStepDuration"
+                         class="pt-2 text-md leading-4 text-secondary flex items-center">
+                      <mat-icon class="icon-size-5 text-hint" [svgIcon]="'heroicons_solid:clock'"></mat-icon>
+                      <div class="ml-1.5 ">{{ step.workflowStepDuration }} minutes</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Progressive flow: locked -->
+                <div *ngIf="!step.isStepUnlocked && contestInfo?.isContestStepsLocked"
+                     class="relative flex items-start">
+                  <div class="flex flex-0 items-center justify-center w-8 h-8 rounded-full ring-2 ring-inset bg-card dark:bg-default"
+                       [ngClass]="{
+                         'bg-primary dark:bg-primary text-on-primary ring-transparent': step.sequenceNumber < currentStep,
+                         'ring-primary': step.sequenceNumber === currentStep,
+                         'ring-gray-300 dark:ring-gray-600': step.sequenceNumber > currentStep
+                       }">
+                    <ng-container *ngIf="step.sequenceNumber < currentStep">
+                      <mat-icon class="icon-size-5 text-current" [svgIcon]="'heroicons_solid:check'"></mat-icon>
+                    </ng-container>
+                    <ng-container *ngIf="step.sequenceNumber === currentStep">
+                      <div class="text-md font-semibold text-primary dark:text-primary-500">
+                        {{ step.sequenceNumber }}
+                      </div>
+                    </ng-container>
+                    <ng-container *ngIf="step.sequenceNumber > currentStep">
+                      <mat-icon class="text-gray-300" svgIcon="lock"></mat-icon>
+                    </ng-container>
+                  </div>
+                  <div class="ml-4">
+                    <div class="font-medium leading-4 text-gray-300">
+                      {{ step.contestStepName }}
+                    </div>
+                    <div *ngIf="step?.workflowStepDuration"
+                         class="pt-2 text-md leading-4 text-secondary flex items-center">
+                      <mat-icon class="icon-size-5 text-gray-300" [svgIcon]="'heroicons_solid:clock'"></mat-icon>
+                      <div class="ml-1.5 text-gray-300">{{ step.workflowStepDuration }} minutes</div>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            </ng-container>
+          </ol>
+        </div>
+
+        <div *ngIf="isViewFeedbackVisible" class="py-2 px-8">
+          <button (click)="onClickReview()"
+                  type="button"
+                  matRipple
+                  matTooltipPosition="above"
+                  matTooltip="View your submission review"
+                  class="fuse-mat-stroked-button-large w-full bg-primary-600 text-white hover:bg-primary-500"
+                  mat-stroked-button
+                  [color]="'primary'">
+            <p>View Feedback</p>
+          </button>
+        </div>
+      </mat-drawer>
+
+      <!-- RIGHT: content -->
+      <mat-drawer-content class="flex flex-col overflow-hidden sm:bg-accent-50">
+
+        <!-- MOBILE top bar: hamburger + arrows + title -->
+        <div *ngIf="iscreenSmall"
+             class="sticky top-0 z-30 flex items-center gap-1 py-2 px-2 border-b bg-card dark:bg-transparent">
+          <button mat-icon-button (click)="matDrawer.toggle()">
+            <mat-icon [svgIcon]="'heroicons_outline:view-list'"></mat-icon>
+          </button>
+          <button mat-icon-button (click)="goToPreviousStep()">
+            <mat-icon [svgIcon]="'heroicons_outline:arrow-narrow-left'"></mat-icon>
+          </button>
+          <button mat-icon-button (click)="goToNextStep()">
+            <mat-icon [svgIcon]="'heroicons_outline:arrow-narrow-right'"></mat-icon>
+          </button>
+          <h2 class="ml-2.5 text-primary-600 bg-blue-100 text-md font-medium tracking-tight truncate py-0.5 px-3 rounded-full">
+            {{ currentWorkflow?.contestStepName }}
+          </h2>
+        </div>
+
+        <!-- DESKTOP top progress -->
+        <mat-progress-bar *ngIf="!iscreenSmall"
+                          class="flex-0 h-0.5 w-full"
+                          [value]="100 * (currentStep) / workflowInfo?.totalSteps">
+        </mat-progress-bar>
+
+        <!-- MAIN content area -->
+        <div class="flex-auto overflow-y-auto sm:-mt-16 -mt-12 -z-10"
+             [ngClass]="isDialog && iscreenSmall ? 'pb-16' : ''"
+             cdkScrollable>
+          <mat-tab-group class="fuse-mat-no-header" [animationDuration]="'200'" #courseSteps>
+            <ng-container *ngIf="steps.length > 0">
+              <ng-container *ngFor="let step of steps; let isLast = last; trackBy: trackByFn">
+                <mat-tab>
+                  <ng-template matTabContent>
+                    <app-contest-assignment
+                      [isLastStep]="isLast"
+                      [workflow]="step"
+                      [rawWorkflowInfo]="workflowInfo"
+                      [selectedStageSubm]="selectedStageSubm"
+                      [workflowId]="workflowInfo?.docId"
+                      [isOldContest]="oldContest"
+                      [contestInfo]="contestInfo">
+                    </app-contest-assignment>
+                  </ng-template>
+                </mat-tab>
+              </ng-container>
+            </ng-container>
+          </mat-tab-group>
+
+          <!-- DESKTOP floating nav -->
+          <div *ngIf="!iscreenSmall && !contestInfo?.isContestStepsLocked"
+               class="z-10 sticky flex bottom-4 p-4">
+            <div class="flex items-center justify-center mx-auto p-2 rounded-full shadow-lg bg-primary">
+              <button class="flex-0 flex items-center text-white fill-white" (click)="goToPreviousStep()">
+                <mat-icon class="mr-2 white-icon" svgIcon="heroicons_outline:arrow-narrow-left"></mat-icon>
+                <span class="mr-1">Prev</span>
+              </button>
+              <div class="flex items-center justify-center mx-2.5 font-medium leading-5 text-on-primary">
+                <span>{{ currentStep }}</span><span class="mx-0.5">/</span><span>{{ workflowInfo?.totalSteps }}</span>
+              </div>
+              <button class="flex-0 flex items-center text-white" (click)="goToNextStep()">
+                <span class="ml-1">Next</span>
+                <mat-icon class="ml-2 white-icon" [svgIcon]="'heroicons_outline:arrow-narrow-right'"></mat-icon>
+              </button>
+            </div>
+          </div>
+
+          <div *ngIf="!iscreenSmall && contestInfo?.isContestStepsLocked"
+               class="z-10 sticky flex bottom-4 p-4">
+            <div class="flex items-center justify-center mx-auto p-2 rounded-full shadow-lg bg-primary">
+              <button class="flex-0 flex items-center text-white fill-white" (click)="goToPreviousStep()">
+                <mat-icon class="mr-2 white-icon" svgIcon="heroicons_outline:arrow-narrow-left"></mat-icon>
+                <span class="mr-1">Prev</span>
+              </button>
+              <div class="flex items-center justify-center mx-2.5 font-medium leading-5 text-on-primary">
+                <span>{{ currentStep }}</span><span class="mx-0.5">/</span><span>{{ workflowInfo?.totalSteps }}</span>
+              </div>
+              <button [disabled]="currentStep + 1 > unlockedSteps"
+                      class="flex-0 flex items-center text-white"
+                      (click)="goToNextStep()">
+                <span class="ml-1">Next</span>
+                <mat-icon class="ml-2 white-icon" [svgIcon]="'heroicons_outline:arrow-narrow-right'"></mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- MOBILE bottom bar: fixed in dialog, sticky when routed -->
+        <div *ngIf="iscreenSmall"
+             [ngClass]="isDialog ? 'fixed inset-x-0 bottom-0 z-40' : 'sticky bottom-0'"
+             class="flex items-center p-3 border-t bg-card">
+          <div class="flex items-center justify-center mr-3 font-medium leading-5">
+            <span>{{ currentStep }}</span>
+            <span class="mx-0.5 text-hint">/</span>
+            <span>{{ workflowInfo?.totalSteps }}</span>
+          </div>
+          <mat-progress-bar class="flex-auto rounded-full"
+                            [value]="100 * (currentStep) / workflowInfo?.totalSteps">
+          </mat-progress-bar>
+        </div>
+
+      </mat-drawer-content>
+    </mat-drawer-container>
+  </div>
+</div>

@@ -1,0 +1,164 @@
+<div class="bg-slate-100 h-screen w-screen overflow-hidden relative">
+    <button (click)="drawerClose()" class="m-3 absolute top-0 right-0 z-40">
+        <mat-icon class="hover:scale-110 transition duration-5000 transform" svgIcon="mat_outline:close">
+        </mat-icon>
+    </button>
+    <div class="px-4 py-3 flex ">
+        <div class="font-bold text-lg text-accent-600 w-max flex items-center py-3">
+            <p class="">{{ contestInfo?.contestTitle }}</p>
+        </div>
+        <div class="flex pt-1 -mb-2 justify-between w-[85vw] mr-6 items-end">
+            <!-- Select Institution -->
+            <mat-form-field class="fuse-mat-dense w-full mx-4">
+                <mat-label>Select Institution</mat-label>
+                <input (keyup)="institutionSearchInput($event)" type="text" [disabled]="isInstituteDisabled"
+                    placeholder="Search And Select Institution" aria-label="Number" matInput [matAutocomplete]="auto"
+                    [(ngModel)]="selectedInstitution" />
+                <mat-autocomplete #auto="matAutocomplete">
+                    <mat-option matTooltipPosition="right" matTooltipShowDelay="500"
+                        [matTooltip]="school?.institutionName" [value]="school?.institutionName" class="text-md"
+                        *ngFor="let school of filteredSchool" (click)="onSelectSchool(school)">
+                        {{ school?.institutionName }}
+                    </mat-option>
+                </mat-autocomplete>
+            </mat-form-field>
+
+            <!-- <mat-form-field appearance="fill" class="w-full mx-4 fuse-mat-dense">
+                <mat-label>Select Type</mat-label>
+                <mat-select [(ngModel)]="selectedClassroomType" placeholder="Select Type"
+                    [disabled]="!selectedInstitution">
+                    <mat-option (click)="onSelectType(type)" *ngFor="let type of classroomTypes" [value]="type">
+                        {{ type }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field> -->
+
+            <!-- Select Stage (enabled after Type selection) -->
+            <mat-form-field appearance="fill" class="w-full fuse-mat-dense">
+                <mat-label>Select Stage</mat-label>
+                <mat-select [(ngModel)]="stageInfo" placeholder="Select Stage" [disabled]="!selectedInstitution">
+                    <mat-option (click)="onStageSelect(stage)" *ngFor="let stage of contestInfo?.stagesNames"
+                        [value]="stage">
+                        {{ stage?.stageName }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <!-- Search -->
+            <mat-form-field appearance="fill" class="w-full ml-2 px-2 mt-2 fuse-mat-dense">
+                <mat-label>Search</mat-label>
+                <input (keyup)="search($event)" matInput placeholder="Search By Name or Phone"
+                    [disabled]="!stageInfo" />
+                <mat-icon matPrefix svgIcon="heroicons_solid:search"></mat-icon>
+            </mat-form-field>
+
+            <button *ngIf="!contestDashboardService.isSpectatorIsATeacher && !accessLevelNine"
+                [disabled]="!contestSubmissions.length" (click)="onReview()" type="button" mat-stroked-button
+                class=" mb-4 text-primary-600 fuse-mat-stroked-button-large arrowBtn disabled:bg-primary-100">
+                Review
+            </button>
+        </div>
+
+    </div>
+    <div class="h-[calc(100%-109px)] flex flex-col" *ngIf="areStudentsAvailable">
+        <div class="overflow-x-auto">
+            <table class="w-full border-collapse text-secondary  ">
+                <thead class="shadow sticky top-0 z-99">
+                    <tr class="bg-gray-50 text-md font-semibold">
+                        <th colspan="3" class="text-center px-2 py-2">
+                            <span class="rounded-full bg-primary-100 text-primary px-2 py-1">Student Info</span>
+                        </th>
+                        <th *ngFor="let sub of submissionColumns" class="text-center px-2 py-2 border-l"
+                            [attr.colspan]="sub.columns.length">
+                            <span class="rounded-full bg-primary-100 text-primary px-2 py-1">{{ sub?.title }}</span>
+                        </th>
+                        <th *ngIf="!contestDashboardService.isSpectatorIsATeacher" class="border-l"></th>
+
+                    </tr>
+                    <tr class="bg-gray-50 ">
+                        <th class="text-center  px-2 py-2">Student ID</th>
+                        <th class="text-center px-2 py-2">Phone</th>
+                        <th class="text-center px-2 py-2">Name</th>
+                        <ng-container *ngFor="let sub of submissionColumns">
+                            <td *ngFor="let col of sub.columns"
+                                class="text-center font-semibold text-md px-2 py-2 border-l border-t">
+                                {{ col?.contestStepName }}
+                            </td>
+                        </ng-container>
+                        <td *ngIf="!contestDashboardService.isSpectatorIsATeacher && !accessLevelNine"
+                            class="text-center font-semibold text-md px-2 py-2 border-l border-t">
+                            Review
+                        </td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let student of contestSubmissions">
+                        <td class="text-center px-2 py-3 truncate border-gray-400 border-b">
+                            <ng-container *ngIf="student?.authInfo?.accessCode; else noAccessCode">
+                                {{ student.authInfo.accessCode.substring(0, 7) }}
+                            </ng-container>
+                            <ng-template #noAccessCode>
+                                <span class="text-red-500">Not available</span>
+                            </ng-template>
+                        </td>
+                        <td class="text-center px-2 py-3 truncate border-gray-400 border-b">
+                            {{ student?.studentMeta?.countryCode + student?.studentMeta?.phoneNumber }}
+                        </td>
+                        <td class="text-center px-2 py-3 truncate border-gray-400 border-b">
+                            {{ student?.studentMeta?.firstName + " " + student?.studentMeta?.lastName }}
+                        </td>
+                        <ng-container *ngFor="let submission of student.contestSubmissions">
+                            <td class="text-center px-2 py-3 truncate border-gray-400 border-b ">
+                                <span class="text-green-600 font-semibold ml-2 flex items-center"
+                                    *ngIf="submission.type==='MEDIA' && submission.submission.length">
+                                    Submitted
+                                    <span matTooltip="View Submission" *ngFor="let sub of submission.submission"
+                                        class="ml-1">
+                                        <a target="_blank" [href]="sub?.submissionPath | getDownloadURL">
+                                            <mat-icon svgIcon="mat_outline:remove_red_eye"
+                                                class="text-primary -mb-3"></mat-icon>
+                                        </a>
+                                    </span>
+                                </span>
+                                <span class="text-green-600 font-semibold ml-2 flex items-center"
+                                    *ngIf="submission.type==='VIDEO'">
+                                    <span
+                                        [matTooltip]="'Submitted At: '+(student?.submissionMeta?.submissionTime?.seconds* 1000|date:'medium')">Submitted</span>
+                                    <span matTooltip="View Submission" class="ml-1">
+                                        <a target="_blank" [href]="submission?.submission.innovationVideoLink">
+                                            <mat-icon svgIcon="mat_outline:remove_red_eye"
+                                                class="text-primary -mb-3"></mat-icon>
+                                        </a>
+                                    </span>
+                                </span>
+                                <span class="text-green-600 font-semibold ml-2 flex items-center"
+                                    *ngIf="submission.type==='QUIZ'">
+                                    Score {{ submission.submission.studentScore + '/' + submission.submission.maxScore
+                                    }}
+                                </span>
+                                <span class="text-green-600 font-semibold ml-2 flex items-center"
+                                    *ngIf="submission.type==='FORM'">
+                                    Submitted
+                                    <span matTooltip="View Submission" class="ml-1">
+                                        <a target="_blank" (click)="displayForm(submission, student)">
+                                            <mat-icon svgIcon="mat_outline:remove_red_eye"
+                                                class="text-primary -mb-3"></mat-icon>
+                                        </a>
+                                    </span>
+                                </span>
+                            </td>
+                        </ng-container>
+
+                        <td *ngIf="!contestDashboardService.isSpectatorIsATeacher && !accessLevelNine"
+                            class="text-center px-2 py-3 truncate border-gray-400 border-b ">
+                            <button type="submit" mat-stroked-button (click)="reviewSubmission(student)"
+                                class="text-primary-600 fuse-mat-stroked-button-large arrowBtn disabled:bg-primary-100">
+                                Review
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

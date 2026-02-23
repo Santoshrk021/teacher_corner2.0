@@ -1,0 +1,58 @@
+// .inventory-grid {
+//     grid-template-columns: 48px auto 40px;
+
+//     @screen sm {
+//         grid-template-columns: 48px auto 112px 72px;
+//     }
+
+//     @screen md {
+//         grid-template-columns: 48px 112px auto 112px 72px;
+//     }
+
+//     @screen lg {
+//         grid-template-columns: 48px 112px auto 112px 96px 96px 72px;
+//     }
+// }
+.inventory-grid {
+  /* same relative widths as your percentages, just using fr so gaps don't overflow */
+  grid-template-columns: 13fr 14fr 10fr 11fr 10fr 11fr 12fr 8fr 6fr;
+  box-sizing: border-box; /* keeps padding inside width */
+}
+
+/* allow content to truncate instead of forcing the track to grow */
+.inventory-grid > * { min-width: 0; }
+
+.dynamicwidth { width: 100%; }
+
+/* (optional but helpful) ensure x doesn't scroll on the list area */
+.overflow-y-auto { overflow-x: hidden; }
+
+
+
+@media only screen and (max-width:800px) {
+    .dynamicwidth {
+
+        width: 1000px;
+    }
+}
+
+
+// @media only screen and (max-width:300px) {
+//     .inventory-grid {
+//        grid-template-columns:auto   
+//     }
+// }
+
+// @media only screen and (min-width: 300px) and (max-width: 500px) {
+//     .inventory-grid {
+//         grid-template-columns:auto 
+
+//        // grid-template-columns:15% 13% 10% 11% 10% 13% 9%;    
+//     }
+//}
+
+// .inventory-grid {
+//    // grid-template-columns: 2fr repeat(2,2fr)  3fr 1fr 60px 40px ;
+
+//     grid-template-columns:10% 13% 14% 16% 16% 19% 4%;
+// }

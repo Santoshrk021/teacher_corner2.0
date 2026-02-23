@@ -1,0 +1,221 @@
+<form [formGroup]="templateForm" (ngSubmit)="onSubmit(templateForm)" #Form>
+    <!-- <div class="bg-white overflow-scroll h-[calc(100vh_-_250px)] sm:w-[50vw] border shadow rounded-2xl p-6 relative items-center text-center m-auto"> -->
+    <!-- <div class="bg-white overflow-scroll h-[calc(100vh_-_250px)] border shadow rounded-2xl p-6 relative items-center text-center m-auto"> -->
+    <div
+        class="bg-white overflow-scroll h-[calc(100vh_-_250px)] rounded-2xl p-6 relative items-center text-center m-auto"
+    >
+        <div class="grid grid-flow-row">
+            <div formArrayName="classInfoArray">
+                <div
+                    *ngFor="let selection of classInfo.controls; let i = index"
+                >
+                    <div
+                        [formGroupName]="i"
+                        class="grid grid-cols-1 md:grid-cols-12 md:gap-2 items-start"
+                    >
+                        <div class="col-span-2">
+                            <mat-form-field
+                                class="w-full text-accent-600"
+                                floatLabel="always"
+                            >
+                                <mat-label class="text-accent-600"
+                                    >Grade</mat-label
+                                >
+                                <mat-select
+                                    formControlName="grade"
+                                    placeholder="Select Grade"
+                                    (selectionChange)="
+                                        onGradeChange(selection, i)
+                                    "
+                                >
+                                    <mat-option value="" disabled selected
+                                        >Select</mat-option
+                                    >
+                                    <mat-option
+                                        *ngFor="let grade of gradeList"
+                                        [value]="grade"
+                                    >
+                                        Class {{ grade }}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+
+                        <div class="col-span-3">
+                            <mat-form-field
+                                class="w-full text-accent-600"
+                                floatLabel="always"
+                            >
+                                <mat-label class="text-accent-600"
+                                    >Section</mat-label
+                                >
+                                <mat-select
+                                    (selectionChange)="
+                                        onSectionChange(selection, i)
+                                    "
+                                    formControlName="section"
+                                    placeholder="Select Grade"
+                                >
+                                    <mat-option value="" disabled selected
+                                        >Select</mat-option
+                                    >
+                                    <mat-option
+                                        *ngFor="
+                                            let section of selection.get(
+                                                'availableSections'
+                                            )?.value
+                                        "
+                                        [value]="section"
+                                    >
+                                        {{ section }}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+
+                        <div class="col-span-3">
+                            <mat-form-field
+                                class="w-full text-accent-600"
+                                floatLabel="always"
+                            >
+                                <mat-label class="text-accent-600"
+                                    >Subject</mat-label
+                                >
+                                <mat-select
+                                    (selectionChange)="
+                                        onSubjectChange(selection, i)
+                                    "
+                                    formControlName="subject"
+                                    placeholder="Select Grade"
+                                >
+                                    <mat-option value="" disabled selected
+                                        >Select</mat-option
+                                    >
+                                    <mat-option
+                                        *ngFor="
+                                            let subject of selection.get(
+                                                'availableSubjects'
+                                            )?.value
+                                        "
+                                        [value]="subject"
+                                    >
+                                        {{ subject }}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+
+                        <div class="col-span-3">
+                            <mat-form-field
+                                class="w-full text-accent-600"
+                                floatLabel="always"
+                            >
+                                <mat-label class="text-accent-600"
+                                    >Programme Category</mat-label
+                                >
+                                <mat-select
+                                    formControlName="programmeTemplate"
+                                    placeholder="Select Grade"
+                                    (selectionChange)="
+                                        onProgrammeTemplateChange(selection, i)
+                                    "
+                                >
+                                    <mat-option value="" disabled selected
+                                        >Select</mat-option
+                                    >
+                                    <mat-option
+                                        *ngFor="
+                                            let template of selection.get(
+                                                'availableProgrammes'
+                                            )?.value
+                                        "
+                                        [value]="template"
+                                    >
+                                        {{ template }}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+
+                        <div class="mt-8 col-span-1">
+                            <button
+                                (click)="removeClassInfo(i)"
+                                type="button"
+                                matTooltipPosition="above"
+                                matTooltip="Delete Classroom"
+                            >
+                                <div *ngIf="deleteLoading[i]; else deleteIcon">
+                                    <mat-spinner [diameter]="30"></mat-spinner>
+                                </div>
+                                <ng-template #deleteIcon>
+                                    <mat-icon
+                                        class="text-red-500 icon-size-6 scale_on_hover125 active:text-red-200"
+                                        svgIcon="mat_solid:delete"
+                                    >
+                                    </mat-icon>
+                                </ng-template>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- add -->
+            <div class="grid grid-cols-1">
+                <div class="col-span-1 flex flex-row-reverse">
+                    <button
+                        (click)="addClassInfo()"
+                        [disabled]="disableAddButton"
+                        type="button"
+                    >
+                        <mat-icon
+                            matTooltipPosition="above"
+                            matTooltip="Add Classroom"
+                            class="icon-size-8 text-primary-600 cursor-pointer plusIcon active:text-primary-500"
+                            [svgIcon]="'heroicons_solid:plus-circle'"
+                        ></mat-icon>
+                    </button>
+                </div>
+            </div>
+
+            <!-- submit -->
+            <!-- <div class="grid grid-cols-3 ">
+                <div class="col-start-2 text-center ">
+                    <button type="submit"
+                        class="disabled:bg-primary-100 fuse-mat-stroked-button-large bg-primary-600 text-white hover:bg-primary-500"
+                        mat-stroked-button>
+                        {{ false?'':'Submit'}}
+                    </button>
+                </div>
+            </div> -->
+            <div class="text-center pt-2">
+                <button
+                    mat-stroked-button
+                    type="submit"
+                    [disabled]="!isSaveButtonEnabled"
+                    class="bg-primary text-white disabled:bg-primary-100"
+                >
+                    <div *ngIf="loading; else saveButton">
+                        <mat-spinner [diameter]="30"></mat-spinner>
+                    </div>
+                    <ng-template #saveButton> Save </ng-template>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex justify-between pt-3">
+        <!-- <button matStepperPrevious mat-stroked-button type="button"
+            class="text-primary-600 fuse-mat-stroked-button-large  arrowBtnBack disabled:bg-primary-100">
+            <mat-icon class="mr-2 icon-size-5  text-primary-600 arrowIconBack"
+                [svgIcon]="'heroicons_solid:arrow-sm-left'"></mat-icon>
+            Back
+        </button>
+        <button  matStepperNext mat-stroked-button type="submit"
+            class="text-primary-600 fuse-mat-stroked-button-large arrowBtn disabled:bg-primary-100">
+            Next
+            <mat-icon class="ml-2 icon-size-5  text-primary-600 arrowIcon"
+                [svgIcon]="'heroicons_solid:arrow-sm-right'"></mat-icon>
+        </button> -->
+    </div>
+</form>

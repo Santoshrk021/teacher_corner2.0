@@ -1,0 +1,99 @@
+<div class="py-6 h-screen w-screen overflow-hidden relative">
+  <!-- Close Button -->
+  <button (click)="closeDrawer()" class="m-3 absolute top-0 right-0 z-40">
+    <mat-icon class="hover:scale-110 transition duration-500 transform" svgIcon="mat_outline:close"></mat-icon>
+  </button>
+
+  <!-- Empty Trash Button -->
+  <button (click)="emptyTrash()" mat-stroked-button color="warn" class="m-3 text-center absolute top-1 right-10 z-40"
+    [disabled]="deletedKits.length === 0">
+    <mat-icon class="text-red-500 cursor-pointer transition duration-500 transform hover:scale-[115%]"
+      svgIcon="delete_outline"></mat-icon>
+    Empty Trash
+  </button>
+
+  <!-- Header -->
+  <div class="pl-4 pr-22 h-10 flex justify-between">
+    <p class="font-bold text-lg text-accent-600">View Deleted Kits</p>
+  </div>
+
+  <!-- Content -->
+  <div class="w-full">
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="flex items-center justify-center py-10">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!isLoading && deletedKits.length === 0" class="flex flex-col items-center justify-center py-20 text-gray-500">
+      <mat-icon class="text-6xl mb-4" style="font-size: 64px; width: 64px; height: 64px;">delete_outline</mat-icon>
+      <p class="text-lg">Trash is empty</p>
+    </div>
+
+    <!-- Table -->
+    <div *ngIf="!isLoading && deletedKits.length > 0" class="grid mt-4">
+      <!-- Table Header -->
+      <div class="inventory-grid z-10 sticky top-0 grid gap-8 py-4 px-10 md:px-8 shadow text-md font-semibold text-secondary bg-gray-50 dark:bg-black dark:bg-opacity-5">
+        <div>Kit ID</div>
+        <div>Teacher Remotes</div>
+        <div>Student Remotes</div>
+        <div>Spare Remotes</div>
+        <div>Status</div>
+        <div>Created On</div>
+        <div>Deleted On</div>
+        <div class="hidden sm:block">Restore</div>
+        <div class="hidden sm:block">Delete</div>
+      </div>
+
+      <!-- Table Body -->
+      <div class="overflow-y-auto h-[calc(100vh_-_140px)]">
+        <ng-container *ngFor="let kit of deletedKits; trackBy: trackByFn">
+          <div class="inventory-grid grid items-center text-secondary gap-8 py-3 px-10 md:px-8 border-b border-gray-400">
+            <!-- Kit ID -->
+            <div class="font-medium">{{kit.kitId}}</div>
+
+            <!-- Teacher Remotes -->
+            <div>{{kit.teacherRemotes?.length || 0}}</div>
+
+            <!-- Student Remotes -->
+            <div>{{kit.studentRemotes?.length || 0}}</div>
+
+            <!-- Spare Remotes -->
+            <div>{{kit.spareRemotes?.length || 0}}</div>
+
+            <!-- Status -->
+            <div>
+              <span class="px-2 py-1 rounded text-xs font-medium" [ngClass]="getStatusClass(kit.status)">
+                {{kit.status | titlecase}}
+              </span>
+            </div>
+
+            <!-- Created Date -->
+            <div>{{formatDate(kit.createdAt)}}</div>
+
+            <!-- Deleted Date -->
+            <div>{{formatDate(kit.deletedAt)}}</div>
+
+            <!-- Restore Button -->
+            <div class="hidden sm:block">
+              <mat-icon (click)="restoreKit(kit)"
+                class="text-primary icon-size-5 cursor-pointer transition duration-500 transform hover:scale-[115%]"
+                matTooltip="Restore Kit">
+                <span class="material-icons">restore_from_trash</span>
+              </mat-icon>
+            </div>
+
+            <!-- Delete Button -->
+            <div class="hidden sm:block">
+              <mat-icon (click)="permanentDelete(kit)"
+                class="text-red-500 cursor-pointer transition duration-500 transform hover:scale-[115%]"
+                svgIcon="delete_outline"
+                matTooltip="Delete Permanently">
+              </mat-icon>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</div>

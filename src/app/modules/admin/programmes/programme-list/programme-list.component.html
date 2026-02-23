@@ -1,0 +1,228 @@
+<div class="w-full h-full overflow-y-auto py-3">
+  <div class="dynamicwidth flex justify-between">
+    <div class="w-[300px] text-3xl font-bold ml-1 mt-1 pl-2">
+      Programmes
+    </div>
+
+    <div class="mt-0 h-[50px] w-[300px] ml-11 mb-2 flex flex-row">
+      <mat-form-field appearance="fill" class="w-full">
+        <input matInput [(ngModel)]="searchValue" placeholder="Search Programme">
+        <mat-icon matPrefix svgIcon="heroicons_solid:search"></mat-icon>
+      </mat-form-field>
+
+      <button (click)="search(searchValue)" mat-raised-button color="primary" class=" ml-2 mt-1 w-max mb-2">
+        Search
+      </button>
+    </div>
+    <div class="flex flex-row justify-center mt-0 ml-10 ">
+
+      <div class="mr-1">
+        <button matRipple matTooltipPosition="above" matTooltip="Create New Programme" (click)="addNewProgramme()"
+          class="h-10 mr-4 quizAsmntBtn w-max px-3.5 bg-primary-500 hover:bg-primary-600 font-semibold cursor-pointer  text-white rounded-full flex justify-center items-center">
+          <mat-icon class="text-white ml-2 plusIcon" svgIcon="heroicons_outline:plus-circle"></mat-icon>
+          <p class=" px-1 ">Add </p>
+        </button>
+
+      </div>
+      <div class="mr-2">
+        <button mat-raised-button color="primary" class="w-full" (click)="goToTrash()">
+          <mat-icon class="mr-1" svgIcon="heroicons_outline:trash"></mat-icon>Trash
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="dynamicwidth">
+    <div class="w-full grid">
+      <div
+        class="inventory-grid grid gap-4 py-4 px-10 md:px-8 shadow text-md font-semibold text-secondary bg-gray-50 dark:bg-black dark:bg-opacity-5 w-full"
+        matSort matSortDisableClear (matSortChange)="sortData($event)">
+        <div>Image</div>
+        <div class="lg:mr-6 sm:mr-0" [mat-sort-header]="'displayName'">Display Name</div>
+        <div [mat-sort-header]="'programmeName'">Name</div>
+        <div [mat-sort-header]="'programmeId'">ID</div>
+        <div [mat-sort-header]="'programmeCode'">Code</div>
+        <div [mat-sort-header]="'programmeStatus'">Status</div>
+        <div [mat-sort-header]="'programmeGrades'">Grades</div>
+        <div [mat-sort-header]="'programmeInstitution'">Institution Name</div>
+        <div class="lg:ml-0 xs:ml-3" [mat-sort-header]="'updatedAt'">Updated At</div>
+        <div [mat-sort-header]="'createdAt'">Created At</div>
+        <div>View Details</div>
+        <div>Delete</div>
+      </div>
+
+      <div class="h-[calc(100vh_-_254px)]  overflow-scroll" infiniteScroll [infiniteScrollDistance]="1"
+        [infiniteScrollUpDistance]="2" [infiniteScrollThrottle]="300" [scrollWindow]="false"
+        (scrolled)="onScroll($event)">
+        <ng-container *ngIf="programDataCopy as programs">
+          <ng-container *ngFor="let program of programmes; let i = index; trackBy: trackByFn">
+            <div
+              class=" inventory-grid grid items-center text-secondary gap-4 py-3 px-10 md:px-8 border-b border-gray-300 "
+              matSort matSortDisableClear>
+              <div class="flex items-center">
+                <div
+                  class="relative flex flex-0 items-center justify-center w-12 h-12 mr-6 rounded overflow-hidden border">
+                  <img class="w-12" *ngIf="program?.programmeImagePath" [alt]="'learning unit thumbnail image'"
+                    [src]="program?.programmeImagePath|getDownloadURL" loading="lazy">
+                  <div
+                    class="flex items-center justify-center w-full h-full text-xs font-semibold leading-none text-center uppercase"
+                    *ngIf="!program?.programmeImagePath">
+                    NO THUMB
+                  </div>
+                </div>
+              </div>
+
+              <div class="lg:ml-1 sm:ml-0 break-words" [matTooltip]="program?.displayName" matTooltipPosition="above"
+                [cdkCopyToClipboard]="program?.displayName" (click)="copyToClipboard(program?.displayName)">
+                {{program?.displayName}}
+              </div>
+
+              <div class="break-words" [matTooltip]="program?.programmeName" matTooltipPosition="above"
+                [cdkCopyToClipboard]="program?.programmeName" (click)="copyToClipboard(program?.programmeName)">
+                {{program?.programmeName}}
+              </div>
+
+              <div class="truncate" [matTooltip]="program?.programmeId" matTooltipPosition="above"
+                [cdkCopyToClipboard]="program?.programmeId" (click)="copyToClipboard(program?.programmeId)">
+                {{program?.programmeId | slice:0:4}}...
+              </div>
+
+              <div class="truncate" [matTooltip]="program?.programmeCode" matTooltipPosition="above"
+                [cdkCopyToClipboard]="program?.programmeCode" (click)="copyToClipboard(program?.programmeCode)">
+                {{program?.programmeCode}}
+              </div>
+
+              <div class="lg:ml-2 xs:ml-0 truncate" [matTooltip]="program?.programmeStatus" matTooltipPosition="above"
+                [cdkCopyToClipboard]="program?.programmeStatus" (click)="copyToClipboard(program?.programmeStatus)">
+                {{program?.programmeStatus}}
+              </div>
+
+              <div class="lg:ml-2 xs:ml-5" [matTooltip]="program?.grades" matTooltipPosition="above"
+                [cdkCopyToClipboard]="program?.grades" (click)="copyToClipboard(program?.grades)">
+                <span *ngIf="isNotString(program?.grades); else gg">
+                  <span *ngIf="program?.grades?.length>1 ;else gd">{{program?.grades?.[0]}} -
+                    {{program?.grades[program?.grades?.length-1]}}</span>
+                  <ng-template #gd>
+                    {{program?.grades?.[0]}}
+                  </ng-template>
+                </span>
+
+                <ng-template #gg>
+                  {{program?.grades}}
+                </ng-template>
+              </div>
+
+              <div class="lg:ml-3 xs:ml-0" [matTooltip]="program?.institutionName" matTooltipPosition="above"
+                [cdkCopyToClipboard]="program?.institutionName" (click)="copyToClipboard(program?.institutionName)">
+                {{program?.institutionName}}
+              </div>
+
+              <div class="lg:ml-0 xs:ml-4" [title]="program.programmeName"
+                [matTooltip]="program?.updatedAt?(program?.updatedAt?.seconds*1000| date: 'dd/MM/yyyy'):''"
+                matTooltipPosition="above"
+                [cdkCopyToClipboard]="program?.updatedAt?(program?.updatedAt?.seconds*1000| date: 'dd/MM/yyyy'):''"
+                (click)="copyToClipboardDate(program?.updatedAt)">
+                {{program?.updatedAt?(program?.updatedAt?.seconds*1000| date: 'dd/MM/yyyy'):''}}
+              </div>
+
+              <div class="lg:ml-0 xs:ml-0"
+                [matTooltip]="program?.createdAt?(program?.createdAt?.seconds*1000| date: 'dd/MM/yyyy'):''"
+                matTooltipPosition="above"
+                [cdkCopyToClipboard]="program?.createdAt?(program?.createdAt?.seconds*1000| date: 'dd/MM/yyyy'):''"
+                (click)="copyToClipboardDate(program?.createdAt)">
+                {{program?.createdAt?.seconds*1000| date: 'dd/MM/yyyy'}}
+              </div>
+
+              <div>
+                <div class="lg:ml-2 xs:mr-4">
+                  <button class="min-w-10 min-h-7 h-7 px-2 leading-6" mat-stroked-button
+                    (click)="toggleDetails(program)"
+                    [ngClass]="{'bg-slate-200':selectedProgramme?.programmeId==program?.programmeId}">
+                    <mat-icon class="icon-size-5"
+                      [svgIcon]="selectedProgramme?.programmeId==program?.programmeId ? 'heroicons_solid:chevron-up' : 'heroicons_solid:chevron-down'">
+                    </mat-icon>
+                  </button>
+                </div>
+              </div>
+
+              <div class="ml-2">
+                <div *ngIf="deletingLoader &&(program.programmeId==selectedProgramId); else deleted">
+                  <mat-spinner [diameter]="30"></mat-spinner>
+                </div>
+                <ng-template #deleted>
+                  <mat-icon class="text-red-500  cursor-pointer transition duration-500 transform  hover:scale-[115%]"
+                    svgIcon="delete_outline" (click)="deleteProgram(program)"></mat-icon>
+                </ng-template>
+              </div>
+            </div>
+
+            <div class="grid">
+              <ng-container *ngIf="selectedProgramme?.programmeId === program?.programmeId">
+                <ng-container *ngTemplateOutlet="rowDetailsTemplate;context: {$implicit: program}">
+                </ng-container>
+              </ng-container>
+            </div>
+          </ng-container>
+        </ng-container>
+      </div>
+
+      <p class="px-2 pt-3 text-secondary">
+        {{loadingMessage}}
+      </p>
+    </div>
+  </div>
+</div>
+
+<ng-template #rowDetailsTemplate let-learningunit>
+  <div class=" border-b border-slate-300 overflow-scroll bg-blue-100 p-1 pt-4">
+    <mat-tab-group [linear]="true" #stepper>
+      <mat-tab>
+        <ng-template matTabLabel>Basic Info</ng-template>
+        <ng-template matTabContent>
+          <div>
+            <app-add-new-programme [stepper]="stepper" [programDetails]="selectedProgramDetails"
+              [allPrograms]="programData" [searchTerm]="searchTerm"
+              (searchTermOutput)="onSearchTermReceived($event)"></app-add-new-programme>
+          </div>
+        </ng-template>
+      </mat-tab>
+
+      <mat-tab>
+        <ng-template matTabLabel>Manage Learning units</ng-template>
+        <ng-template matTabContent>
+          <div class="">
+            <app-learning-list [stepper]="stepper" [programDetails]="selectedProgramDetails">
+            </app-learning-list>
+          </div>
+        </ng-template>
+      </mat-tab>
+
+      <mat-tab>
+        <ng-template matTabLabel>Manage Assignments</ng-template>
+        <ng-template matTabContent>
+          <div class="">
+            <app-assignment-list [stepper]="stepper" [programDetails]="selectedProgramDetails">
+            </app-assignment-list>
+          </div>
+        </ng-template>
+      </mat-tab>
+
+      <mat-tab
+        *ngIf="!selectedProgramDetails?.institutionName || selectedProgramDetails?.institutionName === 'undefined'">
+        <ng-template matTabLabel>Assign Institution</ng-template>
+        <ng-template matTabContent>
+          <div class="">
+            <app-institution-assignment [programDetails]="selectedProgramDetails"></app-institution-assignment>
+          </div>
+        </ng-template>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</ng-template>
+
+<fuse-drawer *ngIf="show" class="w-screen min-w-screen" [opened]="drawerOpened" fixed [mode]="'over'"
+  [position]="'left'">
+  <div>
+    <ng-container *ngComponentOutlet="component"></ng-container>
+  </div>
+</fuse-drawer>

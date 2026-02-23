@@ -1,0 +1,221 @@
+<div class="w-full h-full overflow-y-auto  py-3 ">
+    <div class="dynamicwidth flex justify-between">
+        <div class="  w-[300px] text-3xl font-bold ml-1 mt-1  pl-2">
+            Programme Templates
+        </div>
+        <!-- <div class="grid grid-cols-2 gap-8 w-max ml-auto "> -->
+        <div class="mt-0 h-[50px] w-[300px] ml-11 mb-2 flex flex-row">
+            <mat-form-field appearance="fill" class="w-full">
+                <input matInput [(ngModel)]="searchValue" placeholder="Search Programme Template">
+                <mat-icon matPrefix svgIcon="heroicons_solid:search"></mat-icon>
+            </mat-form-field>
+
+            <button (click)="search(searchValue)" mat-raised-button color="primary" class=" ml-2 mt-1 w-max mb-2">
+                Search
+            </button>
+        </div>
+        <div class="flex flex-row justify-center mt-0 ml-10 ">
+            <!-- <button mat-raised-button color="primary" (click)="openDialog()">Add </button> -->
+            <div class="mr-1">
+                <button matRipple matTooltipPosition="above" matTooltip="Create New Programme Template"
+                    (click)="openDialog()"
+                    class="h-10 mr-4 quizAsmntBtn w-max px-3.5 bg-primary-500 hover:bg-primary-600 font-semibold cursor-pointer  text-white rounded-full flex justify-center items-center">
+                    <mat-icon class="text-white ml-2 plusIcon" svgIcon="heroicons_outline:plus-circle"></mat-icon>
+                    <p class=" px-1 ">Add </p>
+                </button>
+                <!-- <button mat-raised-button color="primary" class="w-full mr-4" (click)="openDialog()">
+            <mat-icon class="mr-1" svgIcon="heroicons_outline:plus-circle"></mat-icon>
+            Add </button> -->
+            </div>
+            <div class="mr-2">
+                <button mat-raised-button color="primary" class="w-full" (click)="goToTrash()">
+                    <mat-icon class="mr-1" svgIcon="heroicons_outline:trash"></mat-icon>Trash
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- </div> -->
+
+    <div class="dynamicwidth">
+        <div class="w-full grid">
+            <div class="inventory-grid grid gap-4 py-4 px-10 md:px-8 shadow text-md font-semibold text-secondary bg-gray-50 dark:bg-black dark:bg-opacity-5 w-full"
+                matSort matSortDisableClear (matSortChange)="sortData($event)">
+                <div>Image</div>
+                <div class="lg:mr-6 sm:mr-0" [mat-sort-header]="'displayName'">Display Name</div>
+                <div [mat-sort-header]="'templateName'">Name</div>
+                <div [mat-sort-header]="'templateId'">ID</div>
+                <div [mat-sort-header]="'templateStatus'">Status</div>
+                <div [mat-sort-header]="'board'">Board</div>
+                <div [mat-sort-header]="'grade'">Grade</div>
+                <div [mat-sort-header]="'subject'">Subject</div>
+                <div [mat-sort-header]="'templateCategory'">Category</div>
+                <div class="lg:ml-0 xs:ml-3" [mat-sort-header]="'updatedAt'">Updated At</div>
+                <div [mat-sort-header]="'createdAt'">Created At</div>
+                <div>View Details</div>
+                <div>Delete</div>
+            </div>
+
+            <div class="h-[calc(100vh_-_254px)]  overflow-scroll">
+                <ng-container *ngIf="programmeTemplateData as programmeTemplates">
+                    <ng-container *ngFor="let template of programmeTemplates; let i = index; trackBy: trackByFn">
+                        <div class=" inventory-grid grid items-center text-secondary gap-4 py-3 px-10 md:px-8 border-b border-gray-300 "
+                            matSort matSortDisableClear>
+
+                            <div class="flex items-center">
+                                <div
+                                    class="relative flex flex-0 items-center justify-center w-12 h-12 mr-6 rounded overflow-hidden border">
+                                    <img class="w-12" *ngIf="template?.templateImagePath"
+                                        [alt]="'learning unit thumbnail image'"
+                                        [src]="template?.templateImagePath|getDownloadURL" loading="lazy">
+                                    <div class="flex items-center justify-center w-full h-full text-xs font-semibold leading-none text-center uppercase"
+                                        *ngIf="!template?.templateImagePath">
+                                        NO THUMB
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="lg:ml-1 sm:ml-0 break-words" [matTooltip]="template?.displayName"
+                                matTooltipPosition="above" [cdkCopyToClipboard]="template?.displayName"
+                                (click)="copyToClipboard(template?.displayName)">
+                                {{template?.displayName}}
+                            </div>
+
+                            <div class="break-words" [matTooltip]="template?.templateName" matTooltipPosition="above"
+                                [cdkCopyToClipboard]="template?.templateName"
+                                (click)="copyToClipboard(template?.templateName)">
+                                {{template?.templateName}}
+                            </div>
+
+                            <div class="truncate" [matTooltip]="programgrades?.templateId" matTooltipPosition="above"
+                                [cdkCopyToClipboard]="template?.templateId"
+                                (click)="copyToClipboard(template?.templateId)">
+                                {{template?.templateId | slice:0:4}}...
+                            </div>
+
+                            <div class="lg:ml-2 xs:ml-0 truncate" [matTooltip]="template?.templateStatus"
+                                matTooltipPosition="above" [cdkCopyToClipboard]="template?.templateStatus"
+                                (click)="copyToClipboard(template?.templateStatus)">
+                                {{template?.templateStatus}}
+                            </div>
+
+                            <div class="lg:ml-2 xs:ml-5" [matTooltip]="template?.board" matTooltipPosition="above"
+                                [cdkCopyToClipboard]="template?.board" (click)="copyToClipboard(template?.board)">
+                                {{template?.board}}
+                            </div>
+
+                            <div class="lg:ml-2 xs:ml-5" [matTooltip]="template?.grade" matTooltipPosition="above"
+                                [cdkCopyToClipboard]="template?.grade" (click)="copyToClipboard(template?.grade)">
+                                {{template?.grade}}
+                            </div>
+
+                            <div class="lg:ml-2 xs:ml-5" [matTooltip]="template?.subject" matTooltipPosition="above"
+                                [cdkCopyToClipboard]="template?.subject" (click)="copyToClipboard(template?.subject)">
+                                {{template?.subject}}
+                            </div>
+
+                            <div class="lg:ml-2 xs:ml-5" [matTooltip]="template?.templateCategory" matTooltipPosition="above"
+                                [cdkCopyToClipboard]="template?.templateCategory" (click)="copyToClipboard(template?.templateCategory)">
+                                {{template?.templateCategory}}
+                            </div>
+
+                            <div class="lg:ml-0 xs:ml-4" [title]="template.templateName"
+                                [matTooltip]="template?.updatedAt?(template?.updatedAt?.seconds*1000| date: 'dd/MM/yyyy'):''"
+                                matTooltipPosition="above"
+                                [cdkCopyToClipboard]="template?.updatedAt?(template?.updatedAt?.seconds*1000| date: 'dd/MM/yyyy'):''"
+                                (click)="copyToClipboardDate(template?.updatedAt)">
+                                {{template?.updatedAt?(template?.updatedAt?.seconds*1000| date: 'dd/MM/yyyy'):''}}
+                            </div>
+
+                            <div class="lg:ml-0 xs:ml-0"
+                                [matTooltip]="template?.createdAt?(template?.createdAt?.seconds*1000| date: 'dd/MM/yyyy'):''"
+                                matTooltipPosition="above"
+                                [cdkCopyToClipboard]="template?.createdAt?(template?.createdAt?.seconds*1000| date: 'dd/MM/yyyy'):''"
+                                (click)="copyToClipboardDate(template?.createdAt)">
+                                {{template?.createdAt?.seconds*1000| date: 'dd/MM/yyyy'}}
+                            </div>
+
+                            <div>
+                                <div class="lg:ml-2 xs:mr-4">
+                                    <button class="min-w-10 min-h-7 h-7 px-2 leading-6" mat-stroked-button
+                                        (click)="toggleDetails(template)"
+                                        [ngClass]="{'bg-slate-200':selectedProgramme?.templateId==template?.templateId}">
+                                        <mat-icon class="icon-size-5"
+                                            [svgIcon]="selectedProgramme?.templateId==template?.templateId ? 'heroicons_solid:chevron-up' : 'heroicons_solid:chevron-down'">
+                                        </mat-icon>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="ml-2">
+                                <div
+                                    *ngIf="deletingLoader && ( template.docId === selectedProgrammeTemplateId ); else deleted">
+                                    <mat-spinner [diameter]="30"></mat-spinner>
+                                </div>
+                                <ng-template #deleted>
+                                    <mat-icon
+                                        class="text-red-500  cursor-pointer transition duration-500 transform  hover:scale-[115%]"
+                                        svgIcon="delete_outline" (click)="deleteProgrammeTemplate(template)"></mat-icon>
+                                </ng-template>
+
+                            </div>
+                        </div>
+                        <div class="grid">
+                            <ng-container *ngIf="selectedProgrammeTemplate?.templateId === template?.templateId">
+                                <ng-container *ngTemplateOutlet="rowDetailsTemplate;context: {$implicit: template}">
+                                </ng-container>
+                            </ng-container>
+                        </div>
+                    </ng-container>
+                </ng-container>
+            </div>
+            <p class="px-2 pt-3 text-secondary">
+                {{loadingMessage}}
+            </p>
+        </div>
+    </div>
+</div>
+
+<ng-template #rowDetailsTemplate let-learningunit>
+    <div class=" border-b border-slate-300 overflow-scroll bg-blue-100 p-1 pt-4">
+        <!-------------mat tabs----------------->
+        <mat-tab-group [linear]="true" #stepper>
+            <mat-tab>
+                <ng-template matTabLabel>Basic Info</ng-template>
+                <ng-template matTabContent>
+                    <div>
+                        <app-add-new-programme-template [stepper]="stepper" [templateDetails]="selectedProgrammeTemplateDetails"
+                            [allPrograms]="programData" [searchTerm]="searchTerm"
+                            (searchTermOutput)="onSearchTermReceived($event)"></app-add-new-programme-template>
+                    </div>
+                </ng-template>
+            </mat-tab>
+
+            <mat-tab>
+                <ng-template matTabLabel>Manage Learning units</ng-template>
+                <ng-template matTabContent>
+                    <div class="">
+                        <app-learning-unit-list [stepper]="stepper" [templateDetails]="selectedProgrammeTemplateDetails">
+                        </app-learning-unit-list>
+                    </div>
+                </ng-template>
+            </mat-tab>
+
+            <mat-tab>
+                <ng-template matTabLabel>Manage Assignments</ng-template>
+                <ng-template matTabContent>
+                    <div class="">
+                        <app-assignment-list [stepper]="stepper" [templateDetails]="selectedProgrammeTemplateDetails">
+                        </app-assignment-list>
+                    </div>
+                </ng-template>
+            </mat-tab>
+        </mat-tab-group>
+    </div>
+</ng-template>
+
+<fuse-drawer *ngIf="show" class="w-screen min-w-screen" [opened]="drawerOpened" fixed [mode]="'over'"
+    [position]="'left'">
+    <div>
+        <ng-container *ngComponentOutlet="component"></ng-container>
+    </div>
+</fuse-drawer>

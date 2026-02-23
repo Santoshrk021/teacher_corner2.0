@@ -1,0 +1,145 @@
+<form [formGroup]="assignmentsFormGroup">
+    <div class="h-[62vh] grid grid-cols-12">
+        <div class="px-2 pt-1 h-full overflow-y-auto scroll-mr-100 col-span-10 bg-slate-50 rounded-xl border">
+            <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                <mat-label class="font-semibold text-primary">Instructions</mat-label>
+                <input matInput formControlName="instructions" type="text"
+                    placeholder="Enter the instructions for this assignment">
+                <!--
+            <app-standard-quill-text-input-field
+                [formRelatedDetails]="{formGroupName: assignmentsFormGroup.get('questions').at(i), formControlName: 'instructions', index: i}"
+                [placeHolder]="'Enter instructions for this assignment'"
+                [toolbarProperties]="[['bold', 'italic', 'underline', 'strike'], ['clean']]"></app-standard-quill-text-input-field>
+            -->
+            </mat-form-field>
+
+            <div formArrayName="questions">
+                <div *ngFor="let question of questions?.controls; let i=index" [formGroupName]="i">
+                    <div class="grid grid-cols-12 gap-2 items-center">
+                        <div class="col-span-11">
+                            <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                                <mat-label class="font-semibold text-primary">
+                                    <!-- Question {{i + 1}} -->
+                                    <ng-container *ngIf="!question.get('isSubquestion').value; else subQuestion">
+                                        Question {{getQuestionNumber(i)}}: {{question.get('question').value}}
+                                    </ng-container>
+                                    <ng-template #subQuestion>
+                                        {{getSubQuestionNumber(i)}}: {{question.get('question').value}}
+                                    </ng-template>
+                                </mat-label>
+                                <input matInput formControlName="question" type="text"
+                                    [placeholder]="'Enter the question number '+(i+1)">
+                            </mat-form-field>
+                            <!--
+                            <app-standard-quill-text-input-field
+                                [formRelatedDetails]="{formGroupName: assignmentsFormGroup.get('questions').at(i), formControlName: 'instructions', index: i}"
+                                [placeHolder]="'Enter instructions for this assignment'"
+                                [toolbarProperties]="[['bold', 'italic', 'underline', 'strike'], ['clean']]"></app-standard-quill-text-input-field>
+                            -->
+
+                            <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                                <mat-label class="font-semibold text-primary">Question Type</mat-label>
+                                <mat-select formControlName="questionType" placeholder="Select the question type">
+                                    <mat-option disabled>Select</mat-option>
+                                    <mat-option *ngFor="let type of questionTypes | keyvalue"
+                                        [value]="type.value.key">{{type.value.display}}</mat-option>
+                                </mat-select>
+                            </mat-form-field>
+
+                            <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                                <mat-label class="font-semibold text-primary">Form Prefix Icon</mat-label>
+                                <input matInput formControlName="fieldIcon" type="text"
+                                    [placeholder]="'Enter the name of the icon to be added in the prefix'">
+                            </mat-form-field>
+
+                            <div *ngIf="questions.at(i).get('questionType').value === 'dropDown'">
+                                <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                                    <mat-label class="font-semibold text-primary">Drop Down Options</mat-label>
+                                    <input matInput formControlName="dropDownOptions" type="text"
+                                        [placeholder]="'Enter the drop down options separated by a comma'">
+                                </mat-form-field>
+                            </div>
+
+                            <div *ngIf="questions.at(i).get('questionType').value === 'dropDownDynamic'">
+                                <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                                    <mat-label class="font-semibold text-primary">Configuration Document</mat-label>
+                                    <input matInput formControlName="dropDownOptionsDynamic" type="text"
+                                        [placeholder]="'Enter the configuration document name which has the options'">
+                                </mat-form-field>
+                            </div>
+
+                            <div *ngIf="questions.at(i).get('questionType').value === 'dropDownDependent'">
+                                <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                                    <mat-label class="font-semibold text-primary">Dependent Drop Down Name</mat-label>
+                                    <input matInput formControlName="dropDownOptionsDependent" type="text"
+                                        [placeholder]="'Enter the dependent drop down name which has the options'">
+                                </mat-form-field>
+                            </div>
+
+                            <div *ngIf="questions.at(i).get('questionType').value === 'text'">
+                                <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                                    <mat-label class="font-semibold text-primary">Prompt</mat-label>
+                                    <input matInput formControlName="prompt" type="text"
+                                        [placeholder]="'Enter the prompt message which will be a placeholder'">
+                                </mat-form-field>
+                            </div>
+
+                            <mat-checkbox formControlName="isSubquestion" class="mb-3 text-accent-600">
+                                <span class="text-accent-600">
+                                    Is this a sub question?
+                                </span>
+                            </mat-checkbox>
+                        </div>
+
+                        <!-- <div class="col-span-1">
+                            <button (click)="removeQuestion(i)">
+                                <mat-icon
+                                    class="text-red-500 icon-size-8 cursor-pointer duration-500 hover:scale-[115%]"
+                                    svgIcon="delete_outline"></mat-icon>
+                                svgIcon="heroicons_solid:trash"
+                            </button>
+                        </div> -->
+                        <div class="col-span-1 flex flex-col items-center">
+                            <button (click)="moveQuestionUp(i)" [disabled]="i === 0">
+                                <mat-icon
+                                    class="text-primary-500 icon-size-8 cursor-pointer duration-500 hover:scale-[115%]"
+                                    svgIcon="arrow_upward"></mat-icon>
+                            </button>
+                            <button (click)="moveQuestionDown(i)" [disabled]="i === questions.length - 1">
+                                <mat-icon
+                                    class="text-primary-500 icon-size-8 cursor-pointer duration-500 hover:scale-[115%]"
+                                    svgIcon="arrow_downward"></mat-icon>
+                            </button>
+                            <button (click)="removeQuestion(i)">
+                                <mat-icon
+                                    class="text-red-500 icon-size-8 cursor-pointer duration-500 hover:scale-[115%]"
+                                    svgIcon="delete_outline"></mat-icon>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-span-1 justify-center">
+                <button class="mt-2" (click)="addQuestion()">
+                    <mat-icon matTooltip="Add new question"
+                        class="ml-4 icon-size-8 text-primary-600 cursor-pointer plusIcon active:text-primary-500"
+                        [svgIcon]="'heroicons_solid:plus-circle'">
+                    </mat-icon>
+                </button>
+            </div>
+        </div>
+    </div>
+</form>
+
+<div class="flex flex-row-reverse pt-3">
+    <button matStepperNext mat-stroked-button type="button" (click)="onClickNext()"
+        [disabled]="!assignmentsFormGroup.valid" class="bg-primary text-white arrowBtn disabled:bg-primary-100"
+        [matTooltip]="tooltipMessage">
+        Next
+        <mat-icon *ngIf="assignmentsFormGroup.valid" class="ml-2 icon-size-5 text-white arrowIcon"
+            [svgIcon]="'heroicons_solid:arrow-sm-right'"></mat-icon>
+        <mat-icon *ngIf="!assignmentsFormGroup.valid" class="ml-2 icon-size-5 text-white "
+            [svgIcon]="'heroicons_solid:arrow-sm-right'"></mat-icon>
+    </button>
+</div>

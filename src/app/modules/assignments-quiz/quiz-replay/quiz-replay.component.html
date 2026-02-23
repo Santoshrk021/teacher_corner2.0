@@ -1,0 +1,471 @@
+<div class="h-[80vh] w-[70vw]  relative">
+    <button mat-dialog-close class="m-4 sm:m-6 sm:mx-7 absolute -top-4 -right-4 z-40">
+        <mat-icon class=" hover:scale-110 transition duration-5000 transform" svgIcon="mat_outline:close">
+        </mat-icon>
+    </button>
+    <div>
+        <div class="w-full h-full  hidden sm:block">
+            <div class="flex mx-6">
+                <div class=" text-2xl font-semibold">{{data?.quizInfo?.displayName}}</div>
+                <!-- quiz timer -->
+                <div class="ml-6 flex items-center leading-5 text-md text-secondary">
+                    <mat-icon class="icon-size-5 text-primary" [svgIcon]="'heroicons_solid:clock'"></mat-icon>
+                    <div class="ml-1.5 text-primary">{{counter|formatTimeConditional}}</div>
+                </div>
+            </div>
+
+            <mat-stepper linear #stepper labelPosition="bottom" (selectionChange)="onStepChange($event)">
+
+                <ng-container [formGroup]="questionsFormGroup">
+                    <div formArrayName="questions">
+                        <div *ngFor="let question of questions.controls;let questionIndex =index;">
+                            <mat-step [formGroupName]="questionIndex.toString()">
+                                <ng-container [ngSwitch]="question.value.questionType" class="h-[49vh] overflow-auto">
+                                    <!-- MCQ Questions -->
+                                    <ng-container *ngSwitchCase="'MCQ'" class="flex flex-col h-full w-full">
+                                        <ng-template matStepLabel>
+
+                                            <div class="flex items-center">
+                                                <mat-icon class="icon-size-4 text-inherit"
+                                                    [svgIcon]="'heroicons_outline:clock'"></mat-icon>
+                                                &nbsp;
+                                                <p class="text-sm">{{question.value.timeTaken|formatTime}}</p>
+                                            </div>
+                                        </ng-template>
+
+                                        <ng-template matStepContent>
+                                            <!-- Title -->
+                                            <div *ngIf="question.value.questionTitle.includes('\<\/'); else textOnly">
+                                                <p class="mb-4" [innerHTML]="question.value.questionTitle"></p>
+                                            </div>
+                                            <ng-template #textOnly>
+                                                <p class="mb-4">{{question.value.questionTitle}}</p>
+                                            </ng-template>
+
+                                            <!-- resources -->
+                                            <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
+                                                <mat-tab label="{{res?.resourceName}}"
+                                                    *ngFor="let res of question.value.optionalResource ; let i = index">
+                                                    <div>
+                                                        <div *ngIf="res.type === 'IMAGE'; else otherRes">
+                                                            <img [src]="res?.resourcePath | getDownloadURL"
+                                                                alt="Image loading..." class=" h-100 object-contain ">
+                                                        </div>
+                                                        <ng-template #otherRes>
+                                                            <div *ngIf="res.type ==='VIDEO' ;else pdfContainer"
+                                                                class="">
+                                                                <div *ngIf="res?.resourcePath">
+                                                                    <app-video
+                                                                        [videoUrl]="res.resourcePath"></app-video>
+                                                                </div>
+                                                            </div>
+                                                        </ng-template>
+                                                        <ng-template #pdfContainer>
+                                                            <ng-container class="pdf-container"
+                                                                *ngIf="res.type ==='PDF'">
+                                                                <div
+                                                                    class="flex justify-center items-center  h-100 pb-2">
+                                                                    <app-pdf
+                                                                        [pdfUrl]="res.resourcePath | getDownloadURL"
+                                                                        class='w-full h-full'></app-pdf>
+                                                                </div>
+                                                            </ng-container>
+                                                        </ng-template>
+                                                    </div>
+                                                </mat-tab>
+                                            </mat-tab-group>
+                                            <!-- Options -->
+                                            <div class="grid grid-cols-1  gap-2 h-full w-full pointer-events-none">
+                                                <div formArrayName="options">
+                                                    <label class="uppercase text-primary font-medium">Options <small
+                                                            class="uppercase text-muted">
+                                                            {{ question.get('oneCorrectOption').value?
+                                                            "(Select the correct option)": "(Tick the correct options)"
+                                                            }}
+                                                        </small>
+                                                    </label>
+                                                    <div
+                                                        *ngIf="!getOneCorrectOption(questionIndex) ; else singleCorrectOptionUI">
+                                                        <div
+                                                            *ngFor="let option of getOptions(questionIndex).controls; let optionIndex=index; let f = first; let l = last">
+                                                            <div [formGroupName]="optionIndex"
+                                                                class="flex py-1 items-center">
+                                                                <div class="pr-1">{{optionIndex +1}}:</div>
+                                                                <div class="form-check">
+                                                                    <input type="checkbox"
+                                                                        formControlName="attemptedOption">
+                                                                    <!-- <input type="text" formControlName="Title" class="form-control pr-1" for="exampleCheck1"> -->
+                                                                    <label class="font-weight-normal"
+                                                                        [for]="'exampleCheck1' + i+optionIndex">{{option.get('name').value}}</label>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <ng-template #singleCorrectOptionUI>
+                                                        <div
+                                                            *ngFor="let option of getOptions(questionIndex).controls; let optionIndex=index; let f = first; let l = last">
+                                                            <div [formGroupName]="optionIndex"
+                                                                class="flex py-1 items-center">
+                                                                <div class="pr-1 mt-4">{{optionIndex +1}}:</div>
+                                                                <div class=" mt-2">
+                                                                    <!-- <p>{{option.get('attemptedOption').value}}</p> -->
+                                                                    <input type="radio"
+                                                                        [checked]="Table==='ntable'?option.get('isCorrect').value:option.get('attemptedOption').value"
+                                                                        class="mt-4 mr-2" name="mcqSingleSelect"
+                                                                        (click)="singleCorrectOptionSetRadio(questionIndex,optionIndex)">
+                                                                    <label
+                                                                        class="font-weight-normal">{{option.get('name').value}}
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </ng-template>
+                                                </div>
+
+
+                                            </div>
+                                        </ng-template>
+                                    </ng-container>
+
+                                    <!-- Fill in the Blanks Questions -->
+                                    <ng-container *ngSwitchCase="'FILL_IN_THE_BLANKS'"
+                                        class="flex flex-col h-full w-full">
+                                        <ng-template matStepLabel>
+                                            <div class="flex items-center">
+                                                <mat-icon class="icon-size-4 text-inherit"
+                                                    [svgIcon]="'heroicons_outline:clock'"></mat-icon>
+                                                &nbsp;
+                                                <p class="text-sm">{{question.value.timeTaken|formatTime}}</p>
+                                            </div>
+                                        </ng-template>
+
+                                        <ng-template matStepContent>
+                                            <div *ngIf="Table === 'ntable' ;else showTable1">
+                                                <!-- <h4 class="mb-3"> -->
+                                                <h5 class="text-justify ques_title mb-4">
+                                                    <span *ngFor="let obj of question.value.blanks;
+                                                                let blankIndex=index;let blankLastIndex=last">
+                                                        <span>
+                                                            <!-- {{blankLastIndex}} -->
+
+                                                            {{question.get('quesSplit').value[blankIndex]}}
+                                                            <select
+                                                                class="font-italic border-2 border-gray-200 rounded-md "
+                                                                style="border:2px solid lightgrey;">
+                                                                <option
+                                                                    *ngFor="let op of question.value.blanks[blankIndex].value"
+                                                                    [ngValue]="op" [selected]="op.isCorrect">
+
+
+                                                                    <p class="pointer-events-none">{{op.name}}</p>
+                                                                </option>
+                                                            </select>
+                                                            <span *ngIf="blankLastIndex">
+                                                                {{question.get('quesSplit').value[blankIndex+1]}}
+                                                            </span>
+
+                                                        </span>
+                                                    </span>
+                                                </h5>
+
+                                            </div>
+                                            <ng-template #showTable1>
+                                                <div>
+                                                    <h5 class="text-justify ques_title mb-4">
+                                                        <span *ngFor="let obj of question.get('blanksObj').value|keyvalue;
+                                                                    let blankIndex=index;let blankLastIndex = last;">
+                                                            <span>
+                                                                {{question.get('quesSplit').value[blankIndex]}}
+                                                                <select
+                                                                    class="font-italic border-2 border-gray-200 rounded-md "
+                                                                    style="border:2px solid lightgrey;">
+                                                                    <option
+                                                                        *ngFor="let op of question.value[obj.key].options"
+                                                                        [ngValue]="op" [selected]="op.attemptedOption">
+                                                                        <p class="pointer-events-none">{{op.name}}</p>
+                                                                    </option>
+                                                                </select>
+                                                                <span *ngIf="blankLastIndex">
+                                                                    {{question.get('quesSplit').value[blankIndex+1]}}
+                                                                </span>
+                                                            </span>
+                                                        </span>
+                                                    </h5>
+
+                                                </div>
+
+                                                <!-- <div *ngIf="Table == 'ntable' ;else showTable1">
+                                                    <h5 class="text-justify ques_title mb-4">
+                                                        <span *ngFor="let obj of question.value.customBlanks;
+                                                                    let blankInd=index;let blankLastInd=last">
+                                                            <span>
+                                                              {{blankLastInd}}
+
+                                                                {{question.get('quesSplit').value[blankInd]}}
+                                                                <select class="font-italic border-2 border-gray-200 rounded-md "
+                                                                    style="border:2px solid lightgrey;">
+                                                                    <option *ngFor="let op of question.value.customBlanks[blankInd].options"
+                                                                        [ngValue]="op" [selected]="op.attemptedOption">
+
+
+                                                                        <p class="pointer-events-none">{{op.name}}</p>
+                                                                    </option>
+                                                                </select>
+                                                                <span *ngIf="blankLastIndex">
+                                                                    {{question.get('quesSplit').value[blankIndex+1]}}
+                                                                </span>
+
+                                                            </span>
+                                                        </span>
+                                                    </h5>
+
+                                                </div> -->
+
+                                            </ng-template>
+                                            <!-- resources -->
+                                            <mat-tab-group mat-align-tabs="start">
+                                                <mat-tab label="{{res?.resourceName}}"
+                                                    *ngFor="let res of question.value.optionalResource ; let i = index">
+                                                    <div>
+                                                        <div *ngIf="res.type === 'IMAGE'; else otherRes">
+                                                            <img [src]="res.resourcePath | getDownloadURL"
+                                                                alt="Image loading..." class=" h-100 object-contain ">
+                                                        </div>
+                                                        <ng-template #otherRes>
+                                                            <div *ngIf="res.type ==='VIDEO' ;else pdfContainer"
+                                                                class="">
+                                                                <div *ngIf="res?.resourcePath">
+                                                                    <app-video
+                                                                        [videoUrl]="res.resourcePath"></app-video>
+                                                                </div>
+                                                            </div>
+                                                        </ng-template>
+                                                        <ng-template #pdfContainer>
+                                                            <ng-container class="pdf-container"
+                                                                *ngIf="res.type ==='PDF'">
+                                                                <div
+                                                                    class="flex justify-center items-center  h-100 pb-2">
+                                                                    <app-pdf
+                                                                        [pdfUrl]="res.resourcePath | getDownloadURL"
+                                                                        class='w-full h-full'></app-pdf>
+                                                                </div>
+                                                            </ng-container>
+                                                        </ng-template>
+                                                    </div>
+                                                </mat-tab>
+                                            </mat-tab-group>
+                                        </ng-template>
+                                    </ng-container>
+
+                                    <!-- Rich blanks -->
+                                    <ng-container *ngSwitchCase="'RICH_BLANKS'" class="flex flex-col h-full w-full">
+                                        <ng-template matStepLabel>
+                                            <div class="flex items-center">
+                                                <mat-icon class="icon-size-4 text-inherit"
+                                                    [svgIcon]="'heroicons_outline:clock'"></mat-icon>
+                                                &nbsp;
+                                                <p class="text-sm">{{question.value.timeTaken|formatTime}}</p>
+                                            </div>
+                                        </ng-template>
+
+                                        <ng-template matStepContent>
+                                            <div>
+                                                <!-- Title -->
+                                                <div class="text-justify ques_title"
+                                                    [innerHTML]="question.get('questionTitle').value"></div>
+
+                                                <div class="bg-light rounded p-2">
+                                                    <label class="uppercase text-primary font-medium">Options <small
+                                                            class="">(Select the
+                                                            correct
+                                                            Answer)</small>
+                                                    </label>
+                                                    <div *ngIf="Table === 'ntable' ;else showTable"
+                                                        class="text-justify ques_title">
+                                                        <div
+                                                            *ngFor="let obj of question.value.blanks;let blankIndex=index;let blankLastIndex = last;">
+                                                            <div class="flex pb-1">
+                                                                <div class="col-1">
+                                                                    ({{question.value.blanks[blankIndex].key.split('
+                                                                    ')[1]}})</div>
+                                                                <div class="col-11 flex flex-col mt-1">
+                                                                    <select
+                                                                        class="ml-1 border-2 border-gray-200 rounded-md"
+                                                                        style="border:2px solid lightgrey;">
+                                                                        <option *ngFor="let op of question.value.blanks[blankIndex].value
+                                                                            " [ngValue]="op"
+                                                                            [selected]="Table==='ntable'?op?.isCorrect:op?.attemptedOption">
+                                                                            {{op.name}}</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <ng-template #showTable>
+                                                        <div class="text-justify ques_title">
+                                                            <div
+                                                                *ngFor="let obj of question.get('blanksObj').value|keyvalue;let blankIndex=index;let blankLastIndex = last;">
+                                                                <div class="flex pb-1">
+
+                                                                    <div class="col-1">({{(obj.key).split(' ')[1]}})
+                                                                    </div>
+                                                                    <div class="col-11 flex flex-col mt-1">
+                                                                        <select
+                                                                            class="ml-1 border-2 border-gray-200 rounded-md"
+                                                                            style="border:2px solid lightgrey;">
+                                                                            <option
+                                                                                *ngFor="let op of question.value[obj.key].options"
+                                                                                [selected]="op.attemptedOption"
+                                                                                [ngValue]="op.attemptedOption">
+                                                                                {{op.name}}</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <!-- <div class="text-justify ques_title">
+                                                            <div
+                                                                *ngFor="let obj of question.value.customBlanks;let blankInd=index;let blankLastInd = last;">
+                                                                <div class="flex pb-1">
+                                                                    <div class="col-1">({{question.value.customBlanks[blankInd].key.split(' ')[1]}})</div>
+                                                                    <div class="col-11 flex flex-col mt-1">
+                                                                        <select class="ml-1 border-2 border-gray-200 rounded-md"
+                                                                            style="border:2px solid lightgrey;">
+                                                                            <option
+                                                                                *ngFor="let op of question.value.customBlanks[blankInd].options
+                                                                                " [ngValue]="op" [selected]="op?.attemptedOption">
+                                                                                {{op.name}}</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div> -->
+
+                                                    </ng-template>
+                                                </div>
+                                                <!-- resources -->
+                                                <mat-tab-group mat-align-tabs="start">
+                                                    <mat-tab label="{{res?.resourceName}}"
+                                                        *ngFor="let res of question.value.optionalResource ; let i = index">
+                                                        <div>
+                                                            <div *ngIf="res.type === 'IMAGE'; else otherRes">
+                                                                <img [src]="res.resourcePath | getDownloadURL"
+                                                                    alt="Image loading..."
+                                                                    class=" h-100 object-contain ">
+                                                            </div>
+                                                            <ng-template #otherRes>
+                                                                <div *ngIf="res.type ==='VIDEO' ;else pdfContainer"
+                                                                    class="">
+                                                                    <div *ngIf="res?.resourcePath">
+                                                                        <app-video
+                                                                            [videoUrl]="res.resourcePath"></app-video>
+                                                                    </div>
+                                                                </div>
+                                                            </ng-template>
+                                                            <ng-template #pdfContainer>
+                                                                <ng-container class="pdf-container"
+                                                                    *ngIf="res.type ==='PDF'">
+                                                                    <div
+                                                                        class="flex justify-center items-center  h-100 pb-2">
+                                                                        <app-pdf
+                                                                            [pdfUrl]="res.resourcePath | getDownloadURL"
+                                                                            class='w-full h-full'></app-pdf>
+                                                                    </div>
+                                                                </ng-container>
+                                                            </ng-template>
+                                                        </div>
+                                                    </mat-tab>
+                                                </mat-tab-group>
+                                            </div>
+                                        </ng-template>
+                                    </ng-container>
+
+                                    <!-- Text -->
+                                    <ng-container *ngSwitchCase="'TEXT'">
+                                        <ng-template matStepLabel>
+                                            <div class="flex items-center">
+                                                <mat-icon class="icon-size-4 text-inherit"
+                                                    [svgIcon]="'heroicons_outline:clock'"></mat-icon>
+                                                &nbsp;
+                                                <p class="text-sm">{{question.value.timeTaken|formatTime}}</p>
+                                            </div>
+                                        </ng-template>
+
+                                        <ng-template matStepContent>
+                                            <!-- Title -->
+                                            <div>
+                                                <p class="mb-4">{{question.value.questionTitle}}</p>
+                                            </div>
+                                            <!-- resources -->
+                                            <mat-tab-group mat-align-tabs="start">
+                                                <mat-tab label="{{res?.resourceName}}"
+                                                    *ngFor="let res of question.value.optionalResource ; let i = index">
+                                                    <div>
+                                                        <div *ngIf="res.type === 'IMAGE'; else otherRes">
+                                                            <img [src]="res.resourcePath | getDownloadURL"
+                                                                alt="Image loading..." class=" h-100 object-contain ">
+                                                        </div>
+                                                        <ng-template #otherRes>
+                                                            <div *ngIf="res.type ==='VIDEO' ;else pdfContainer"
+                                                                class="">
+                                                                <div *ngIf="res?.resourcePath">
+                                                                    <app-video
+                                                                        [videoUrl]="res.resourcePath"></app-video>
+                                                                </div>
+                                                            </div>
+                                                        </ng-template>
+                                                        <ng-template #pdfContainer>
+                                                            <ng-container class="pdf-container"
+                                                                *ngIf="res.type ==='PDF'">
+                                                                <div
+                                                                    class="flex justify-center items-center  h-100 pb-2">
+                                                                    <app-pdf
+                                                                        [pdfUrl]="res.resourcePath | getDownloadURL"
+                                                                        class='w-full h-full'></app-pdf>
+                                                                </div>
+                                                            </ng-container>
+                                                        </ng-template>
+                                                    </div>
+                                                </mat-tab>
+                                            </mat-tab-group>
+
+                                            <!-- text answer - Quill view -->
+                                            <div class="w-full quiz-text-answer-view">
+                                                <quill-view-html
+                                                    [content]="Table==='ntable'? question.get('answer').value : question.get('text').value"
+                                                    class="quiz-text-answer-display">
+                                                </quill-view-html>
+                                            </div>
+                                        </ng-template>
+                                    </ng-container>
+                                </ng-container>
+
+                                <button mat-stroked-button matStepperNext class="mainBtn mt-2" style="float:right;">
+                                    <span class="inline-flex items-center ">
+                                        <span>Next</span>
+                                        <mat-icon class="ml-1.5 icon-size-5 arrowIcon"
+                                            [svgIcon]="'heroicons_solid:arrow-sm-right'">
+                                        </mat-icon>
+                                    </span>
+                                </button>
+                            </mat-step>
+
+                        </div>
+                    </div>
+                </ng-container>
+
+                <mat-step state="final">
+                    <!-- <ng-template matStepLabel>Done</ng-template> -->
+                    <!-- <ng-template matStepContent> -->
+                        <p>You are now done.</p>
+                    <!-- </ng-template> -->
+                </mat-step>
+
+                <ng-template matStepperIcon="final">
+                    <mat-icon svgIcon="heroicons_outline:check-circle"></mat-icon>
+                </ng-template>
+            </mat-stepper>
+
+        </div>
+    </div>
+</div>

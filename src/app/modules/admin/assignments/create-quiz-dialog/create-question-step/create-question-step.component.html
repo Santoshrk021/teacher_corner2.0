@@ -1,0 +1,1815 @@
+<div class="h-[57vh]">
+    <div class="relative pt-1 h-full">
+        <div *ngIf="loader" class="absolute h-full w-full flex justify-center items-center z-80  bg-[#ffffff7b]">
+            <div>
+                <mat-spinner [diameter]="35"></mat-spinner>
+            </div>
+        </div>
+
+        <div class="h-full overflow-auto rounded-lg bg-white px-4">
+            <form [formGroup]="questionsFormGroup">
+                <div formArrayName="questions">
+                    <!-- *ngFor="let question of questionsFormGroup.get('questions')['controls']; let questionIndex=index"> -->
+                    <div *ngFor="let question of questions.controls; let questionIndex=index"
+                        [formGroupName]="questionIndex.toString()">
+
+                        <div [ngSwitch]="question.get('questionType').value">
+                            <!-- mcq  -->
+                            <div *ngSwitchCase="'MCQ'">
+                                <div class="p-2 border mb-4 rounded-xl shadow bg-primary-100">
+                                    <div class="flex justify-between">
+                                        <p class="mb-3 font-bold">QUESTION : {{questionIndex+1}} (MCQ)</p>
+                                        <mat-icon (click)="removeQuestion(questionIndex)"
+                                            svgIcon="mat_solid:delete_outline" matTooltipPosition="above"
+                                            matTooltip="Delete This Question"
+                                            class="text-red-500 hover:cursor-pointer  transition duration-500 transform  hover:scale-[115%]"></mat-icon>
+                                    </div>
+
+                                    <!-- <mat-form-field class="w-full text-accent-600"> -->
+                                    <mat-label class="text-[#282B66]">Title</mat-label>
+
+                                    <!-- <quill-editor [modules]="quillConfig" formControlName="questionTitle"
+                                            [styles]="{height: '30px'}"></quill-editor> -->
+                                    <!-- <quill-editor formControlName="questionTitle"
+                                            [styles]="{height: '30px'}" [modules]="quillConfig"></quill-editor> -->
+                                    <quill-editor formControlName="questionTitle" (onEditorCreated)="created($event)"
+                                        (onFocus)="focus($event)" (onEditorChanged)="editrochange($event)"
+                                        [styles]="{height: '30px'}" [format]="'html'" [sanitize]="true">
+                                        <div quill-editor-toolbar>
+                                            <button class="ql-bold mt-2">Bold</button>
+                                            <button class="ql-italic mt-2">Italic</button>
+                                            <button class="ql-underline mt-2">Underline</button>
+                                            <button class="ql-strike mt-2">Strike</button>
+                                            <button type="button" class="ql-blockquote mt-2"><svg viewBox="0 0 18 18">
+                                                    <rect class="ql-fill ql-stroke" height="3" width="3" x="4" y="5">
+                                                    </rect>
+                                                    <rect class="ql-fill ql-stroke" height="3" width="3" x="11" y="5">
+                                                    </rect>
+                                                    <path class="ql-even ql-fill ql-stroke" d="M7,8c0,4.031-3,5-3,5">
+                                                    </path>
+                                                    <path class="ql-even ql-fill ql-stroke" d="M14,8c0,4.031-3,5-3,5">
+                                                    </path>
+                                                </svg></button>
+                                            <button type="button" class="ql-code-block mt-2"><svg viewBox="0 0 18 18">
+                                                    <polyline class="ql-even ql-stroke" points="5 7 3 9 5 11">
+                                                    </polyline>
+                                                    <polyline class="ql-even ql-stroke" points="13 7 15 9 13 11">
+                                                    </polyline>
+                                                    <line class="ql-stroke" x1="10" x2="8" y1="5" y2="13"></line>
+                                                </svg></button>
+                                            <button class="ql-script mt-2" value="sub"></button>
+                                            <button class="ql-script mt-2" value="super"></button>
+                                            <button class="ql-link mt-2"></button>
+                                            <button class="ql-image mt-2"></button>
+                                            <button class="ql-video mt-2"></button>
+                                            <button type="button" class="ql-clean mt-2"><svg class=""
+                                                    viewBox="0 0 18 18">
+                                                    <line class="ql-stroke" x1="5" x2="13" y1="3" y2="3"></line>
+                                                    <line class="ql-stroke" x1="6" x2="9.35" y1="12" y2="3"></line>
+                                                    <line class="ql-stroke" x1="11" x2="15" y1="11" y2="15"></line>
+                                                    <line class="ql-stroke" x1="15" x2="11" y1="11" y2="15"></line>
+                                                    <rect class="ql-fill" height="1" rx="0.5" ry="0.5" width="7" x="2"
+                                                        y="14"></rect>
+                                                </svg></button>
+                                            <select class="ql-header mt-2">
+                                                <option value="1">Heading 1</option>
+                                                <option value="2">Heading 2</option>
+                                                <option selected>Normal</option>
+                                            </select>
+                                            <select class="ql-size mt-2">
+                                                <option value="small">Small</option>
+                                                <option selected>Normal</option>
+                                                <option value="large">Large</option>
+                                                <option value="huge">Huge</option>
+                                            </select>
+                                            <button class="ql-list mt-2" value="ordered">Ordered List</button>
+                                            <button class="ql-list mt-2" value="bullet">Unordered List</button>
+                                            <button class="ql-indent mt-2" value="-1">Decrease Indent</button>
+                                            <button class="ql-indent mt-2" value="+1">Increase Indent</button>
+                                            <button class="ql-direction mt-2" value="rtl">Right-to-Left</button>
+                                            <span class="ql-formats mt-2">
+                                                <select class="ql-font">
+                                                    <option value="aref">Aref Ruqaa</option>
+                                                    <option value="mirza">Mirza</option>
+                                                    <option value="roboto">Roboto</option>
+                                                    <option value="serif">serif</option>
+                                                    <option value="consolas">consolas</option>
+                                                    <option value="monospace">monospace</option>
+                                                    <option value="sansserif">sansserif</option>
+                                                </select>
+                                            </span>
+                                            <select class="ql-align mt-2" [title]="'Aligment'">
+                                                <option selected></option>
+                                                <option value="center"></option>
+                                                <option value="right"></option>
+                                                <option value="justify"></option>
+                                            </select>
+
+                                            <select class="ql-color mt-2" [title]="'Color'">
+                                            </select>
+
+                                            <select class="ql-background mt-2" [title]="'BackgroundColor'">
+                                            </select>
+
+                                            <!-- <button class="ql-cust ml-3 w-max" (click)="insertTextArea(event,questionIndex)">Insert Text</button> -->
+                                        </div>
+                                    </quill-editor>
+
+                                    <div class="grid grid-cols-3 gap-4">
+                                        <mat-form-field class="w-full text-accent-600">
+                                            <mat-label class="text-[#282B66]">Pedagogy Type</mat-label>
+                                            <mat-select formControlName="pedagogyType"
+                                                placeholder="Select Pedagogy Type">
+                                                <mat-option disabled selected>Select</mat-option>
+                                                <mat-option value="FA">FA</mat-option>
+                                                <mat-option value="SA">SA</mat-option>
+                                                <mat-option value="ENGAGEMENT">Engagement</mat-option>
+                                            </mat-select>
+                                            <!-- <mat-error
+                                                *ngIf="quizInfoForm.get('authenticationType')?.invalid &&quizInfoForm.get('authenticationType')?.touched">
+                                                Authentication Type is required
+                                                 </mat-error> -->
+                                        </mat-form-field>
+
+                                        <mat-form-field class="w-full text-accent-600">
+                                            <mat-label class="text-[#282B66]">Question Type</mat-label>
+                                            <input id="title" readonly matInput value="MCQ" type="text"
+                                                placeholder="Enter Question">
+                                            <!-- <mat-error
+                                                *ngIf="quizInfoForm.get('authenticationType')?.invalid &&quizInfoForm.get('authenticationType')?.touched">
+                                                 Authentication Type is required
+                                                </mat-error> -->
+                                        </mat-form-field>
+
+                                        <mat-form-field class="w-full text-accent-600">
+                                            <mat-label class="text-[#282B66]">Marks</mat-label>
+                                            <input id="mark" matInput [formControlName]="'marks'" [min]="0"
+                                                type="number" placeholder="Enter Marks">
+                                            <!-- <mat-error
+                                                 *ngIf="quizInfoForm.get('authenticationType')?.invalid &&quizInfoForm.get('authenticationType')?.touched">
+                                                Authentication Type is required
+                                                </mat-error> -->
+                                        </mat-form-field>
+                                    </div>
+
+                                    <app-duration-input [i]="questionIndex" [questionsFormArray]="questions"
+                                        [questionsFormGroup]="questionsFormGroup"
+                                        [quizInfo]="quizInfo === undefined ? quizBasicInfo : quizInfo"></app-duration-input>
+
+                                    <!-- resources -->
+                                    <div formArrayName="optionalResource">
+                                        <div class="flex items-center mb-2">
+                                            <p class="font-semibold mr-2">Add Resources(Optional)</p>
+                                            <mat-icon matTooltipPosition="above" matTooltip="Add New Resource"
+                                                (click)="addResource(questionIndex)"
+                                                class="ml-4 icon-size-7 text-primary-600 cursor-pointer plusIcon active:text-primary-500"
+                                                [svgIcon]="'heroicons_solid:plus-circle'">
+                                            </mat-icon>
+                                        </div>
+                                        <!-- resource layout -->
+
+                                        <div *ngFor="let optionalRes of question?.get('optionalResource')?.controls;
+                                            let resourceIndex=index;
+                                            let f = first; let l = last" [formGroupName]="resourceIndex"
+                                            class="grid grid-cols-12 gap-4">
+                                            <div class="col-span-1 font-semibold pt-9 pl-4">{{resourceIndex+1}}</div>
+
+                                            <div class="col-span-4">
+                                                <mat-form-field class="w-full text-accent-600">
+                                                    <mat-label class="text-[#282B66]">Display Title</mat-label>
+                                                    <input id="title" matInput [formControlName]="'resourceName'"
+                                                        type="text" placeholder="Enter Display Title">
+                                                    <!-- <mat-error *ngIf="quizInfoForm.get('title').invalid ">
+                                                     Quiz Title is required
+                                                    </mat-error> -->
+                                                </mat-form-field>
+                                            </div>
+
+                                            <div class="col-span-2">
+                                                <mat-form-field class="w-full text-accent-600">
+                                                    <mat-label class="text-[#282B66]">Type</mat-label>
+                                                    <mat-select formControlName="type" placeholder="Select Type">
+                                                        <mat-option disabled selected>Select</mat-option>
+                                                        <mat-option value="PDF">Pdf</mat-option>
+                                                        <mat-option value="VIDEO">Video</mat-option>
+                                                        <mat-option value="IMAGE">Image</mat-option>
+
+                                                    </mat-select>
+                                                    <!-- <mat-error
+                                                 *ngIf="quizInfoForm.get('authenticationType')?.invalid &&quizInfoForm.get('authenticationType')?.touched">
+                                                 Authentication Type is required
+                                                </mat-error> -->
+                                                </mat-form-field>
+                                            </div>
+
+                                            <div class="col-span-4">
+                                                <div class="grid grid-cols-5 gap-4">
+                                                    <div class="col-span-3">
+                                                        <ng-container
+                                                            *ngIf="optionalRes?.value?.type==='PDF' || optionalRes?.value?.type==='IMAGE';else videoTemplate">
+                                                            <mat-label
+                                                                class="text-[#282B66] font-medium">{{optionalRes?.value?.resourcePath?'Re-upload':'Upload'}}</mat-label>
+                                                            <div class="flex flex-col mt-1  bg-grey-lighter w-full">
+                                                                <label matRipple
+                                                                    class=" border h-12 border-primary relative w-full flex flex-col items-center  rounded-md p-2  cursor-pointer bg-primary-200 text-primary-600 hover:bg-slate-200">
+                                                                    <span class="mx-2 absolute left-0  mt-[2px]">
+                                                                        <mat-icon class="text-primary"
+                                                                            svgIcon="heroicons_outline:arrow-circle-down"></mat-icon>
+                                                                        <!-- <mat-icon class="text-green-600" svgIcon="heroicons_outline:check-circle"></mat-icon> -->
+                                                                        <!-- <mat-spinner *ngIf="loader" [diameter]="20" class="mt-[2px]"></mat-spinner> -->
+                                                                    </span>
+                                                                    <div class="flex items-center ">
+
+                                                                        <span class=" mt-1 text-sm -mr-6 font-medium">
+                                                                            Choose File
+                                                                        </span>
+                                                                    </div>
+                                                                    <input *ngIf="optionalRes?.value?.type==='PDF'"
+                                                                        type='file' class="hidden" accept=".pdf"
+                                                                        (change)="onChooseFile($event,optionalRes?.value?.type,resourceIndex,questionIndex)"
+                                                                        #elementRef />
+                                                                    <input *ngIf="optionalRes?.value?.type==='IMAGE'"
+                                                                        type='file' class="hidden"
+                                                                        accept=".png,.jpg,.jpeg"
+                                                                        (change)="onChooseFile($event,optionalRes?.value?.type,resourceIndex,questionIndex)"
+                                                                        #elementRef />
+
+                                                                </label>
+                                                            </div>
+                                                        </ng-container>
+
+                                                        <ng-template #videoTemplate>
+                                                            <mat-form-field class="w-full text-accent-600">
+                                                                <mat-label class="text-[#282B66]">Youtube
+                                                                    Link</mat-label>
+                                                                <input id="title" matInput
+                                                                    [formControlName]="'resourcePath'" type="text"
+                                                                    placeholder="Enter Display Title">
+
+                                                            </mat-form-field>
+                                                        </ng-template>
+                                                    </div>
+                                                    <div class="col-span-2">
+                                                        <div *ngIf="optionalRes?.value?.resourcePath"
+                                                            class="w-full font-semibold  mt-6 h-12 bg-primary-600 text-white rounded-lg hover:bg-primary-500 active:bg-primary-600">
+                                                            <a *ngIf="optionalRes?.value?.type!=='VIDEO'"
+                                                                target="_blank"
+                                                                [href]="optionalRes?.value?.resourcePath | getDownloadURL"
+                                                                class="w-full h-full flex items-center justify-center">
+                                                                <p>View</p>
+                                                            </a>
+                                                            <a *ngIf="optionalRes?.value?.type==='VIDEO'"
+                                                                target="_blank"
+                                                                [href]="optionalRes?.value?.resourcePath"
+                                                                class="w-full h-full flex items-center justify-center">
+                                                                <p>View</p>
+                                                            </a>
+
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+
+                                            </div>
+
+                                            <div class="col-span-1 pt-8">
+                                                <mat-icon (click)="removeResource(questionIndex, resourceIndex)"
+                                                    matTooltipPosition="above" matTooltip="Delete This Resource"
+                                                    class="ml-4 icon-size-7 text-red-600 cursor-pointer plusIcon active:text-red-500"
+                                                    [svgIcon]="'heroicons_solid:x-circle'">
+                                                </mat-icon>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                    <!-- option -->
+                                    <div class="flex justify-between mt-4">
+                                        <div class="flex items-center">
+                                            <p class="font-semibold mr-2">OPTIONS
+                                                <span class="text-secondary text-sm">{{ question.value.OneCorrectOption?
+                                                    "(Select the correct option)": "(Tick the correct options)"}}</span>
+                                            </p>
+                                            <mat-icon matTooltipPosition="above" matTooltip="Add New Option"
+                                                (click)="addOption(questionIndex)"
+                                                class="ml-4 icon-size-7 text-primary-600 cursor-pointer plusIcon active:text-primary-500"
+                                                [svgIcon]="'heroicons_solid:plus-circle'">
+                                            </mat-icon>
+                                        </div>
+
+                                        <mat-slide-toggle color="primary" class="font-semibold"
+                                            [checked]="!question.value.oneCorrectOption"
+                                            (change)="mcqSingleCorrectOptionToggle(questionIndex,question.value.oneCorrectOption)">Multiple
+                                            Correct
+                                            Options</mat-slide-toggle>
+                                    </div>
+
+                                    <div formArrayName="options" class="flex flex-col mt-2">
+
+                                        <!-- <ng-contaier
+                                            *ngIf="!getOneCorrectOption(questionIndex) ; else singleCorrectOptionUI">
+                                            <div *ngFor="let option of getOptions(questionIndex).controls;
+                                                     let optionIndex=index; let f = first; let l = last"
+                                                [formGroupName]=" optionIndex.toString()">
+                                                <div class="flex ">
+                                                    <div class="mx-2 mt-[14px] font-semibold">{{optionIndex+1}}
+                                                    </div>
+                                                    <mat-checkbox formControlName="isCorrect" class="example-margin"
+                                                        color="primary" class="mt-3 mr-2"></mat-checkbox>
+                                                    <mat-form-field class="w-80 text-accent-600">
+                                                        <input id="name" matInput type="text" placeholder="Enter Option"
+                                                            formControlName="name">
+                                                    </mat-form-field>
+
+                                                    <mat-icon matTooltipPosition="above" matTooltip="Delete This Option"
+                                                        (click)="removeOption(questionIndex, optionIndex)"
+                                                        class="ml-2 mb-5 icon-size-7 text-red-600 cursor-pointer plusIcon active:text-red-500"
+                                                        [svgIcon]="'heroicons_solid:x-circle'">
+                                                    </mat-icon>
+                                                </div>
+                                            </div>
+                                        </ng-contaier> -->
+
+                                        <!-- {{getOneCorrectOption}}: one correct option -->
+
+                                        <ng-container
+                                            *ngIf="!getOneCorrectOption(questionIndex); else singleCorrectOptionUI">
+                                            <div *ngFor="let option of getOptions(questionIndex).controls; let optionIndex = index;"
+                                                [formGroupName]="optionIndex.toString()" class="flex items-center mb-3">
+
+                                                <div class="mx-2 mt-[14px] font-semibold">{{ optionIndex + 1 }}</div>
+
+                                                <mat-checkbox formControlName="isCorrect" color="primary"
+                                                    class="mt-3 mr-2"></mat-checkbox>
+
+                                                <!-- Type selector -->
+                                                <mat-form-field class="w-32 mr-2">
+                                                    <mat-label>Type</mat-label>
+                                                    <mat-select formControlName="optionType">
+                                                        <mat-option value="TEXT">Text</mat-option>
+                                                        <mat-option value="IMAGE">Image</mat-option>
+                                                    </mat-select>
+                                                </mat-form-field>
+
+                                                <ng-container
+                                                    *ngIf="option.get('optionType')?.value === 'TEXT'; else imageOption">
+                                                    <mat-form-field class="w-80 text-accent-600 mt-6">
+                                                        <input matInput type="text" placeholder="Enter Option"
+                                                            formControlName="name">
+                                                    </mat-form-field>
+                                                </ng-container>
+
+                                                <ng-template #imageOption>
+                                                    <div class="flex flex-row space-x-2 mt-2">
+                                                        <label
+                                                            class="border h-12 border-primary relative w-80 flex items-center justify-center rounded-md p-2 cursor-pointer bg-primary-200 text-primary-600 hover:bg-slate-200">
+                                                            <span>{{ option.value.imagePath ? 'Re-upload' : 'Choose
+                                                                Image' }}</span>
+                                                            <input type="file" accept="image/*" class="hidden"
+                                                                (change)="onOptionImageSelected($event, questionIndex, optionIndex)">
+                                                        </label>
+
+
+                                                        <!-- <div class="w-full font-semibold h-12 bg-primary-600 text-white rounded-lg hover:bg-primary-500 active:bg-primary-600"
+                                                            *ngIf="option.value.imagePath">
+                                                            <a *ngIf="option.value.imagePath" target="_blank"
+                                                                [href]="option.value.imagePath | getDownloadURL"
+                                                                class="w-full h-full flex items-center justify-center">
+                                                                <p>View</p>
+                                                            </a>
+                                                        </div> -->
+
+                                                        <div class="w-full font-semibold h-12 bg-primary-600 text-white rounded-lg hover:bg-primary-500 active:bg-primary-600"
+                                                            *ngIf="option.value.imagePath">
+                                                            <a *ngIf="option.value.imagePath.startsWith('blob:')"
+                                                                [href]="sanitizeUrl(option.value.imagePath)"
+                                                                target="_blank"
+                                                                class="w-full h-full flex items-center justify-center">
+                                                                <p>View</p>
+                                                            </a>
+                                                            <a *ngIf="!option.value.imagePath.startsWith('blob:')"
+                                                                [href]="option.value.imagePath | getDownloadURL"
+                                                                target="_blank"
+                                                                class="w-full h-full flex items-center justify-center">
+                                                                <p>View</p>
+                                                            </a>
+                                                        </div>
+
+                                                    </div>
+                                                </ng-template>
+
+                                                <mat-icon (click)="removeOption(questionIndex, optionIndex)"
+                                                    class="ml-2 mb-5 icon-size-7 text-red-600 cursor-pointer"
+                                                    [svgIcon]="'heroicons_solid:x-circle'">
+                                                </mat-icon>
+                                            </div>
+                                        </ng-container>
+
+
+                                        <!-- <ng-template #singleCorrectOptionUI>
+
+                                            <div
+                                                *ngFor="let option of getOptions(questionIndex).controls; let optionIndex=index; let f = first; let l = last">
+                                                <div [formGroupName]=" optionIndex">
+                                                    <div class="flex ">
+                                                        <div class="mx-2 mt-[14px] font-semibold">{{optionIndex+1}}
+                                                        </div>
+                                                        <input type="radio" [checked]="option.value.isCorrect"
+                                                            class="mt-4 mr-2"
+                                                            (click)="singleCorrectOptionSetRadio(questionIndex,optionIndex)">
+                                                        <mat-form-field class="w-80 text-accent-600 mt-6">
+                                                            <input id="name" matInput type="text"
+                                                                placeholder="Enter Option" formControlName="name">
+                                                        </mat-form-field>
+
+                                                        <mat-icon matTooltipPosition="above"
+                                                            matTooltip="Delete This Option"
+                                                            (click)="removeOption(questionIndex, optionIndex)"
+                                                            class="ml-2 mb-5 icon-size-7 text-red-600 cursor-pointer plusIcon active:text-red-500"
+                                                            [svgIcon]="'heroicons_solid:x-circle'">
+                                                        </mat-icon>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </ng-template> -->
+                                        <ng-template #singleCorrectOptionUI>
+                                            <div *ngFor="let option of getOptions(questionIndex).controls; let optionIndex = index;"
+                                                [formGroupName]="optionIndex.toString()" class="flex items-center mb-3">
+
+                                                <div class="mx-2 mt-[14px] font-semibold">{{ optionIndex + 1 }}</div>
+
+                                                <input type="radio" [checked]="option.value.isCorrect" class="mt-4 mr-2"
+                                                    (click)="singleCorrectOptionSetRadio(questionIndex,optionIndex)">
+
+                                                <!-- Type selector -->
+                                                <mat-form-field class="w-32 mr-2">
+                                                    <mat-label>Type</mat-label>
+                                                    <mat-select formControlName="optionType">
+                                                        <mat-option value="TEXT">Text</mat-option>
+                                                        <mat-option value="IMAGE">Image</mat-option>
+                                                    </mat-select>
+                                                </mat-form-field>
+
+                                                <ng-container
+                                                    *ngIf="option.get('optionType')?.value === 'TEXT'; else imageOptionRadio">
+                                                    <mat-form-field class="w-80 text-accent-600 mt-6">
+                                                        <input matInput type="text" placeholder="Enter Option"
+                                                            formControlName="name">
+                                                    </mat-form-field>
+                                                </ng-container>
+
+                                                <ng-template #imageOptionRadio>
+                                                    <div class="flex flex-row space-x-2 mt-2">
+                                                        <label
+                                                            class="border h-12 border-primary relative w-80 flex items-center justify-center rounded-md p-2 cursor-pointer bg-primary-200 text-primary-600 hover:bg-slate-200">
+                                                            <span>{{ option.value.imagePath ? 'Re-upload' : 'Choose
+                                                                Image' }}</span>
+                                                            <input type="file" accept="image/*" class="hidden"
+                                                                (change)="onOptionImageSelected($event, questionIndex, optionIndex)">
+                                                        </label>
+                                                        <!--
+                                                        <div *ngIf="option.value.imagePath" class="mt-2">
+                                                            <img [src]="option.value.imagePath"
+                                                                class="h-20 w-20 object-cover rounded" />
+                                                        </div> -->
+                                                        <!-- <div class="w-full font-semibold h-12 bg-primary-600 text-white rounded-lg hover:bg-primary-500 active:bg-primary-600"
+                                                            *ngIf="option.value.imagePath">
+                                                            <a *ngIf="option.value.imagePath" target="_blank"
+                                                                [href]="option.value.imagePath | getDownloadURL"
+                                                                class="w-full h-full flex items-center justify-center">
+                                                                <p>View</p>
+                                                            </a>
+                                                        </div> -->
+
+                                                        <div class="w-full font-semibold h-12 bg-primary-600 text-white rounded-lg hover:bg-primary-500 active:bg-primary-600"
+                                                            *ngIf="option.value.imagePath">
+                                                            <a *ngIf="option.value.imagePath.startsWith('blob:')"
+                                                                [href]="sanitizeUrl(option.value.imagePath)"
+                                                                target="_blank"
+                                                                class="w-full h-full flex items-center justify-center">
+                                                                <p>View</p>
+                                                            </a>
+                                                            <a *ngIf="!option.value.imagePath.startsWith('blob:')"
+                                                                [href]="option.value.imagePath | getDownloadURL"
+                                                                target="_blank"
+                                                                class="w-full h-full flex items-center justify-center">
+                                                                <p>View</p>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </ng-template>
+
+                                                <mat-icon (click)="removeOption(questionIndex, optionIndex)"
+                                                    class="ml-2 mb-5 icon-size-7 text-red-600 cursor-pointer"
+                                                    [svgIcon]="'heroicons_solid:x-circle'">
+                                                </mat-icon>
+                                            </div>
+                                        </ng-template>
+
+
+                                    </div>
+
+                                    <!-- ===================== SUB-PARTS SECTION ===================== -->
+                                    <div class="mt-6 border-t pt-4">
+                                        <div class="flex items-center justify-between mb-4">
+                                            <div class="flex items-center">
+                                                <p class="font-semibold mr-2">SUB-QUESTIONS (a, b, c...)</p>
+                                                <mat-slide-toggle color="primary"
+                                                    [checked]="question.value.hasSubParts"
+                                                    (change)="toggleHasSubParts(questionIndex)">
+                                                    Enable Sub-questions
+                                                </mat-slide-toggle>
+                                            </div>
+                                            <div *ngIf="question.value.hasSubParts" class="flex items-center">
+                                                <mat-icon matTooltipPosition="above" matTooltip="Add New Sub-Question"
+                                                    (click)="addSubPart(questionIndex)"
+                                                    class="ml-4 icon-size-7 text-primary-600 cursor-pointer plusIcon active:text-primary-500"
+                                                    [svgIcon]="'heroicons_solid:plus-circle'">
+                                                </mat-icon>
+                                            </div>
+                                        </div>
+
+                                        <!-- Note Banner -->
+                                        <div *ngIf="question.value.hasSubParts && getSubParts(questionIndex).length > 0"
+                                            class="bg-blue-50 border-l-4 border-blue-500 text-blue-700 p-3 mb-4 rounded">
+                                            <div class="flex items-center">
+                                                <mat-icon class="text-blue-500 mr-2">info</mat-icon>
+                                                <span class="text-sm font-medium">
+                                                    <strong>Note:</strong> This is a multistep question and marks would be given only when all sub-questions are correct.
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <!-- Sub-Questions Navigator - Styled like main question stepper -->
+                                        <div *ngIf="question.value.hasSubParts && getSubParts(questionIndex).length > 0"
+                                            class="mb-4">
+                                            <div class="flex flex-wrap gap-3 mb-4">
+                                                <div *ngFor="let subPart of getSubParts(questionIndex).controls; let subPartIndex = index"
+                                                    (click)="setActiveSubPart(questionIndex, subPartIndex)"
+                                                    class="w-10 h-10 rounded-full flex items-center justify-center cursor-pointer font-bold text-sm transition-all duration-200"
+                                                    [ngClass]="{
+                                                        'bg-primary text-white shadow-md': activeSubPartIndex[questionIndex] === subPartIndex,
+                                                        'bg-gray-200 text-gray-700 hover:bg-gray-300': activeSubPartIndex[questionIndex] !== subPartIndex
+                                                    }">
+                                                    {{ subPart.value.label }}
+                                                </div>
+                                            </div>
+
+                                            <!-- Sub-Part Editor -->
+                                            <div formArrayName="subParts">
+                                                <ng-container *ngFor="let subPart of getSubParts(questionIndex).controls; let subPartIndex = index">
+                                                    <div *ngIf="activeSubPartIndex[questionIndex] === subPartIndex"
+                                                        [formGroupName]="subPartIndex"
+                                                        class="border rounded-lg p-4 shadow-sm">
+
+                                                        <div class="flex justify-between items-center mb-3">
+                                                            <h4 class="font-bold text-lg text-primary">
+                                                                Sub-Question ({{ subPart.value.label }})
+                                                            </h4>
+                                                            <mat-icon (click)="removeSubPart(questionIndex, subPartIndex)"
+                                                                matTooltipPosition="above"
+                                                                matTooltip="Delete This Sub-Question"
+                                                                class="text-red-500 hover:cursor-pointer transition duration-500 transform hover:scale-[115%]"
+                                                                svgIcon="mat_solid:delete_outline">
+                                                            </mat-icon>
+                                                        </div>
+
+                                                        <!-- Sub-Part Title -->
+                                                        <div class="mb-4">
+                                                            <mat-label class="text-[#282B66] font-medium">Sub-Question Title *</mat-label>
+                                                            <quill-editor formControlName="subPartTitle"
+                                                                [styles]="{height: '30px'}" [format]="'html'" [sanitize]="true">
+                                                                <div quill-editor-toolbar>
+                                                                    <button class="ql-bold mt-2">Bold</button>
+                                                                    <button class="ql-italic mt-2">Italic</button>
+                                                                    <button class="ql-underline mt-2">Underline</button>
+                                                                    <button class="ql-strike mt-2">Strike</button>
+                                                                    <button class="ql-script mt-2" value="sub"></button>
+                                                                    <button class="ql-script mt-2" value="super"></button>
+                                                                    <button class="ql-link mt-2"></button>
+                                                                    <button class="ql-image mt-2"></button>
+                                                                    <select class="ql-header mt-2">
+                                                                        <option value="1">Heading 1</option>
+                                                                        <option value="2">Heading 2</option>
+                                                                        <option selected>Normal</option>
+                                                                    </select>
+                                                                    <select class="ql-size mt-2">
+                                                                        <option value="small">Small</option>
+                                                                        <option selected>Normal</option>
+                                                                        <option value="large">Large</option>
+                                                                        <option value="huge">Huge</option>
+                                                                    </select>
+                                                                    <button class="ql-list mt-2" value="ordered">Ordered List</button>
+                                                                    <button class="ql-list mt-2" value="bullet">Unordered List</button>
+                                                                    <select class="ql-align mt-2" [title]="'Aligment'">
+                                                                        <option selected></option>
+                                                                        <option value="center"></option>
+                                                                        <option value="right"></option>
+                                                                        <option value="justify"></option>
+                                                                    </select>
+                                                                    <select class="ql-color mt-2" [title]="'Color'"></select>
+                                                                    <select class="ql-background mt-2" [title]="'BackgroundColor'"></select>
+                                                                </div>
+                                                            </quill-editor>
+                                                        </div>
+
+                                                        <!-- Sub-Part Marks -->
+                                                        <div class="grid grid-cols-2 gap-4 mb-4">
+                                                            <mat-form-field class="w-full">
+                                                                <mat-label>Marks</mat-label>
+                                                                <input matInput type="number" formControlName="marks" [min]="0">
+                                                            </mat-form-field>
+                                                            <div class="flex items-center">
+                                                                <mat-slide-toggle color="primary"
+                                                                    [checked]="!subPart.value.oneCorrectOption"
+                                                                    (change)="toggleSubPartSingleCorrect(questionIndex, subPartIndex)">
+                                                                    Multiple Correct Options
+                                                                </mat-slide-toggle>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- Sub-Part Options -->
+                                                        <div class="mb-2">
+                                                            <div class="flex items-center mb-2">
+                                                                <p class="font-semibold mr-2">Options</p>
+                                                                <mat-icon matTooltipPosition="above" matTooltip="Add Option"
+                                                                    (click)="addSubPartOption(questionIndex, subPartIndex)"
+                                                                    class="icon-size-6 text-primary-600 cursor-pointer"
+                                                                    [svgIcon]="'heroicons_solid:plus-circle'">
+                                                                </mat-icon>
+                                                            </div>
+
+                                                            <div formArrayName="options">
+                                                                <div *ngFor="let option of getSubPartOptions(questionIndex, subPartIndex).controls; let optionIndex = index"
+                                                                    [formGroupName]="optionIndex"
+                                                                    class="flex items-center mb-2">
+                                                                    <div class="mx-2 font-semibold">{{ optionIndex + 1 }}</div>
+
+                                                                    <!-- Single correct: Radio -->
+                                                                    <input *ngIf="subPart.value.oneCorrectOption"
+                                                                        type="radio"
+                                                                        [checked]="option.value.isCorrect"
+                                                                        class="mr-2"
+                                                                        (click)="setSubPartRadioOption(questionIndex, subPartIndex, optionIndex)">
+
+                                                                    <!-- Multiple correct: Checkbox -->
+                                                                    <mat-checkbox *ngIf="!subPart.value.oneCorrectOption"
+                                                                        formControlName="isCorrect"
+                                                                        color="primary"
+                                                                        class="mr-2">
+                                                                    </mat-checkbox>
+
+                                                                    <mat-form-field class="flex-1">
+                                                                        <input matInput type="text" formControlName="name"
+                                                                            placeholder="Enter option">
+                                                                    </mat-form-field>
+
+                                                                    <mat-icon (click)="removeSubPartOption(questionIndex, subPartIndex, optionIndex)"
+                                                                        class="ml-2 text-red-500 cursor-pointer"
+                                                                        [svgIcon]="'heroicons_solid:x-circle'">
+                                                                    </mat-icon>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </ng-container>
+                                            </div>
+
+                                            <!-- Total Sub-Part Marks Display -->
+                                            <div class="mt-3 text-right text-sm text-gray-600">
+                                                Total Sub-Parts Marks: <span class="font-bold text-primary">{{ getTotalSubPartMarks(questionIndex) }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- ===================== END SUB-PARTS SECTION ===================== -->
+
+                                </div>
+                            </div>
+
+                            <!-- blank -->
+                            <div *ngSwitchCase="'FILL_IN_THE_BLANKS'">
+                                <div class="p-2 border mb-4 rounded-xl shadow bg-primary-100">
+                                    <div class="flex justify-between">
+                                        <p class="mb-3 font-bold">QUESTION : {{questionIndex+1}} (Fill in the Blanks)
+                                        </p>
+                                        <mat-icon (click)="removeQuestion(questionIndex)"
+                                            svgIcon="mat_solid:delete_outline" matTooltipPosition="above"
+                                            matTooltip="Delete This Question"
+                                            class="text-red-500 hover:cursor-pointer  transition duration-500 transform  hover:scale-[115%]"></mat-icon>
+                                    </div>
+                                    <mat-form-field class="w-full text-accent-600">
+                                        <mat-label class="text-[#282B66]">Title</mat-label>
+                                        <!-- <input id="title" matInput  type="text" placeholder="Enter Question"> -->
+                                        <textarea matInput rows="2" formControlName="questionTitle"
+                                            (focusout)="getBlankCountQues(questionIndex)"
+                                            placeholder="Use '<<blank>>' for Fill In The Blank Field"></textarea>
+                                        <!-- <mat-error *ngIf="quizInfoForm.get('title').invalid ">
+                                                                    Quiz Title is required
+                                                                </mat-error> -->
+                                    </mat-form-field>
+
+                                    <div class="grid grid-cols-3 gap-4">
+                                        <mat-form-field class="w-full text-accent-600">
+                                            <mat-label class="text-[#282B66]">Pedagogy Type</mat-label>
+                                            <mat-select formControlName="pedagogyType"
+                                                placeholder="Select Pedagogy Type">
+                                                <mat-option disabled selected>Select</mat-option>
+                                                <mat-option value="FA">FA</mat-option>
+                                                <mat-option value="SA">SA</mat-option>
+                                                <mat-option value="ENGAGEMENT">Engagement</mat-option>
+
+                                            </mat-select>
+                                            <!-- <mat-error
+                                            *ngIf="quizInfoForm.get('authenticationType')?.invalid &&quizInfoForm.get('authenticationType')?.touched">
+                                             Authentication Type is required
+                                            </mat-error> -->
+                                        </mat-form-field>
+
+                                        <mat-form-field class="w-full text-accent-600">
+                                            <mat-label class="text-[#282B66]">Question Type</mat-label>
+                                            <input id="title" readonly matInput value="Fill in the Blanks" type="text"
+                                                placeholder="Enter Question">
+                                            <!-- <mat-error
+                                            *ngIf="quizInfoForm.get('authenticationType')?.invalid &&quizInfoForm.get('authenticationType')?.touched">
+                                             Authentication Type is required
+                                             </mat-error> -->
+                                        </mat-form-field>
+
+                                        <mat-form-field class="w-full text-accent-600">
+                                            <mat-label class="text-[#282B66]">Marks</mat-label>
+                                            <input formControlName="marks" id="mark" matInput [min]="0" type="number"
+                                                placeholder="Enter Marks">
+                                            <!-- <mat-error
+                                            *ngIf="quizInfoForm.get('authenticationType')?.invalid &&quizInfoForm.get('authenticationType')?.touched">
+                                             Authentication Type is required
+                                             </mat-error> -->
+                                        </mat-form-field>
+                                    </div>
+
+                                    <app-duration-input [i]="questionIndex" [questionsFormArray]="questions"
+                                        [questionsFormGroup]="questionsFormGroup"
+                                        [quizInfo]="quizInfo === undefined ? quizBasicInfo : quizInfo"></app-duration-input>
+
+                                    <!-- resources -->
+                                    <div formArrayName="optionalResource">
+                                        <div class="flex items-center mb-2">
+                                            <p class="font-semibold mr-2">Add Resources(Optional)</p>
+                                            <mat-icon matTooltipPosition="above" matTooltip="Add New Resource"
+                                                (click)="addResource(questionIndex)"
+                                                class="ml-4 icon-size-7 text-primary-600 cursor-pointer plusIcon active:text-primary-500"
+                                                [svgIcon]="'heroicons_solid:plus-circle'">
+                                            </mat-icon>
+                                        </div>
+                                        <!-- resource layout -->
+
+                                        <div *ngFor="let optionalRes of question?.get('optionalResource')?.controls;
+                                                                                let resourceIndex=index;
+                                                                                let f = first; let l = last"
+                                            [formGroupName]="resourceIndex" class="grid grid-cols-12 gap-4">
+                                            <div class="col-span-1 font-semibold pt-9 pl-4">{{resourceIndex+1}}</div>
+
+                                            <div class="col-span-4">
+                                                <mat-form-field class="w-full text-accent-600">
+                                                    <mat-label class="text-[#282B66]">Display Title</mat-label>
+                                                    <input id="title" matInput [formControlName]="'resourceName'"
+                                                        type="text" placeholder="Enter Display Title">
+                                                    <!-- <mat-error *ngIf="quizInfoForm.get('title').invalid ">
+                                                                                         Quiz Title is required
+                                                                                        </mat-error> -->
+                                                </mat-form-field>
+                                            </div>
+
+                                            <div class="col-span-2">
+                                                <mat-form-field class="w-full text-accent-600">
+                                                    <mat-label class="text-[#282B66]">Type</mat-label>
+                                                    <mat-select formControlName="type" placeholder="Select Type">
+                                                        <mat-option disabled selected>Select</mat-option>
+                                                        <mat-option value="PDF">Pdf</mat-option>
+                                                        <mat-option value="VIDEO">Video</mat-option>
+                                                        <mat-option value="IMAGE">Image</mat-option>
+                                                    </mat-select>
+                                                    <!-- <mat-error
+                                                                                     *ngIf="quizInfoForm.get('authenticationType')?.invalid &&quizInfoForm.get('authenticationType')?.touched">
+                                                                                     Authentication Type is required
+                                                                                    </mat-error> -->
+                                                </mat-form-field>
+                                            </div>
+
+                                            <div class="col-span-4">
+                                                <div class="grid grid-cols-5 gap-4">
+                                                    <div class="col-span-3">
+                                                        <ng-container
+                                                            *ngIf="optionalRes?.value?.type==='PDF' || optionalRes?.value?.type==='IMAGE';else videoTemplate">
+                                                            <mat-label
+                                                                class="text-[#282B66] font-medium">{{optionalRes?.value?.resourcePath?'Re-upload':'Upload'}}</mat-label>
+                                                            <div class="flex flex-col mt-1  bg-grey-lighter w-full">
+                                                                <label matRipple
+                                                                    class=" border h-12 border-primary relative w-full flex flex-col items-center  rounded-md p-2  cursor-pointer bg-primary-200 text-primary-600 hover:bg-slate-200">
+                                                                    <span class="mx-2 absolute left-0  mt-[2px]">
+                                                                        <mat-icon class="text-primary"
+                                                                            svgIcon="heroicons_outline:arrow-circle-down"></mat-icon>
+                                                                        <!-- <mat-icon class="text-green-600" svgIcon="heroicons_outline:check-circle"></mat-icon> -->
+                                                                        <!-- <mat-spinner *ngIf="loader" [diameter]="20" class="mt-[2px]"></mat-spinner> -->
+                                                                    </span>
+                                                                    <div class="flex items-center ">
+
+                                                                        <span class=" mt-1 text-sm -mr-6 font-medium">
+                                                                            Choose File
+                                                                        </span>
+                                                                    </div>
+                                                                    <input *ngIf="optionalRes?.value?.type==='PDF'"
+                                                                        type='file' class="hidden" accept=".pdf"
+                                                                        (change)="onChooseFile($event,optionalRes?.value?.type,resourceIndex,questionIndex)"
+                                                                        #elementRef />
+                                                                    <input *ngIf="optionalRes?.value?.type==='IMAGE'"
+                                                                        type='file' class="hidden"
+                                                                        accept=".png,.jpg,.jpeg"
+                                                                        (change)="onChooseFile($event,optionalRes?.value?.type,resourceIndex,questionIndex)"
+                                                                        #elementRef />
+
+                                                                </label>
+                                                            </div>
+                                                        </ng-container>
+
+                                                        <ng-template #videoTemplate>
+                                                            <mat-form-field class="w-full text-accent-600">
+                                                                <mat-label class="text-[#282B66]">Youtube
+                                                                    Link</mat-label>
+                                                                <input id="title" matInput
+                                                                    [formControlName]="'resourcePath'" type="text"
+                                                                    placeholder="Enter Display Title">
+
+                                                            </mat-form-field>
+                                                        </ng-template>
+                                                    </div>
+                                                    <div class="col-span-2">
+                                                        <div *ngIf="optionalRes?.value?.resourcePath"
+                                                            class="w-full font-semibold  mt-6 h-12 bg-primary-600 text-white rounded-lg hover:bg-primary-500 active:bg-primary-600">
+                                                            <a *ngIf="optionalRes?.value?.type!=='VIDEO'"
+                                                                target="_blank"
+                                                                [href]="optionalRes?.value?.resourcePath | getDownloadURL"
+                                                                class="w-full h-full flex items-center justify-center">
+                                                                <p>View</p>
+                                                            </a>
+                                                            <a *ngIf="optionalRes?.value?.type==='VIDEO'"
+                                                                target="_blank"
+                                                                [href]="optionalRes?.value?.resourcePath"
+                                                                class="w-full h-full flex items-center justify-center">
+                                                                <p>View</p>
+                                                            </a>
+
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+
+                                            </div>
+
+                                            <div class="col-span-1 pt-8">
+                                                <mat-icon (click)="removeResource(questionIndex, resourceIndex)"
+                                                    matTooltipPosition="above" matTooltip="Delete This Resource"
+                                                    class="ml-4 icon-size-7 text-red-600 cursor-pointer plusIcon active:text-red-500"
+                                                    [svgIcon]="'heroicons_solid:x-circle'">
+                                                </mat-icon>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- options -->
+                                    <div formGroupName="blanks" class="bg-light rounded p-2">
+                                        <div
+                                            *ngFor="let blank of question.controls['blanks'].controls|keyvalue; let bIndex=index">
+                                            <div class="flex items-center">
+                                                <p class="font-semibold mr-2">{{blank.key}}
+                                                    <span class="text-secondary text-sm">(Select the correct
+                                                        option)</span>
+                                                </p>
+                                                <mat-icon matTooltipPosition="above" matTooltip="Add New Option"
+                                                    (click)="addOptionToBlank(questionIndex,blank.key)"
+                                                    class="ml-4 icon-size-7 text-primary-600 cursor-pointer plusIcon active:text-primary-500"
+                                                    [svgIcon]="'heroicons_solid:plus-circle'">
+                                                </mat-icon>
+                                            </div>
+                                            <div [formArrayName]="blank.key">
+                                                <div
+                                                    *ngFor="let option of question.controls['blanks'].get(blank.key).controls|keyvalue; let optionIndex=index;">
+                                                    <div class="flex " [formGroupName]="optionIndex">
+                                                        <div class="mx-2 mt-[14px] font-semibold">{{optionIndex+1}}
+                                                        </div>
+                                                        <input type="radio" [checked]="option.value.value.isCorrect"
+                                                            class="mt-4 mr-2"
+                                                            (click)="setRadioBtnDynamic(questionIndex,blank.key,optionIndex, question.controls['blanks'].get(blank.key).value)">
+                                                        <mat-form-field class="w-80 text-accent-600 mt-6">
+                                                            <input id="name" matInput type="text"
+                                                                placeholder="Enter Option" formControlName="name">
+                                                        </mat-form-field>
+
+                                                        <mat-icon matTooltipPosition="above"
+                                                            matTooltip="Delete This Option"
+                                                            (click)="removeOption(questionIndex, optionIndex, blank.key)"
+                                                            class="ml-2 mb-5 icon-size-7 text-red-600 cursor-pointer plusIcon active:text-red-500"
+                                                            [svgIcon]="'heroicons_solid:x-circle'">
+                                                        </mat-icon>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- text -->
+                            <div *ngSwitchCase="'TEXT'">
+                                <div class="p-2 border mb-4 rounded-xl shadow bg-primary-100">
+                                    <div class="flex justify-between">
+                                        <p class="mb-3 font-bold">QUESTION : {{questionIndex+1}} (Text)</p>
+                                        <mat-icon (click)="removeQuestion(questionIndex)"
+                                            svgIcon="mat_solid:delete_outline" matTooltipPosition="above"
+                                            matTooltip="Delete This Question"
+                                            class="text-red-500 hover:cursor-pointer  transition duration-500 transform  hover:scale-[115%]"></mat-icon>
+                                    </div>
+                                    <mat-form-field class="w-full text-accent-600">
+                                        <mat-label class="text-[#282B66]">Title</mat-label>
+                                        <!-- <input id="title" matInput  type="text" placeholder="Enter Question"> -->
+                                        <textarea matInput formControlName="questionTitle" rows="1"
+                                            placeholder="Type Question"></textarea>
+                                        <!-- <mat-error *ngIf="quizInfoForm.get('title').invalid ">
+                                         Quiz Title is required
+                                        </mat-error> -->
+                                    </mat-form-field>
+
+                                    <div class="grid grid-cols-4 gap-4">
+                                        <mat-form-field class="w-full text-accent-600">
+                                            <mat-label class="text-[#282B66]">Pedagogy Type</mat-label>
+                                            <mat-select formControlName="pedagogyType"
+                                                placeholder="Select Pedagogy Type">
+                                                <mat-option disabled selected>Select</mat-option>
+                                                <mat-option value="FA">FA</mat-option>
+                                                <mat-option value="SA">SA</mat-option>
+                                                <mat-option value="ENGAGEMENT">Engagement</mat-option>
+                                            </mat-select>
+                                            <!-- <mat-error
+                                             *ngIf="quizInfoForm.get('authenticationType')?.invalid &&quizInfoForm.get('authenticationType')?.touched">
+                                             Authentication Type is required
+                                            </mat-error> -->
+                                        </mat-form-field>
+
+                                        <mat-form-field class="w-full text-accent-600">
+                                            <mat-label class="text-[#282B66]">Question Type</mat-label>
+                                            <input id="title" readonly matInput value="text" type="text"
+                                                placeholder="Enter Question">
+                                            <!-- <mat-error
+                                                *ngIf="quizInfoForm.get('authenticationType')?.invalid &&quizInfoForm.get('authenticationType')?.touched">
+                                                Authentication Type is required
+                                            </mat-error> -->
+                                        </mat-form-field>
+
+                                        <mat-form-field class="w-full text-accent-600">
+                                            <mat-label class="text-[#282B66]">Marks</mat-label>
+                                            <input formControlName="marks" id="mark" matInput [min]="1" type="number"
+                                                placeholder="Enter Marks">
+                                            <!-- <mat-error
+                                                *ngIf="quizInfoForm.get('authenticationType')?.invalid &&quizInfoForm.get('authenticationType')?.touched">
+                                                Authentication Type is required
+                                            </mat-error> -->
+                                        </mat-form-field>
+
+                                        <mat-form-field class="w-full text-accent-600">
+                                            <mat-label class="text-[#282B66]">Max. Length</mat-label>
+                                            <input formControlName="maxCharLength" id="maxLength" matInput [min]="1"
+                                                type="number" placeholder="Enter Max. Length">
+                                            <!-- <mat-error
+                                            *ngIf="quizInfoForm.get('authenticationType')?.invalid &&quizInfoForm.get('authenticationType')?.touched">
+                                            Authentication Type is required
+                                            </mat-error> -->
+                                        </mat-form-field>
+                                    </div>
+
+                                    <app-duration-input [i]="questionIndex" [questionsFormArray]="questions"
+                                        [questionsFormGroup]="questionsFormGroup"
+                                        [quizInfo]="quizInfo === undefined ? quizBasicInfo : quizInfo"></app-duration-input>
+
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <mat-form-field class="w-full text-accent-600">
+                                            <mat-label class="text-[#282B66]">Answer</mat-label>
+                                            <textarea matInput formControlName="answer" rows="1"
+                                                placeholder="Type Question"></textarea>
+                                            <!-- <mat-error
+                                            *ngIf="quizInfoForm.get('authenticationType')?.invalid &&quizInfoForm.get('authenticationType')?.touched">
+                                             Authentication Type is required
+                                             </mat-error> -->
+                                        </mat-form-field>
+
+                                    </div>
+
+                                    <!-- resources -->
+                                    <div formArrayName="optionalResource">
+                                        <div class="flex items-center mb-2">
+                                            <p class="font-semibold mr-2">Add Resources(Optional)</p>
+                                            <mat-icon matTooltipPosition="above" matTooltip="Add New Resource"
+                                                (click)="addResource(questionIndex)"
+                                                class="ml-4 icon-size-7 text-primary-600 cursor-pointer plusIcon active:text-primary-500"
+                                                [svgIcon]="'heroicons_solid:plus-circle'">
+                                            </mat-icon>
+                                        </div>
+                                        <!-- resource layout -->
+
+                                        <div *ngFor="let optionalRes of question?.get('optionalResource')?.controls;
+                                                                                let resourceIndex=index;
+                                                                                let f = first; let l = last"
+                                            [formGroupName]="resourceIndex" class="grid grid-cols-12 gap-4">
+                                            <div class="col-span-1 font-semibold pt-9 pl-4">{{resourceIndex+1}}</div>
+
+                                            <div class="col-span-4">
+                                                <mat-form-field class="w-full text-accent-600">
+                                                    <mat-label class="text-[#282B66]">Display Title</mat-label>
+                                                    <input id="title" matInput [formControlName]="'resourceName'"
+                                                        type="text" placeholder="Enter Display Title">
+                                                    <!-- <mat-error *ngIf="quizInfoForm.get('title').invalid ">
+                                                                                         Quiz Title is required
+                                                                                        </mat-error> -->
+                                                </mat-form-field>
+                                            </div>
+
+                                            <div class="col-span-2">
+                                                <mat-form-field class="w-full text-accent-600">
+                                                    <mat-label class="text-[#282B66]">Type</mat-label>
+                                                    <mat-select formControlName="type" placeholder="Select Type">
+                                                        <mat-option disabled selected>Select</mat-option>
+                                                        <mat-option value="PDF">Pdf</mat-option>
+                                                        <mat-option value="VIDEO">Video</mat-option>
+                                                        <mat-option value="IMAGE">Image</mat-option>
+
+                                                    </mat-select>
+                                                    <!-- <mat-error
+                                                                                     *ngIf="quizInfoForm.get('authenticationType')?.invalid &&quizInfoForm.get('authenticationType')?.touched">
+                                                                                     Authentication Type is required
+                                                                                    </mat-error> -->
+                                                </mat-form-field>
+                                            </div>
+
+                                            <div class="col-span-4">
+                                                <div class="grid grid-cols-5 gap-4">
+                                                    <div class="col-span-3">
+                                                        <ng-container
+                                                            *ngIf="optionalRes?.value?.type==='PDF' || optionalRes?.value?.type==='IMAGE';else videoTemplate">
+                                                            <mat-label
+                                                                class="text-[#282B66] font-medium">{{optionalRes?.value?.resourcePath?'Re-upload':'Upload'}}</mat-label>
+                                                            <div class="flex flex-col mt-1  bg-grey-lighter w-full">
+                                                                <label matRipple
+                                                                    class=" border h-12 border-primary relative w-full flex flex-col items-center  rounded-md p-2  cursor-pointer bg-primary-200 text-primary-600 hover:bg-slate-200">
+                                                                    <span class="mx-2 absolute left-0  mt-[2px]">
+                                                                        <mat-icon class="text-primary"
+                                                                            svgIcon="heroicons_outline:arrow-circle-down"></mat-icon>
+                                                                        <!-- <mat-icon class="text-green-600" svgIcon="heroicons_outline:check-circle"></mat-icon> -->
+                                                                        <!-- <mat-spinner *ngIf="loader" [diameter]="20" class="mt-[2px]"></mat-spinner> -->
+                                                                    </span>
+                                                                    <div class="flex items-center ">
+
+                                                                        <span class=" mt-1 text-sm -mr-6 font-medium">
+                                                                            Choose File
+                                                                        </span>
+                                                                    </div>
+                                                                    <input *ngIf="optionalRes?.value?.type==='PDF'"
+                                                                        type='file' class="hidden" accept=".pdf"
+                                                                        (change)="onChooseFile($event,optionalRes?.value?.type,resourceIndex,questionIndex)"
+                                                                        #elementRef />
+                                                                    <input *ngIf="optionalRes?.value?.type==='IMAGE'"
+                                                                        type='file' class="hidden"
+                                                                        accept=".png,.jpg,.jpeg"
+                                                                        (change)="onChooseFile($event,optionalRes?.value?.type,resourceIndex,questionIndex)"
+                                                                        #elementRef />
+
+                                                                </label>
+                                                            </div>
+                                                        </ng-container>
+
+                                                        <ng-template #videoTemplate>
+                                                            <mat-form-field class="w-full text-accent-600">
+                                                                <mat-label class="text-[#282B66]">Youtube
+                                                                    Link</mat-label>
+                                                                <input id="title" matInput
+                                                                    [formControlName]="'resourcePath'" type="text"
+                                                                    placeholder="Enter Display Title">
+
+                                                            </mat-form-field>
+                                                        </ng-template>
+                                                    </div>
+                                                    <div class="col-span-2">
+                                                        <div *ngIf="optionalRes?.value?.resourcePath"
+                                                            class="w-full font-semibold  mt-6 h-12 bg-primary-600 text-white rounded-lg hover:bg-primary-500 active:bg-primary-600">
+                                                            <a *ngIf="optionalRes?.value?.type!=='VIDEO'"
+                                                                target="_blank"
+                                                                [href]="optionalRes?.value?.resourcePath | getDownloadURL"
+                                                                class="w-full h-full flex items-center justify-center">
+                                                                <p>View</p>
+                                                            </a>
+                                                            <a *ngIf="optionalRes?.value?.type==='VIDEO'"
+                                                                target="_blank"
+                                                                [href]="optionalRes?.value?.resourcePath"
+                                                                class="w-full h-full flex items-center justify-center">
+                                                                <p>View</p>
+                                                            </a>
+
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+
+                                            </div>
+
+                                            <div class="col-span-1 pt-8">
+                                                <mat-icon (click)="removeResource(questionIndex, resourceIndex)"
+                                                    matTooltipPosition="above" matTooltip="Delete This Resource"
+                                                    class="ml-4 icon-size-7 text-red-600 cursor-pointer plusIcon active:text-red-500"
+                                                    [svgIcon]="'heroicons_solid:x-circle'">
+                                                </mat-icon>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <!-- rich blank -->
+                            <div *ngSwitchCase="'RICH_BLANKS'">
+                                <div class="p-2 border mb-4 rounded-xl shadow bg-primary-100">
+                                    <div class="flex justify-between">
+                                        <p class="mb-3 font-bold">QUESTION : {{questionIndex+1}} (Fill in the Blanks)
+                                        </p>
+                                        <!-- remove step button -->
+                                        <mat-icon (click)="removeQuestion(questionIndex)"
+                                            svgIcon="mat_solid:delete_outline" matTooltipPosition="above"
+                                            matTooltip="Delete This Question"
+                                            class="text-red-500 hover:cursor-pointer  transition duration-500 transform  hover:scale-[115%]"></mat-icon>
+                                    </div>
+                                    <div class="mb-2">
+                                        <div class="grid grid-cols-12">
+                                            <div class='col-span-11'>
+                                                <mat-label class="text-[#282B66] font-medium">Title</mat-label>
+                                                <quill-editor [modules]="quillConfig" formControlName="questionTitle"
+                                                    [styles]="{height: '30px'}" [format]="'html'" [sanitize]="true">
+                                                    <div quill-editor-toolbar>
+                                                        <button class="ql-bold mt-2">Bold</button>
+                                                        <button class="ql-italic mt-2">Italic</button>
+                                                        <button class="ql-underline mt-2">Underline</button>
+                                                        <button class="ql-strike mt-2">Strike</button>
+                                                        <button type="button" class="ql-blockquote mt-2"><svg
+                                                                viewBox="0 0 18 18">
+                                                                <rect class="ql-fill ql-stroke" height="3" width="3"
+                                                                    x="4" y="5"></rect>
+                                                                <rect class="ql-fill ql-stroke" height="3" width="3"
+                                                                    x="11" y="5"></rect>
+                                                                <path class="ql-even ql-fill ql-stroke"
+                                                                    d="M7,8c0,4.031-3,5-3,5"></path>
+                                                                <path class="ql-even ql-fill ql-stroke"
+                                                                    d="M14,8c0,4.031-3,5-3,5"></path>
+                                                            </svg></button>
+                                                        <button type="button" class="ql-code-block mt-2"><svg
+                                                                viewBox="0 0 18 18">
+                                                                <polyline class="ql-even ql-stroke"
+                                                                    points="5 7 3 9 5 11"></polyline>
+                                                                <polyline class="ql-even ql-stroke"
+                                                                    points="13 7 15 9 13 11"></polyline>
+                                                                <line class="ql-stroke" x1="10" x2="8" y1="5" y2="13">
+                                                                </line>
+                                                            </svg></button>
+                                                        <button class="ql-script mt-2" value="sub"></button>
+                                                        <button class="ql-script mt-2" value="super"></button>
+                                                        <button class="ql-link mt-2"></button>
+                                                        <button class="ql-image mt-2"></button>
+                                                        <button class="ql-video mt-2"></button>
+                                                        <button type="button" class="ql-clean mt-2"><svg class=""
+                                                                viewBox="0 0 18 18">
+                                                                <line class="ql-stroke" x1="5" x2="13" y1="3" y2="3">
+                                                                </line>
+                                                                <line class="ql-stroke" x1="6" x2="9.35" y1="12" y2="3">
+                                                                </line>
+                                                                <line class="ql-stroke" x1="11" x2="15" y1="11" y2="15">
+                                                                </line>
+                                                                <line class="ql-stroke" x1="15" x2="11" y1="11" y2="15">
+                                                                </line>
+                                                                <rect class="ql-fill" height="1" rx="0.5" ry="0.5"
+                                                                    width="7" x="2" y="14"></rect>
+                                                            </svg></button>
+                                                        <select class="ql-header mt-2">
+                                                            <option value="1">Heading 1</option>
+                                                            <option value="2">Heading 2</option>
+                                                            <option selected>Normal</option>
+                                                        </select>
+                                                        <select class="ql-size mt-2">
+                                                            <option value="small">Small</option>
+                                                            <option selected>Normal</option>
+                                                            <option value="large">Large</option>
+                                                            <option value="huge">Huge</option>
+                                                        </select>
+                                                        <button class="ql-list mt-2" value="ordered">Ordered
+                                                            List</button>
+                                                        <button class="ql-list mt-2" value="bullet">Unordered
+                                                            List</button>
+                                                        <button class="ql-indent mt-2" value="-1">Decrease
+                                                            Indent</button>
+                                                        <button class="ql-indent mt-2" value="+1">Increase
+                                                            Indent</button>
+                                                        <button class="ql-direction mt-2"
+                                                            value="rtl">Right-to-Left</button>
+                                                        <span class="ql-formats mt-2">
+                                                            <select class="ql-font ">
+                                                                <option value="aref">Aref Ruqaa</option>
+                                                                <option value="mirza">Mirza</option>
+                                                                <option value="roboto">Roboto</option>
+                                                                <option value="serif">serif</option>
+                                                                <option value="consolas">consolas</option>
+                                                                <option value="monospace">monospace</option>
+                                                                <option value="sansserif">sansserif</option>
+                                                            </select>
+                                                        </span>
+                                                        <select class="ql-align mt-2" [title]="'Aligment'">
+                                                            <option selected></option>
+                                                            <option value="center"></option>
+                                                            <option value="right"></option>
+                                                            <option value="justify"></option>
+                                                        </select>
+
+
+                                                        <select class="ql-color mt-2" [title]="'Color'">
+                                                        </select>
+
+                                                        <select class="ql-background mt-2" [title]="'BackgroundColor'">
+                                                        </select>
+
+                                                        <!-- <button class="ql-cust ml-3 w-max" (click)="insertTextArea(event,questionIndex)">Insert Text</button> -->
+                                                    </div>
+                                                </quill-editor>
+                                                <!-- <mat-error *ngIf="quizInfoForm.get('title').invalid ">
+                                                     Quiz Title is required
+                                                    </mat-error> -->
+                                            </div>
+                                            <div class="col-span-1 flex flex-col mt-12">
+                                                <mat-icon (click)="addRichBlank(questionIndex, blankCount)"
+                                                    matTooltipPosition="above" matTooltip="Add New Blank"
+                                                    class="ml-2 my-5 icon-size-7 text-primary-600 cursor-pointer  active:text-primary-500 transition duration-500 transform  hover:scale-[115%]"
+                                                    [svgIcon]="'heroicons_solid:plus'">
+                                                </mat-icon>
+                                                <mat-icon matTooltipPosition="above" matTooltip="Remove Blank"
+                                                    (click)="removeRichBlanks(questionIndex)"
+                                                    class="ml-2 my-5 icon-size-7  text-red-600 cursor-pointer  active:text-red-500 transition duration-500 transform  hover:scale-[115%]"
+                                                    [svgIcon]="'heroicons_solid:minus-sm'">
+                                                </mat-icon>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="grid grid-cols-3 gap-4">
+                                        <mat-form-field class="w-full text-accent-600">
+                                            <mat-label class="text-[#282B66]">Pedagogy Type</mat-label>
+                                            <mat-select formControlName="pedagogyType"
+                                                placeholder="Select Pedagogy Type">
+                                                <mat-option disabled selected>Select</mat-option>
+                                                <mat-option value="FA">FA</mat-option>
+                                                <mat-option value="SA">SA</mat-option>
+                                                <mat-option value="ENGAGEMENT">Engagement</mat-option>
+                                            </mat-select>
+                                            <!-- <mat-error
+                                            *ngIf="quizInfoForm.get('authenticationType')?.invalid &&quizInfoForm.get('authenticationType')?.touched">
+                                             Authentication Type is required
+                                            </mat-error> -->
+                                        </mat-form-field>
+
+                                        <mat-form-field class="w-full text-accent-600">
+                                            <mat-label class="text-[#282B66]">Question Type</mat-label>
+                                            <input id="title" readonly matInput value="Rich blanks" type="text"
+                                                placeholder="Enter Question">
+                                            <!-- <mat-error
+                                                 *ngIf="quizInfoForm.get('authenticationType')?.invalid &&quizInfoForm.get('authenticationType')?.touched">
+                                                 Authentication Type is required
+                                                </mat-error> -->
+                                        </mat-form-field>
+
+                                        <mat-form-field class="w-full text-accent-600">
+                                            <mat-label class="text-[#282B66]">Marks</mat-label>
+                                            <input id="mark" formControlName="marks" matInput [min]="0" type="number"
+                                                placeholder="Enter Marks">
+                                            <!-- <mat-error
+                                             *ngIf="quizInfoForm.get('authenticationType')?.invalid &&quizInfoForm.get('authenticationType')?.touched">
+                                             Authentication Type is required
+                                            </mat-error> -->
+                                        </mat-form-field>
+                                    </div>
+
+                                    <app-duration-input [i]="questionIndex" [questionsFormArray]="questions"
+                                        [questionsFormGroup]="questionsFormGroup"
+                                        [quizInfo]="quizInfo === undefined ? quizBasicInfo : quizInfo"></app-duration-input>
+
+                                    <!-- resources -->
+                                    <div formArrayName="optionalResource">
+                                        <div class="flex items-center mb-2">
+                                            <p class="font-semibold mr-2">Add Resources(Optional)</p>
+                                            <mat-icon matTooltipPosition="above" matTooltip="Add New Resource"
+                                                (click)="addResource(questionIndex)"
+                                                class="ml-4 icon-size-7 text-primary-600 cursor-pointer plusIcon active:text-primary-500"
+                                                [svgIcon]="'heroicons_solid:plus-circle'">
+                                            </mat-icon>
+                                        </div>
+                                        <!-- resource layout -->
+
+                                        <div *ngFor="let optionalRes of question?.get('optionalResource')?.controls;
+                                                                                let resourceIndex=index;
+                                                                                let f = first; let l = last"
+                                            [formGroupName]="resourceIndex" class="grid grid-cols-12 gap-4">
+                                            <div class="col-span-1 font-semibold pt-9 pl-4">{{resourceIndex+1}}</div>
+
+                                            <div class="col-span-4">
+                                                <mat-form-field class="w-full text-accent-600">
+                                                    <mat-label class="text-[#282B66]">Display Title</mat-label>
+                                                    <input id="title" matInput [formControlName]="'resourceName'"
+                                                        type="text" placeholder="Enter Display Title">
+                                                    <!-- <mat-error *ngIf="quizInfoForm.get('title').invalid ">
+                                                                                         Quiz Title is required
+                                                                                        </mat-error> -->
+                                                </mat-form-field>
+                                            </div>
+
+                                            <div class="col-span-2">
+                                                <mat-form-field class="w-full text-accent-600">
+                                                    <mat-label class="text-[#282B66]">Type</mat-label>
+                                                    <mat-select formControlName="type" placeholder="Select Type">
+                                                        <mat-option disabled selected>Select</mat-option>
+                                                        <mat-option value="PDF">Pdf</mat-option>
+                                                        <mat-option value="VIDEO">Video</mat-option>
+                                                        <mat-option value="IMAGE">Image</mat-option>
+
+                                                    </mat-select>
+                                                    <!-- <mat-error
+                                                                                     *ngIf="quizInfoForm.get('authenticationType')?.invalid &&quizInfoForm.get('authenticationType')?.touched">
+                                                                                     Authentication Type is required
+                                                                                    </mat-error> -->
+                                                </mat-form-field>
+                                            </div>
+
+                                            <div class="col-span-4">
+                                                <div class="grid grid-cols-5 gap-4">
+                                                    <div class="col-span-3">
+                                                        <ng-container
+                                                            *ngIf="optionalRes?.value?.type==='PDF' || optionalRes?.value?.type==='IMAGE';else videoTemplate">
+                                                            <mat-label
+                                                                class="text-[#282B66] font-medium">{{optionalRes?.value?.resourcePath?'Re-upload':'Upload'}}</mat-label>
+                                                            <div class="flex flex-col mt-1  bg-grey-lighter w-full">
+                                                                <label matRipple
+                                                                    class=" border h-12 border-primary relative w-full flex flex-col items-center  rounded-md p-2  cursor-pointer bg-primary-200 text-primary-600 hover:bg-slate-200">
+                                                                    <span class="mx-2 absolute left-0  mt-[2px]">
+                                                                        <mat-icon class="text-primary"
+                                                                            svgIcon="heroicons_outline:arrow-circle-down"></mat-icon>
+                                                                        <!-- <mat-icon class="text-green-600" svgIcon="heroicons_outline:check-circle"></mat-icon> -->
+                                                                        <!-- <mat-spinner *ngIf="loader" [diameter]="20" class="mt-[2px]"></mat-spinner> -->
+                                                                    </span>
+                                                                    <div class="flex items-center ">
+
+                                                                        <span class=" mt-1 text-sm -mr-6 font-medium">
+                                                                            Choose File
+                                                                        </span>
+                                                                    </div>
+                                                                    <input *ngIf="optionalRes?.value?.type==='PDF'"
+                                                                        type='file' class="hidden" accept=".pdf"
+                                                                        (change)="onChooseFile($event,optionalRes?.value?.type,resourceIndex,questionIndex)"
+                                                                        #elementRef />
+                                                                    <input *ngIf="optionalRes?.value?.type==='IMAGE'"
+                                                                        type='file' class="hidden"
+                                                                        accept=".png,.jpg,.jpeg"
+                                                                        (change)="onChooseFile($event,optionalRes?.value?.type,resourceIndex,questionIndex)"
+                                                                        #elementRef />
+
+                                                                </label>
+                                                            </div>
+                                                        </ng-container>
+
+                                                        <ng-template #videoTemplate>
+                                                            <mat-form-field class="w-full text-accent-600">
+                                                                <mat-label class="text-[#282B66]">Youtube
+                                                                    Link</mat-label>
+                                                                <input id="title" matInput
+                                                                    [formControlName]="'resourcePath'" type="text"
+                                                                    placeholder="Enter Display Title">
+
+                                                            </mat-form-field>
+                                                        </ng-template>
+                                                    </div>
+                                                    <div class="col-span-2">
+                                                        <div *ngIf="optionalRes?.value?.resourcePath"
+                                                            class="w-full font-semibold  mt-6 h-12 bg-primary-600 text-white rounded-lg hover:bg-primary-500 active:bg-primary-600">
+                                                            <a *ngIf="optionalRes?.value?.type!=='VIDEO'"
+                                                                target="_blank"
+                                                                [href]="optionalRes?.value?.resourcePath | getDownloadURL"
+                                                                class="w-full h-full flex items-center justify-center">
+                                                                <p>View</p>
+                                                            </a>
+                                                            <a *ngIf="optionalRes?.value?.type==='VIDEO'"
+                                                                target="_blank"
+                                                                [href]="optionalRes?.value?.resourcePath"
+                                                                class="w-full h-full flex items-center justify-center">
+                                                                <p>View</p>
+                                                            </a>
+
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+
+                                            </div>
+
+                                            <div class="col-span-1 pt-8">
+                                                <mat-icon (click)="removeResource(questionIndex, resourceIndex)"
+                                                    matTooltipPosition="above" matTooltip="Delete This Resource"
+                                                    class="ml-4 icon-size-7 text-red-600 cursor-pointer plusIcon active:text-red-500"
+                                                    [svgIcon]="'heroicons_solid:x-circle'">
+                                                </mat-icon>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+
+                                    <!-- option -->
+                                    <div formGroupName="blanks" class="bg-light rounded p-2">
+                                        <div
+                                            *ngFor="let blank of question.controls['blanks'].controls|keyvalue; let bIndex=index">
+                                            <div class="flex items-center">
+                                                <p class="font-semibold mr-2">{{blank.key}}
+                                                    <span class="text-secondary text-sm">(Select the correct
+                                                        option)</span>
+                                                </p>
+                                                <mat-icon matTooltipPosition="above" matTooltip="Add New Option"
+                                                    (click)="addOptionToBlank(questionIndex,blank.key)"
+                                                    class="ml-4 icon-size-7 text-primary-600 cursor-pointer plusIcon active:text-primary-500"
+                                                    [svgIcon]="'heroicons_solid:plus-circle'">
+                                                </mat-icon>
+                                            </div>
+                                            <div [formArrayName]="blank.key">
+                                                <div
+                                                    *ngFor="let option of question.controls['blanks'].get(blank.key).controls|keyvalue; let optionIndex=index;">
+                                                    <div class="flex " [formGroupName]="optionIndex">
+                                                        <div class="mx-2 mt-[14px] font-semibold">{{optionIndex+1}}
+                                                        </div>
+                                                        <input type="radio" [checked]="option.value.value.isCorrect"
+                                                            class="mt-4 mr-2"
+                                                            (click)="setRadioBtnDynamic(questionIndex,blank.key,optionIndex, question.controls['blanks'].get(blank.key).value)">
+                                                        <mat-form-field class="w-80 text-accent-600 mt-6">
+                                                            <input id="title" matInput type="text"
+                                                                placeholder="Enter Option" formControlName="name">
+                                                        </mat-form-field>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+
+
+
+                              <div *ngSwitchCase="'DESCRIPTIVE'">
+                                <div class="p-2 border mb-4 rounded-xl shadow bg-primary-100">
+                                    <div class="flex justify-between">
+                                        <p class="mb-3 font-bold">QUESTION : {{questionIndex+1}} (Text)</p>
+                                        <mat-icon (click)="removeQuestion(questionIndex)"
+                                            svgIcon="mat_solid:delete_outline" matTooltipPosition="above"
+                                            matTooltip="Delete This Question"
+                                            class="text-red-500 hover:cursor-pointer  transition duration-500 transform  hover:scale-[115%]"></mat-icon>
+                                    </div>
+                                   <mat-label class="text-[#282B66]">Title</mat-label>
+
+                                    <!-- <quill-editor [modules]="quillConfig" formControlName="questionTitle"
+                                            [styles]="{height: '30px'}"></quill-editor> -->
+                                    <!-- <quill-editor formControlName="questionTitle"
+                                            [styles]="{height: '30px'}" [modules]="quillConfig"></quill-editor> -->
+                                    <quill-editor formControlName="questionTitle" (onEditorCreated)="created($event)"
+                                        (onFocus)="focus($event)" (onEditorChanged)="editrochange($event)"
+                                        [styles]="{height: '30px'}" [format]="'html'" [sanitize]="true">
+                                        <div quill-editor-toolbar>
+                                            <button class="ql-bold mt-2">Bold</button>
+                                            <button class="ql-italic mt-2">Italic</button>
+                                            <button class="ql-underline mt-2">Underline</button>
+                                            <button class="ql-strike mt-2">Strike</button>
+                                            <button type="button" class="ql-blockquote mt-2"><svg viewBox="0 0 18 18">
+                                                    <rect class="ql-fill ql-stroke" height="3" width="3" x="4" y="5">
+                                                    </rect>
+                                                    <rect class="ql-fill ql-stroke" height="3" width="3" x="11" y="5">
+                                                    </rect>
+                                                    <path class="ql-even ql-fill ql-stroke" d="M7,8c0,4.031-3,5-3,5">
+                                                    </path>
+                                                    <path class="ql-even ql-fill ql-stroke" d="M14,8c0,4.031-3,5-3,5">
+                                                    </path>
+                                                </svg></button>
+                                            <button type="button" class="ql-code-block mt-2"><svg viewBox="0 0 18 18">
+                                                    <polyline class="ql-even ql-stroke" points="5 7 3 9 5 11">
+                                                    </polyline>
+                                                    <polyline class="ql-even ql-stroke" points="13 7 15 9 13 11">
+                                                    </polyline>
+                                                    <line class="ql-stroke" x1="10" x2="8" y1="5" y2="13"></line>
+                                                </svg></button>
+                                            <button class="ql-script mt-2" value="sub"></button>
+                                            <button class="ql-script mt-2" value="super"></button>
+                                            <button class="ql-link mt-2"></button>
+                                            <button class="ql-image mt-2"></button>
+                                            <button class="ql-video mt-2"></button>
+                                            <button type="button" class="ql-clean mt-2"><svg class=""
+                                                    viewBox="0 0 18 18">
+                                                    <line class="ql-stroke" x1="5" x2="13" y1="3" y2="3"></line>
+                                                    <line class="ql-stroke" x1="6" x2="9.35" y1="12" y2="3"></line>
+                                                    <line class="ql-stroke" x1="11" x2="15" y1="11" y2="15"></line>
+                                                    <line class="ql-stroke" x1="15" x2="11" y1="11" y2="15"></line>
+                                                    <rect class="ql-fill" height="1" rx="0.5" ry="0.5" width="7" x="2"
+                                                        y="14"></rect>
+                                                </svg></button>
+                                            <select class="ql-header mt-2">
+                                                <option value="1">Heading 1</option>
+                                                <option value="2">Heading 2</option>
+                                                <option selected>Normal</option>
+                                            </select>
+                                            <select class="ql-size mt-2">
+                                                <option value="small">Small</option>
+                                                <option selected>Normal</option>
+                                                <option value="large">Large</option>
+                                                <option value="huge">Huge</option>
+                                            </select>
+                                            <button class="ql-list mt-2" value="ordered">Ordered List</button>
+                                            <button class="ql-list mt-2" value="bullet">Unordered List</button>
+                                            <button class="ql-indent mt-2" value="-1">Decrease Indent</button>
+                                            <button class="ql-indent mt-2" value="+1">Increase Indent</button>
+                                            <button class="ql-direction mt-2" value="rtl">Right-to-Left</button>
+                                            <span class="ql-formats mt-2">
+                                                <select class="ql-font">
+                                                    <option value="aref">Aref Ruqaa</option>
+                                                    <option value="mirza">Mirza</option>
+                                                    <option value="roboto">Roboto</option>
+                                                    <option value="serif">serif</option>
+                                                    <option value="consolas">consolas</option>
+                                                    <option value="monospace">monospace</option>
+                                                    <option value="sansserif">sansserif</option>
+                                                </select>
+                                            </span>
+                                            <select class="ql-align mt-2" [title]="'Aligment'">
+                                                <option selected></option>
+                                                <option value="center"></option>
+                                                <option value="right"></option>
+                                                <option value="justify"></option>
+                                            </select>
+
+                                            <select class="ql-color mt-2" [title]="'Color'">
+                                            </select>
+
+                                            <select class="ql-background mt-2" [title]="'BackgroundColor'">
+                                            </select>
+
+                                            <!-- <button class="ql-cust ml-3 w-max" (click)="insertTextArea(event,questionIndex)">Insert Text</button> -->
+                                        </div>
+                                    </quill-editor>
+
+                                    <div class="grid grid-cols-4 gap-4">
+                                        <mat-form-field class="w-full text-accent-600">
+                                            <mat-label class="text-[#282B66]">Pedagogy Type</mat-label>
+                                            <mat-select formControlName="pedagogyType"
+                                                placeholder="Select Pedagogy Type">
+                                                <mat-option disabled selected>Select</mat-option>
+                                                <mat-option value="FA">FA</mat-option>
+                                                <mat-option value="SA">SA</mat-option>
+                                                <mat-option value="ENGAGEMENT">Engagement</mat-option>
+                                            </mat-select>
+                                            <!-- <mat-error
+                                             *ngIf="quizInfoForm.get('authenticationType')?.invalid &&quizInfoForm.get('authenticationType')?.touched">
+                                             Authentication Type is required
+                                            </mat-error> -->
+                                        </mat-form-field>
+
+                                        <mat-form-field class="w-full text-accent-600">
+                                            <mat-label class="text-[#282B66]">Question Type</mat-label>
+                                            <input id="title" readonly matInput value="DESCRIPTIVE" type="text"
+                                                placeholder="Enter Question">
+                                            <!-- <mat-error
+                                                *ngIf="quizInfoForm.get('authenticationType')?.invalid &&quizInfoForm.get('authenticationType')?.touched">
+                                                Authentication Type is required
+                                            </mat-error> -->
+                                        </mat-form-field>
+
+                                        <mat-form-field class="w-full text-accent-600">
+                                            <mat-label class="text-[#282B66]">Marks</mat-label>
+                                            <input formControlName="marks" id="mark" matInput [min]="1" type="number"
+                                                placeholder="Enter Marks">
+                                            <!-- <mat-error
+                                                *ngIf="quizInfoForm.get('authenticationType')?.invalid &&quizInfoForm.get('authenticationType')?.touched">
+                                                Authentication Type is required
+                                            </mat-error> -->
+                                        </mat-form-field>
+
+                                        <mat-form-field class="w-full text-accent-600">
+                                            <mat-label class="text-[#282B66]">Max. Length</mat-label>
+                                            <input formControlName="maxCharLength" id="maxLength" matInput [min]="1"
+                                                type="number" placeholder="Enter Max. Length">
+                                            <!-- <mat-error
+                                            *ngIf="quizInfoForm.get('authenticationType')?.invalid &&quizInfoForm.get('authenticationType')?.touched">
+                                            Authentication Type is required
+                                            </mat-error> -->
+                                        </mat-form-field>
+                                    </div>
+
+                                    <app-duration-input [i]="questionIndex" [questionsFormArray]="questions"
+                                        [questionsFormGroup]="questionsFormGroup"
+                                        [quizInfo]="quizInfo === undefined ? quizBasicInfo : quizInfo"></app-duration-input>
+
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <mat-form-field class="w-full col-span-2 text-accent-600">
+                                            <mat-label class="text-[#282B66]">Answer</mat-label>
+                                            <textarea matInput formControlName="answer" rows="1"
+                                                placeholder="Type Question..."></textarea>
+                                            <!-- <mat-error
+                                            *ngIf="quizInfoForm.get('authenticationType')?.invalid &&quizInfoForm.get('authenticationType')?.touched">
+                                             Authentication Type is required
+                                             </mat-error> -->
+                                        </mat-form-field>
+
+                                    </div>
+
+                                    <!-- resources -->
+                                    <div formArrayName="optionalResource">
+                                        <div class="flex items-center mb-2">
+                                            <p class="font-semibold mr-2">Add Resources(Optional)</p>
+                                            <mat-icon matTooltipPosition="above" matTooltip="Add New Resource"
+                                                (click)="addResource(questionIndex)"
+                                                class="ml-4 icon-size-7 text-primary-600 cursor-pointer plusIcon active:text-primary-500"
+                                                [svgIcon]="'heroicons_solid:plus-circle'">
+                                            </mat-icon>
+                                        </div>
+                                        <!-- resource layout -->
+
+                                        <div *ngFor="let optionalRes of question?.get('optionalResource')?.controls;
+                                                                                let resourceIndex=index;
+                                                                                let f = first; let l = last"
+                                            [formGroupName]="resourceIndex" class="grid grid-cols-12 gap-4">
+                                            <div class="col-span-1 font-semibold pt-9 pl-4">{{resourceIndex+1}}</div>
+
+                                            <div class="col-span-4">
+                                                <mat-form-field class="w-full text-accent-600">
+                                                    <mat-label class="text-[#282B66]">Display Title</mat-label>
+                                                    <input id="title" matInput [formControlName]="'resourceName'"
+                                                        type="text" placeholder="Enter Display Title">
+                                                    <!-- <mat-error *ngIf="quizInfoForm.get('title').invalid ">
+                                                                                         Quiz Title is required
+                                                                                        </mat-error> -->
+                                                </mat-form-field>
+                                            </div>
+
+                                            <div class="col-span-2">
+                                                <mat-form-field class="w-full text-accent-600">
+                                                    <mat-label class="text-[#282B66]">Type</mat-label>
+                                                    <mat-select formControlName="type" placeholder="Select Type">
+                                                        <mat-option disabled selected>Select</mat-option>
+                                                        <mat-option value="PDF">Pdf</mat-option>
+                                                        <mat-option value="VIDEO">Video</mat-option>
+                                                        <mat-option value="IMAGE">Image</mat-option>
+
+                                                    </mat-select>
+                                                    <!-- <mat-error
+                                                                                     *ngIf="quizInfoForm.get('authenticationType')?.invalid &&quizInfoForm.get('authenticationType')?.touched">
+                                                                                     Authentication Type is required
+                                                                                    </mat-error> -->
+                                                </mat-form-field>
+                                            </div>
+
+                                            <div class="col-span-4">
+                                                <div class="grid grid-cols-5 gap-4">
+                                                    <div class="col-span-3">
+                                                        <ng-container
+                                                            *ngIf="optionalRes?.value?.type==='PDF' || optionalRes?.value?.type==='IMAGE';else videoTemplate">
+                                                            <mat-label
+                                                                class="text-[#282B66] font-medium">{{optionalRes?.value?.resourcePath?'Re-upload':'Upload'}}</mat-label>
+                                                            <div class="flex flex-col mt-1  bg-grey-lighter w-full">
+                                                                <label matRipple
+                                                                    class=" border h-12 border-primary relative w-full flex flex-col items-center  rounded-md p-2  cursor-pointer bg-primary-200 text-primary-600 hover:bg-slate-200">
+                                                                    <span class="mx-2 absolute left-0  mt-[2px]">
+                                                                        <mat-icon class="text-primary"
+                                                                            svgIcon="heroicons_outline:arrow-circle-down"></mat-icon>
+                                                                        <!-- <mat-icon class="text-green-600" svgIcon="heroicons_outline:check-circle"></mat-icon> -->
+                                                                        <!-- <mat-spinner *ngIf="loader" [diameter]="20" class="mt-[2px]"></mat-spinner> -->
+                                                                    </span>
+                                                                    <div class="flex items-center ">
+
+                                                                        <span class=" mt-1 text-sm -mr-6 font-medium">
+                                                                            Choose File
+                                                                        </span>
+                                                                    </div>
+                                                                    <input *ngIf="optionalRes?.value?.type==='PDF'"
+                                                                        type='file' class="hidden" accept=".pdf"
+                                                                        (change)="onChooseFile($event,optionalRes?.value?.type,resourceIndex,questionIndex)"
+                                                                        #elementRef />
+                                                                    <input *ngIf="optionalRes?.value?.type==='IMAGE'"
+                                                                        type='file' class="hidden"
+                                                                        accept=".png,.jpg,.jpeg"
+                                                                        (change)="onChooseFile($event,optionalRes?.value?.type,resourceIndex,questionIndex)"
+                                                                        #elementRef />
+
+                                                                </label>
+                                                            </div>
+                                                        </ng-container>
+
+                                                        <ng-template #videoTemplate>
+                                                            <mat-form-field class="w-full text-accent-600">
+                                                                <mat-label class="text-[#282B66]">Youtube
+                                                                    Link</mat-label>
+                                                                <input id="title" matInput
+                                                                    [formControlName]="'resourcePath'" type="text"
+                                                                    placeholder="Enter Display Title">
+
+                                                            </mat-form-field>
+                                                        </ng-template>
+                                                    </div>
+                                                    <div class="col-span-2">
+                                                        <div *ngIf="optionalRes?.value?.resourcePath"
+                                                            class="w-full font-semibold  mt-6 h-12 bg-primary-600 text-white rounded-lg hover:bg-primary-500 active:bg-primary-600">
+                                                            <a *ngIf="optionalRes?.value?.type!=='VIDEO'"
+                                                                target="_blank"
+                                                                [href]="optionalRes?.value?.resourcePath | getDownloadURL"
+                                                                class="w-full h-full flex items-center justify-center">
+                                                                <p>View</p>
+                                                            </a>
+                                                            <a *ngIf="optionalRes?.value?.type==='VIDEO'"
+                                                                target="_blank"
+                                                                [href]="optionalRes?.value?.resourcePath"
+                                                                class="w-full h-full flex items-center justify-center">
+                                                                <p>View</p>
+                                                            </a>
+
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+
+                                            </div>
+
+                                            <div class="col-span-1 pt-8">
+                                                <mat-icon (click)="removeResource(questionIndex, resourceIndex)"
+                                                    matTooltipPosition="above" matTooltip="Delete This Resource"
+                                                    class="ml-4 icon-size-7 text-red-600 cursor-pointer plusIcon active:text-red-500"
+                                                    [svgIcon]="'heroicons_solid:x-circle'">
+                                                </mat-icon>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            </div>
+
+
+
+                           
+                            
+                        </div>
+                    </div> 
+                </div>
+            </form>
+
+
+            <button matRipple matTooltipPosition="above" matTooltip="Add Question" [matMenuTriggerFor]="menu"
+                class="h-10  w-max px-3 bg-primary-600 hover:bg-primary-500 font-semibold cursor-pointer  text-white rounded-full flex justify-center items-center">
+                <p>Add New Question</p>
+                <mat-icon class="text-white ml-2" svgIcon="heroicons_outline:plus-circle"></mat-icon>
+            </button>
+            <mat-menu #menu="matMenu" xPosition="before">
+                <button mat-menu-item *ngFor="let template of quizzerSchema" (click)="addQuestion(template)">
+
+                    <mat-icon *ngIf="template.type==='MCQ'" class="text-primary-700"
+                        svgIcon="mat_outline:ballot"></mat-icon>
+                    <mat-icon *ngIf="template.type==='FILL_IN_THE_BLANKS' || template.type==='RICH_BLANKS' || template.type==='DESCRIPTIVE'"
+                        class="text-primary-700" svgIcon="border_color"></mat-icon>
+                    <mat-icon *ngIf="template.type==='TEXT' " class="text-primary-700"
+                        svgIcon="mat_outline:create"></mat-icon>
+
+                    <span class="text-primary-700 font-medium">{{template?.name}}</span>
+                </button>
+            </mat-menu>
+        </div>
+    </div>
+</div>
+
+<div class="flex justify-between pt-3">
+    <button matStepperPrevious mat-stroked-button type="button"
+        class="bg-primary text-white  arrowBtnBack disabled:bg-primary-100">
+        <mat-icon class="mr-2 icon-size-5  text-white arrowIconBack"
+            [svgIcon]="'heroicons_solid:arrow-sm-left'"></mat-icon>
+        Back
+    </button>
+    <button (click)='onClickNext()' matStepperNext mat-stroked-button type="button"
+        class="bg-primary text-white arrowBtn disabled:bg-primary-100">
+        Next
+        <mat-icon class="ml-2 icon-size-5  text-white arrowIcon"
+            [svgIcon]="'heroicons_solid:arrow-sm-right'"></mat-icon>
+        <!-- <mat-icon *ngIf="!quizInfoForm.valid" class="ml-2 icon-size-5  text-white "
+            [svgIcon]="'heroicons_solid:arrow-sm-right'"></mat-icon> -->
+    </button>
+</div>

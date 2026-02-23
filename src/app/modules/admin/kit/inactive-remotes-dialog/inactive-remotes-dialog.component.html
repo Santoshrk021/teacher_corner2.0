@@ -1,0 +1,147 @@
+<div class="flex flex-col w-full">
+  <div class="flex items-center justify-between px-6 py-4 border-b">
+    <div class="flex items-center gap-2">
+      <mat-icon class="text-red-500">report</mat-icon>
+      <div>
+        <div class="text-lg font-semibold text-slate-800">Inactive Remotes</div>
+        <div class="text-xs text-slate-500">Remotes reported as not working for this kit</div>
+      </div>
+    </div>
+    <button mat-icon-button (click)="close()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div class="px-6 py-5" *ngIf="loading">
+    <div class="flex items-center gap-3 text-sm text-slate-600">
+      <mat-spinner diameter="18"></mat-spinner>
+      <span>Loading...</span>
+    </div>
+  </div>
+
+  <div class="px-6 py-5" *ngIf="!loading">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <!-- Left: list -->
+      <div class="lg:col-span-2">
+        <div class="flex items-center justify-between">
+          <div class="text-sm font-semibold text-slate-800">Reported remotes</div>
+          <div class="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">
+            {{ inactiveEntries.length }}
+          </div>
+        </div>
+
+        <div *ngIf="inactiveEntries.length === 0" class="mt-3 p-6 rounded-lg border border-slate-200 bg-slate-50 text-center">
+          <div class="text-sm font-medium text-slate-700">No inactive remotes yet</div>
+          <div class="text-xs text-slate-500 mt-1">When a remote is replaced during quiz, the old MAC will appear here.</div>
+        </div>
+
+        <div *ngIf="inactiveEntries.length > 0" class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <button type="button"
+            *ngFor="let e of inactiveEntries"
+            (click)="selectEntry(e)"
+            class="text-left rounded-xl border px-4 py-3 transition"
+            [ngClass]="selectedEntry?.id === e.id ? 'border-primary-300 bg-primary-50' : 'border-red-200 bg-red-50 hover:bg-red-100'">
+            <div class="flex items-start justify-between gap-3">
+              <div class="min-w-0">
+                <div class="flex items-center gap-2">
+                  <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full"
+                    [ngClass]="e.role === 'teacher' ? 'bg-green-50 text-green-700 border border-green-200'
+                      : e.role === 'student' ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                      : 'bg-amber-50 text-amber-700 border border-amber-200'">
+                    {{ e.role | titlecase }}
+                  </span>
+                  <span class="text-xs" [ngClass]="e.slotNumber ? 'text-slate-600' : 'text-red-700'">
+                    {{ e.slotNumber ? ('Slot ' + e.slotNumber) : 'Slot unknown' }}
+                  </span>
+                  <span *ngIf="!isReplaceableEntry(e)" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-700 border border-red-200">
+                    Needs re-add
+                  </span>
+                </div>
+                <div class="mt-1 text-sm font-mono text-slate-800 break-all">{{ e.mac }}</div>
+              </div>
+              <mat-icon [ngClass]="selectedEntry?.id === e.id ? 'text-primary-400' : 'text-red-400'">cancel</mat-icon>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Right: replace flow -->
+      <div class="rounded-xl border border-slate-200 bg-white p-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <div class="text-sm font-semibold text-slate-800">Replace kit remote</div>
+            <div class="text-xs text-slate-500">Update a kit slot with a new remote</div>
+          </div>
+          <button mat-stroked-button class="text-xs" (click)="reload()">
+            <mat-icon class="icon-size-4 mr-1">sync</mat-icon>
+            Reload
+          </button>
+        </div>
+
+        <div class="mt-4 grid grid-cols-1 gap-3">
+          <div class="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2" *ngIf="selectedEntry">
+            <div class="text-xs text-slate-500">Selected inactive remote</div>
+            <div class="mt-1 flex flex-wrap items-center gap-2">
+              <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full"
+                [ngClass]="selectedEntry.role === 'teacher' ? 'bg-green-50 text-green-700 border border-green-200'
+                  : selectedEntry.role === 'student' ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                  : 'bg-amber-50 text-amber-700 border border-amber-200'">
+                {{ selectedEntry.role | titlecase }}
+              </span>
+              <span class="text-xs" [ngClass]="selectedEntry.slotNumber ? 'text-slate-600' : 'text-red-700'">
+                {{ selectedEntry.slotNumber ? ('Slot ' + selectedEntry.slotNumber) : 'Slot unknown' }}
+              </span>
+              <span *ngIf="!isReplaceableEntry(selectedEntry)" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-700 border border-red-200">
+                Cannot replace (missing slot)
+              </span>
+            </div>
+            <div class="mt-1 text-sm font-mono text-slate-800 break-all">{{ selectedEntry.mac }}</div>
+          </div>
+
+          <div class="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2" *ngIf="!selectedEntry">
+            <div class="text-xs text-slate-500">Selected inactive remote</div>
+            <div class="text-sm text-slate-700">Select an inactive remote from the list</div>
+          </div>
+
+          <div class="rounded-lg border border-slate-200 bg-white px-3 py-2">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="text-xs text-slate-500">New MAC</div>
+                <div class="text-sm font-mono text-slate-800 break-all">{{ capturedMac || 'Not captured' }}</div>
+              </div>
+              <button mat-stroked-button class="text-xs" (click)="connectUsb()" *ngIf="!usbService.isConnected">
+                <mat-icon class="icon-size-4 mr-1">usb</mat-icon>
+                Connect
+              </button>
+            </div>
+
+            <div class="mt-2 flex items-center gap-2">
+              <button mat-flat-button color="primary" class="text-xs" (click)="startListening()" [disabled]="listening">
+                <mat-icon class="icon-size-4 mr-1">sensors</mat-icon>
+                {{ listening ? 'Listening...' : 'Capture from Remote' }}
+              </button>
+              <button mat-stroked-button class="text-xs" (click)="stopListening()" *ngIf="listening">
+                Stop
+              </button>
+            </div>
+            <div *ngIf="listening" class="mt-2 text-xs text-slate-500">Press any key on the new remote…</div>
+          </div>
+
+          <button mat-raised-button color="primary" (click)="replaceRemote()" [disabled]="!canReplace()">
+            <mat-icon class="mr-2">swap_horiz</mat-icon>
+            Replace Remote
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex flex-col w-full mt-auto">
+    <div class="relative h-0.5">
+      <div class="h-0.5 bg-primary-100 w-full"></div>
+    </div>
+    <div class="px-6 py-4 text-right bg-gray-50 dark:bg-transparent flex items-center justify-end">
+      <button mat-stroked-button (click)="close()">Close</button>
+    </div>
+  </div>
+</div>

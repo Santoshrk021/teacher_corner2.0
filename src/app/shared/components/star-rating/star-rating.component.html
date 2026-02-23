@@ -1,0 +1,12 @@
+<div id="container" class="mb-2">
+    <mat-icon class="icon-size-10" [class.rated]="rating >= 5" [svgIcon]="'heroicons_solid:star'" (click)="setRating(5)">
+    </mat-icon>
+    <mat-icon class="icon-size-10" [class.rated]="rating >= 4" [svgIcon]="'heroicons_solid:star'" (click)="setRating(4)">
+    </mat-icon>
+    <mat-icon class="icon-size-10" [class.rated]="rating >= 3" [svgIcon]="'heroicons_solid:star'" (click)="setRating(3)">
+    </mat-icon>
+    <mat-icon class="icon-size-10" [class.rated]="rating >= 2" [svgIcon]="'heroicons_solid:star'" (click)="setRating(2)">
+    </mat-icon>
+    <mat-icon class="icon-size-10" [class.rated]="rating >= 1" [svgIcon]="'heroicons_solid:star'" (click)="setRating(1)">
+    </mat-icon>
+</div>

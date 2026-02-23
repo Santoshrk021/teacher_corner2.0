@@ -1,0 +1,281 @@
+<form *ngIf="newTemplate" [formGroup]="newTemplate" (ngSubmit)="onSubmit(newTemplate)">
+    <div class="h-[63vh] overflow-y-auto md:w-[calc(75vw_-_48px)] sm:w-full mt-2" *ngIf="isLoaded; else notLoaded">
+        <div class=" overflow-auto bg-primary-50 rounded-xl p-9 w-140 m-auto">
+
+            <!-- Country Name -->
+            <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                <mat-label class="text-[#282B66]">Select Country</mat-label>
+                <mat-select formControlName="country" placeholder="Select Country Name">
+                    <mat-option value="" disabled selected>Select</mat-option>
+                    <mat-option *ngFor="let country of countryCodes|keyvalue" [value]="country?.key"
+                        matTooltipPosition="right"
+                        [matTooltip]="country?.value?.displayName">{{country?.value?.displayName}}</mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <!-- template name -->
+            <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                <mat-label class="text-[#282B66]">
+                    Template Name
+                </mat-label>
+                <input matInput name="templateName" class="form-contol" placeholder="Enter template name" required
+                    formControlName="templateName">
+            </mat-form-field>
+
+            <!-- display name -->
+            <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                <mat-label class="text-[#282B66]">
+                    Display Name
+                </mat-label>
+                <input matInput name="displayName" class="form-contol" placeholder="Enter Display name" required
+                    formControlName="displayName">
+            </mat-form-field>
+
+            <!-- template status -->
+            <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                <mat-label class="text-[#282B66]">
+                    Select Template Status
+                </mat-label>
+                <mat-select formControlName="templateStatus" placeholder="Select Template Status">
+                    <mat-option *ngFor="let option of templateStatus" [value]="option">
+                        {{option}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <!-- template description -->
+            <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                <mat-label class="text-[#282B66]">
+                    Template Description
+                </mat-label>
+                <textarea id="message" rows="1" matInput placeholder="Template description..."
+                    formControlName="templateDescription"></textarea>
+            </mat-form-field>
+
+            <!-- template type -->
+            <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                <mat-label class="text-[#282B66]">
+                    Select Template Type
+                </mat-label>
+                <mat-select formControlName="type" placeholder="Select Template Type">
+                    <mat-option *ngFor="let option of templateType" [value]="option">
+                        {{option}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <!-- template image -->
+            <div class="flex mb-4">
+                <div>
+                    <mat-label class="font-medium text-accent-600">
+                        Template Image
+                    </mat-label>
+                    <div class="mt-1" [ngClass]="{'pointer-events-none':loader}">
+                        <div class="flex flex-row w-50">
+                            <div class="flex flex-col bg-grey-lighter w-50">
+                                <label matRipple [matRippleDisabled]="disableUploadButton" [ngClass]="{
+                                    'disableUpload': disableUploadButton,
+                                    'border border-primary rounded-lg text-primary-600 hover:bg-slate-200': !disableUploadButton
+                                    }">
+                                    <span
+                                        class="relative right-0 flex flex-col items-center rounded-lg p-2 h-12 cursor-pointer bg-white">
+                                        <span class="absolute left-0 mt-1 ml-2">
+                                            <mat-icon *ngIf="!loader"
+                                                [ngClass]="{ 'text-gray-400': disableUploadButton, 'text-primary': !disableUploadButton }"
+                                                svgIcon="heroicons_outline:arrow-circle-down"></mat-icon>
+                                            <mat-spinner *ngIf="loader" [diameter]="20"></mat-spinner>
+                                        </span>
+                                        <div class="flex items-center mt-1 ">
+                                            <span class=" md:text-base relative sm:text-[10px]">
+                                                {{templateDetails?.templateImagePath?'Re-upload':'Upload'}}
+                                            </span>
+                                        </div>
+                                        <input type='file' class="hidden h-12" accept=".png,.jpeg"
+                                            (change)="selectFile($event)" [disabled]="disableUploadButton" />
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div *ngIf="templateDetails?.templateImagePath || imagePath" class="w-50 ml-6 mt-7">
+                    <div matRipple class=" mat-stroked-button right-2 bg-primary text-white
+                      active:bg-primary-800 cursor-pointer text-center ">
+                        <a target="_blank" [href]="templateDetails?.templateImagePath ||imagePath | getDownloadURL"
+                            class="  h-full flex items-center justify-center">
+                            View
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- board -->
+            <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                <mat-label class="text-[#282B66]">
+                    Board
+                </mat-label>
+                <mat-select formControlName="board" placeholder="Select board name">
+                    <mat-option value="" disabled selected>Select</mat-option>
+                    <mat-option *ngFor="let board of countryBoard" [value]="board?.code" matTooltipPosition="right"
+                        [matTooltip]="board?.name" class="text-sm">
+                        {{board?.name}}
+                    </mat-option>
+                    <mat-option
+                        *ngIf="!isAddNewBoard && schoolInfo?.get('institutionAddress')?.get('country')?.value !== 'india'">
+                        <span class="bg-gray-200 rounded-full text-gray-500 py-2 px-4"
+                            (click)="isAddNewBoard = true;">Add A New Board&nbsp;&nbsp;
+                            <mat-icon class="m-0" svgIcon="feather:plus-circle"></mat-icon>
+                        </span>
+                    </mat-option>
+                    <mat-option *ngIf="isAddNewBoard" [value]="addNewBoard.value">
+                        <div class="flex flex-row">
+                            <input type="text" #addNewBoard matInput id="addNewBoard" formControlName="board"
+                                (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()"
+                                placeholder="Enter Board Name">
+                            <span>
+                                <mat-icon class="m-0 text-red-500" svgIcon="heroicons_solid:x-mark"
+                                    matTooltip="Clear the field"
+                                    (click)="newTemplate?.get('board')?.reset(); isAddNewBoard = false"></mat-icon>
+                            </span>
+                            <span>
+                                <mat-icon class="m-0 ml-2 text-green-500" svgIcon="heroicons_solid:check"
+                                    matTooltip="Save the new board" (click)="saveNewBoard()"></mat-icon>
+                            </span>
+                        </div>
+                    </mat-option>
+                </mat-select>
+                <!-- <input matInput type="text" placeholder="Enter Board" formControlName="board"> -->
+                <mat-error *ngIf="newTemplate.get('board')?.invalid && newTemplate.get('board')?.touched">
+                    School Board is required
+                </mat-error>
+            </mat-form-field>
+
+            <!-- grade -->
+            <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                <mat-label class="text-[#282B66]">
+                    Grade
+                </mat-label>
+
+                <mat-select formControlName="grade" placeholder="Select grade">
+                    <mat-option value="" disabled selected>Select grade</mat-option>
+                    <mat-option *ngFor="let grade of gradeList" [value]="grade">
+                        <span class="text-sm">{{grade}}</span>
+                    </mat-option>
+                </mat-select>
+
+                <mat-error *ngIf="newTemplate.get('grade').invalid">
+                    Grade is required
+                </mat-error>
+            </mat-form-field>
+
+            <!-- subject -->
+            <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                <mat-label class="text-[#282B66]">
+                    Subject
+                </mat-label>
+
+                <mat-select formControlName="subject" placeholder="Select subject">
+                    <mat-option value="" disabled selected>Select subject</mat-option>
+                    <mat-option *ngFor="let subject of subjectList" [value]="subject">
+                        <span class="text-sm">{{subject}}</span>
+                    </mat-option>
+                    <mat-option *ngIf="!isAddNewSubject">
+                        <span class="bg-gray-200 rounded-full text-gray-500 py-2 px-4"
+                            (click)="isAddNewSubject = true;">Add A New Subject&nbsp;&nbsp;
+                            <mat-icon class="m-0" svgIcon="feather:plus-circle"></mat-icon>
+                        </span>
+                    </mat-option>
+                    <mat-option *ngIf="isAddNewSubject" [value]="addNewSubject.value">
+                        <div class="flex flex-row">
+                            <input type="text" #addNewSubject matInput id="addNewSubject" formControlName="subject"
+                                (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()"
+                                placeholder="Enter Subject Name">
+                            <span>
+                                <mat-icon class="m-0 text-red-500" svgIcon="heroicons_solid:x-mark"
+                                    matTooltip="Clear the field"
+                                    (click)="newTemplate?.get('subject')?.reset(); isAddNewSubject = false"></mat-icon>
+                            </span>
+                            <span>
+                                <mat-icon class="m-0 ml-2 text-green-500" svgIcon="heroicons_solid:check"
+                                    matTooltip="Save the new subject" (click)="saveNewSubject()"></mat-icon>
+                            </span>
+                        </div>
+                    </mat-option>
+                </mat-select>
+
+                <mat-error *ngIf="newTemplate.get('subject').invalid">
+                    Subject is required
+                </mat-error>
+            </mat-form-field>
+
+            <!-- category -->
+            <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                <mat-label class="text-[#282B66]">
+                    Category
+                </mat-label>
+
+                <mat-select formControlName="templateCategory" placeholder="Select category">
+                    <mat-option value="" disabled selected>Select category</mat-option>
+                    <mat-option *ngFor="let category of templateCategoryList" [value]="category">
+                        <span class="text-sm">{{category}}</span>
+                    </mat-option>
+                    <mat-option *ngIf="!isAddNewCategory">
+                        <span class="bg-gray-200 rounded-full text-gray-500 py-2 px-4"
+                            (click)="isAddNewCategory = true;">Add A New Category&nbsp;&nbsp;
+                            <mat-icon class="m-0" svgIcon="feather:plus-circle"></mat-icon>
+                        </span>
+                    </mat-option>
+                    <mat-option *ngIf="isAddNewCategory" [value]="addNewCategory.value">
+                        <div class="flex flex-row">
+                            <input type="text" #addNewCategory matInput id="addNewCategory" formControlName="templateCategory"
+                                (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()"
+                                placeholder="Enter Category Name">
+                            <span>
+                                <mat-icon class="m-0 text-red-500" svgIcon="heroicons_solid:x-mark"
+                                    matTooltip="Clear the field"
+                                    (click)="newTemplate?.get('templateCategory')?.reset(); isAddNewCategory = false"></mat-icon>
+                            </span>
+                            <span>
+                                <mat-icon class="m-0 ml-2 text-green-500" svgIcon="heroicons_solid:check"
+                                    matTooltip="Save the new category" (click)="saveNewCategory()"></mat-icon>
+                            </span>
+                        </div>
+                    </mat-option>
+                </mat-select>
+
+                <mat-error *ngIf="newTemplate.controls.subject.invalid">
+                    Subject is required
+                </mat-error>
+            </mat-form-field>
+        </div>
+    </div>
+
+    <!-- continue button -->
+    <div *ngIf="addNewTemplateFlag" class="z-99 pt-1 flex justify-end">
+        <button matStepperNext mat-stroked-button type="submit" [disabled]="!newTemplate?.valid"
+            class="bg-primary text-white arrowBtn disabled:bg-primary-100">
+            Continue
+            <mat-icon class="ml-2 icon-size-5  text-white arrowIcon"
+                [svgIcon]="'heroicons_solid:arrow-sm-right'"></mat-icon>
+        </button>
+    </div>
+
+    <!-- save button -->
+    <div *ngIf="!addNewTemplateFlag" class="text-center pt-2">
+        <button mat-stroked-button [disabled]="disableForm || newTemplate.invalid" type="submit" class="bg-primary text-white disabled:bg-primary-100">
+            <div *ngIf="loading; else saveButton">
+                <mat-spinner [diameter]="30"></mat-spinner>
+            </div>
+            <ng-template #saveButton>
+                Save
+            </ng-template>
+        </button>
+    </div>
+</form>
+
+<ng-template #notLoaded>
+    <div class="flex justify-center items-center">
+        <mat-spinner diameter="40"></mat-spinner>
+    </div>
+</ng-template>

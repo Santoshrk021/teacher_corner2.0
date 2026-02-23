@@ -1,0 +1,101 @@
+<div class="mx-auto p-4 relative">
+    <button mat-dialog-close class="absolute -top-4 -right-2">
+        <mat-icon class="hover:scale-110 transition duration-5000 transform" svgIcon="mat_outline:close">
+        </mat-icon>
+    </button>
+
+    <div class="flex justify-end">
+        <div *ngIf="data?.submission?.submissionPath; else generateNew">
+            <a mat-flat-button target="_blank" matTooltip="Download"
+                [href]="data.submission.submissionPath | getDownloadURL">
+                <mat-icon color="primary" class="download-pdf icon-size-8"
+                    svgIcon="mat_solid:cloud_download"></mat-icon>
+            </a>
+        </div>
+        <ng-template #generateNew>
+            <a mat-flat-button target="_blank" matTooltip="Download" (click)="downloadPdf()">
+                <mat-icon color="primary" class="download-pdf icon-size-8"
+                    svgIcon="mat_solid:cloud_download"></mat-icon>
+            </a>
+        </ng-template>
+    </div>
+
+    <div class="font-semibold text-center mb-2">{{data?.contestStepName}} Submission</div>
+
+    <form [formGroup]="assignmentFormGroup">
+        <div class="rounded-xl bg-white p-5 m-5 overflow-y-auto">
+            <h2 class="text-center text-primary-500">{{assignmentFormGroup?.get('instructions')?.value}}</h2>
+
+            <div formArrayName="questions">
+                <div *ngFor="let question of questions?.controls; let i = index" [formGroupName]="i">
+                    <div *ngIf="question?.get('isSubquestion')?.value === false; else subQuestion">
+                        Question {{question?.get('questionNumber')?.value}}: {{question?.get('question')?.value}}
+                    </div>
+                    <ng-template #subQuestion>
+                        {{question?.get('questionNumber')?.value}}: {{question?.get('question')?.value}}
+                    </ng-template>
+                    <div [ngSwitch]="question?.get('questionType')?.value">
+                        <div *ngSwitchCase="'text'">
+                            <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                                <input matInput type="text" formControlName="answer"
+                                    placeholder="Enter the answer here">
+                            </mat-form-field>
+                        </div>
+
+                        <div *ngSwitchCase="'textBox'">
+                            <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                                <textarea matInput formControlName="answer"
+                                    [placeholder]="question?.get('prompt')?.value"></textarea>
+                            </mat-form-field>
+                        </div>
+
+                        <div *ngSwitchCase="'dropDown'">
+                            <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                                <mat-select formControlName="answer" placeholder="Select the option">
+                                    <mat-option disabled>Select</mat-option>
+                                    <mat-option *ngFor="let option of question?.get('dropDownOptions')?.value"
+                                        [value]="option">{{option}}</mat-option>
+                                </mat-select>
+                                <mat-icon class="icon-size-5" matPrefix
+                                    [svgIcon]="question?.get('fieldIcon')?.value"></mat-icon>
+                            </mat-form-field>
+                        </div>
+
+                        <div *ngSwitchCase="'dropDownDynamic'">
+                            <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                                <mat-select formControlName="answer" placeholder="Select the dynamic option">
+                                    <mat-option disabled>Select</mat-option>
+                                    <mat-option *ngFor="let option of question?.get('dropDownOptionsDynamic')?.value"
+                                        [value]="option">{{option}}</mat-option>
+                                </mat-select>
+                                <mat-icon class="icon-size-5" matPrefix
+                                    [svgIcon]="question?.get('fieldIcon')?.value"></mat-icon>
+                            </mat-form-field>
+                        </div>
+
+                        <div *ngSwitchCase="'dropDownDependent'">
+                            <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                                <mat-select formControlName="answer" placeholder="Select the dependent option">
+                                    <mat-option disabled>Select</mat-option>
+                                    <mat-option *ngFor="let option of question?.get('dropDownOptionsDependent')?.value"
+                                        [value]="option">{{option}}</mat-option>
+                                </mat-select>
+                                <mat-icon class="icon-size-5" matPrefix
+                                    [svgIcon]="question?.get('fieldIcon')?.value"></mat-icon>
+                            </mat-form-field>
+                        </div>
+
+                        <div *ngSwitchCase="'starRating'">
+                            <app-star-rating [question]="question.getRawValue()"
+                                (ratingInfo)="catchRatingEvent($event, i)"></app-star-rating>
+                        </div>
+
+                        <div *ngSwitchCase="'none'"></div>
+
+                        <div *ngSwitchDefault></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

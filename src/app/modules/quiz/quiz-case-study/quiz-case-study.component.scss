@@ -1,0 +1,149 @@
+:host {
+  display: block;
+}
+
+
+:host ::ng-deep .case-study-content {
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+:host ::ng-deep .case-study-content img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 16px auto;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  object-fit: contain;
+}
+
+
+:host ::ng-deep .case-study-content .pdf-embed-container {
+  margin: 18px 0;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  background: #f8fafc;
+ 
+}
+
+:host ::ng-deep .case-study-content .pdf-embed-container .pdf-embed-wrapper {
+  position: relative;
+}
+
+:host ::ng-deep .case-study-content .pdf-embed-container .pdf-header {
+  position: relative;
+  padding: 10px 12px;
+  background: #fef2f2;
+  border-bottom: 1px solid #fecaca;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+:host ::ng-deep .case-study-content .pdf-embed-container .pdf-filename {
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+:host ::ng-deep .case-study-content .pdf-embed-container .pdf-delete-btn {
+  display: none;
+}
+
+:host ::ng-deep .case-study-content .pdf-embed-container iframe {
+  display: block;
+  width: 100%;
+  min-height: 600px;
+  border: none;
+  background: white;
+}
+
+:host ::ng-deep .case-study-content table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+:host ::ng-deep .case-study-content th,
+:host ::ng-deep .case-study-content td {
+  border: 1px solid #e5e7eb;
+  padding: 8px;
+}
+
+:host ::ng-deep .case-study-content h1 {
+  font-size: 2em;
+  font-weight: bold;
+  margin: 0.67em 0;
+}
+
+:host ::ng-deep .case-study-content h2 {
+  font-size: 1.5em;
+  font-weight: bold;
+  margin: 0.83em 0;
+}
+
+:host ::ng-deep .case-study-content h3 {
+  font-size: 1.17em;
+  font-weight: bold;
+  margin: 1em 0;
+}
+
+:host ::ng-deep .case-study-content blockquote {
+  border-left: 4px solid #ccc;
+  margin: 1em 0;
+  padding-left: 16px;
+  color: #666;
+}
+
+:host ::ng-deep .case-study-content pre {
+  background: #f4f4f4;
+  border-radius: 4px;
+  padding: 12px;
+  overflow-x: auto;
+  font-family: monospace;
+}
+
+:host ::ng-deep .case-study-content ul,
+:host ::ng-deep .case-study-content ol {
+  padding-left: 1.5em;
+  margin: 0.5em 0;
+}
+
+:host ::ng-deep .case-study-content .ql-indent-1 {
+  padding-left: 3em;
+}
+
+:host ::ng-deep .case-study-content .ql-indent-2 {
+  padding-left: 6em;
+}
+
+:host ::ng-deep .case-study-content .ql-align-center {
+  text-align: center;
+}
+
+:host ::ng-deep .case-study-content .ql-align-right {
+  text-align: right;
+}
+
+:host ::ng-deep .case-study-content .ql-align-justify {
+  text-align: justify;
+}
+
+/* Size classes from Quill */
+:host ::ng-deep .case-study-content .ql-size-small {
+  font-size: 0.75em;
+}
+
+:host ::ng-deep .case-study-content .ql-size-large {
+  font-size: 1.5em;
+}
+
+:host ::ng-deep .case-study-content .ql-size-huge {
+  font-size: 2.5em;
+}

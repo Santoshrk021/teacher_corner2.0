@@ -1,0 +1,9 @@
+// .inventory-grid {
+//     grid-template-columns: repeat(6, 1fr) ;
+// }
+ .inventory-grid {
+    grid-template-columns: repeat(7, 8vw) 10vw;
+}
+ .inventory-grid10 {
+    grid-template-columns: repeat(10, 7vw) 
+}

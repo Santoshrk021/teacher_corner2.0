@@ -1,0 +1,13 @@
+:host {
+  display: block;
+}
+
+::ng-deep .inactive-remotes-dialog .mat-mdc-dialog-container {
+  padding: 0 !important;
+}
+
+::ng-deep .inactive-remotes-dialog .mat-mdc-dialog-content {
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow-x: hidden;
+}

@@ -1,0 +1,197 @@
+<div class="py-6 h-screen w-screen overflow-hidden relative">
+    <button (click)="drawerClose()" class="m-3  absolute top-0 right-0 z-40">
+        <mat-icon class=" hover:scale-110 transition duration-5000 transform" svgIcon="mat_outline:close">
+        </mat-icon>
+    </button>
+    <button (click)="emptyTrash()" mat-stroked-button color="warn"
+        class=" m-3 text-center absolute top-1 right-10 z-40">
+        <mat-icon class="text-red-500  cursor-pointer transition duration-500 transform  hover:scale-[115%]"
+            svgIcon="delete_outline">
+        </mat-icon>Empty Trash
+    </button>
+    <div class="pl-4 pr-22 h-10 flex justify-between">
+        <p Class=" font-bold text-lg text-accent-600">View Deleted Programmes
+        </p>
+    </div>
+
+    <div class="w-full ">
+        <div class="grid mt-4 ">
+            <div
+                class="inventory-grid z-10 sticky top-0 grid gap-8 py-4 px-10 md:px-8 shadow text-md font-semibold text-secondary bg-gray-50 dark:bg-black dark:bg-opacity-5">
+                <div>Image</div>
+                <div>Name</div>
+                <div>Display Name</div>
+                <div>ID</div>
+                <div>Status</div>
+                <div>Creation Date</div>
+                <div class="">View More</div>
+                <div class="hidden sm:block">Restore</div>
+                <div class="hidden sm:block">Delete</div>
+
+            </div>
+
+
+            <div class="overflow-y-auto h-[calc(100vh_-_140px)] ">
+                <ng-container *ngFor="let program of deletedProgrammes">
+                    <div
+                        class="inventory-grid grid items-center text-secondary gap-8 py-3 px-10 md:px-8 border-b border-gray-400 ">
+                        <div class="flex items-center">
+                            <div
+                                class="relative flex flex-0 items-center justify-center w-12 h-12 mr-6 rounded overflow-hidden border">
+                                <img class="w-12" *ngIf="program?.programmeImagePath"
+                                    [alt]="'learning unit thumbnail image'"
+                                    [src]="program?.programmeImagePath|getDownloadURL" loading="lazy">
+                                <div class="flex items-center justify-center w-full h-full text-xs font-semibold leading-none text-center uppercase"
+                                    *ngIf="!program?.programmeImagePath">
+                                    NO THUMB
+                                </div>
+                            </div>
+                        </div>
+                        <div>{{program?.programmeName}}</div>
+                        <div>{{program?.displayName}}</div>
+                        <div>{{program?.programmeId}}</div>
+                        <div>{{program?.programmeStatus}}</div>
+                        <div>{{program?.createdAt?.seconds*1000| date: 'shortDate'}}</div>
+                        <div class="">
+                            <!-- <button class="min-w-10 min-h-7 h-7 px-2 leading-6" mat-stroked-button
+                                (click)="toggleDetails(program)"
+                                [ngClass]="{'bg-slate-200':selectedProgramme?.docId==program?.docId}">
+                                <mat-icon class="icon-size-5"
+                                    [svgIcon]="selectedProgramme?.docId==program?.docId ? 'heroicons_solid:chevron-up' : 'heroicons_solid:chevron-down'">
+                                </mat-icon>
+
+                            </button> -->
+                            <button class="min-w-10 min-h-7 h-7 px-2 leading-6" mat-stroked-button
+                                (click)="toggleDetails(program)"
+                                [ngClass]="{'bg-slate-200':selectedProgramme?.programmeId==program?.programmeId}">
+                                <mat-icon class="icon-size-5"
+                                    [svgIcon]="selectedProgramme?.programmeId==program?.programmeId ? 'heroicons_solid:chevron-up' : 'heroicons_solid:chevron-down'">
+                                </mat-icon>
+
+                            </button>
+                        </div>
+                        <!-- Restore -->
+                        <div>
+                            <mat-icon (click)="restoreInstitute(program)"
+                                class="text-primary icon-size-5 cursor-pointer transition duration-500 transform  hover:scale-[115%]">
+
+                                <span class="material-icons">
+                                    restore_from_trash
+                                </span>
+                            </mat-icon>
+                        </div>
+                        <!-- Delete  -->
+                        <div>
+                            <mat-icon (click)="deleteInstitute(program?.programmeId)"
+                                class="text-red-500  cursor-pointer transition duration-500 transform  hover:scale-[115%]"
+                                svgIcon="delete_outline"></mat-icon>
+                        </div>
+                    </div>
+                    <div class="grid">
+                        <ng-container *ngIf="selectedProgramme?.docId === program?.docId">
+                            <ng-container *ngTemplateOutlet="rowDetailsTemplate;context: {$implicit: program}">
+                            </ng-container>
+                        </ng-container>
+                    </div>
+                </ng-container>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<ng-template #rowDetailsTemplate let-program>
+    <div class="h-100 border-b border-slate-300 overflow-scroll bg-blue-100 p-4 pt-10 ">
+        <mat-tab-group disablePagination="false">
+            <mat-tab label="Basic Info">
+                <mat-card class="grid grid-cols-2 gap-2 rounded-2xl w-1/2">
+                    <div>
+                        <div>Programme Name</div>
+                        <div>Display Name</div>
+                        <div>Programme Code</div>
+                        <div>Programme Status</div>
+                        <div>Grades</div>
+                        <div>Programme Description</div>
+                        <div>Institution</div>
+                    </div>
+                    <div>
+                        <div class="font-bold">{{program?.programmeName ? program?.programmeName : 'Not Available'}}
+                        </div>
+                        <div class="font-bold">{{program?.displayName ? program?.displayName : 'Not Available'}}</div>
+                        <div class="font-bold">{{program?.programmeCode ? program?.programmeCode : 'Not Available'}}
+                        </div>
+                        <div class="font-bold">{{program?.programmeStatus ? program?.programmeStatus : 'Not Available'}}
+                        </div>
+                        <div class="font-bold">{{program?.grades?.length > 0 ? program?.grades : 'Not Available'}}</div>
+                        <div class="font-bold">{{program?.programmeDescription ? program?.programmeDescription : 'Not
+                            Available'}}</div>
+                        <div class="font-bold">{{program?.institutionName ? program?.institutionName : 'Not Available'}}
+                        </div>
+                    </div>
+                </mat-card>
+            </mat-tab>
+
+            <mat-tab label="Learning Units">
+                <div class="grid grid-cols-2">
+                    <div class=" bg-white rounded-2xl ">
+                        <mat-list role="list" *ngFor="let lu of learningUnitsObj[program?.programmeId]">
+                            <mat-list-item role="listitem" class="flex text-md">
+                                <ng-container *ngIf="lu">
+                                    <span><strong>{{lu?.learningUnitDisplayName}}({{lu?.learningUnitCode}})</strong></span>
+                                    <span class=" ml-3">{{lu?.version}}</span>
+                                </ng-container>
+                            </mat-list-item>
+                        </mat-list>
+
+                        <ng-template #noLearningUnit>
+                            <span><strong>No Learning Unit Name Provided</strong></span>
+                        </ng-template>
+
+                    </div>
+                </div>
+            </mat-tab>
+
+            <mat-tab label="Assignments">
+                <!-- <div class="grid grid-cols-2">
+                    <div class=" bg-white rounded-2xl ">
+                        <mat-list role="list">
+                            <mat-list-item role="listitem" class="flex text-md"
+                                *ngFor="let a of assignmentsObj[program?.programmeId]">
+                                <span><strong>{{a?.displayName}}</strong></span>
+                            </mat-list-item>
+                        </mat-list>
+                       
+                          
+                    </div>
+                </div> -->
+
+                <div class="grid grid-cols-2">
+                    <div class="bg-white rounded-2xl p-4">
+                        <mat-list role="list">
+                            <!-- If there are assignments, iterate and display -->
+                            <mat-list-item role="listitem" class="flex text-md"
+                                *ngFor="let a of assignmentsObj[program?.programmeId] || []">
+                                <span>
+                                    <strong *ngIf="a?.displayName; else noAssignment">{{ a?.displayName }}</strong>
+                                </span>
+                            </mat-list-item>
+
+                            <!-- Global fallback if no assignments exist -->
+                            <mat-list-item *ngIf="!(assignmentsObj[program?.programmeId]?.length)">
+                                <span><strong>No Assignments to show</strong></span>
+                            </mat-list-item>
+                        </mat-list>
+
+                        <!-- Template for missing individual assignments -->
+                        <!-- <ng-template #noAssignment>
+                        <span><strong>No Assignments to show</strong></span>
+                      </ng-template> -->
+                    </div>
+                </div>
+
+            </mat-tab>
+        </mat-tab-group>
+
+    </div>
+</ng-template>

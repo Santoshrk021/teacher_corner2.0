@@ -1,0 +1,58 @@
+<div *ngIf="assignmentInfoArr.length>0" class="mt-6 border shadow  rounded-lg bg-slate-50 p-6 ">
+    <p class="text-primary font-semibold text-lg">Assignments</p>
+    <div class="overflow-auto">
+        <div class="grid mt-1">
+            <div
+                class="inventory-grid z-10 sticky top-0 grid gap-8 py-4 px-10 md:px-8 shadow  text-md font-semibold text-secondary  dark:bg-black dark:bg-opacity-5">
+                <div>Display Name </div>
+                <div>Type </div>
+                <div>Due Date</div>
+                <div>Submissions</div>
+                <div></div>
+            </div>
+
+
+            <div *ngFor="let assignment of assignmentInfoArr"
+                class="bg-gray-100 inventory-grid grid items-center text-secondary gap-8 py-3 px-10 md:px-8 border-b border-gray-300 ">
+
+                <div>{{assignment?.assignmentName || assignment?.displayName}}</div>
+                <div>{{assignment?.type}}</div>
+                <div [ngClass]="{'text-red-500 font-bold text-center': !assignment?.assignmentDueDate || assignment?.assignmentExpired==true}">{{assignment?.assignmentDueDate ? (assignment?.assignmentDueDate?.seconds*1000 | date:'dd/MM/yyyy') : "Not Available"}}</div>
+                <div id="chart ">
+                    <apx-chart [dataLabels]="chartOptions.dataLabels" [series]="chartOptions.series"
+                        [legend]="chartOptions.legend" [chart]="chartOptions.chart" [labels]="chartOptions.labels"
+                        [colors]="chartOptions.colors"></apx-chart>
+                </div>
+                <div>
+                    <button class="bg-slate-50 px-2 leading-6 arrowBtn" mat-stroked-button
+                    [ngClass]="{'bg-primary-600 text-white':assignment?.workflowId+assignment?.assignmentId==currentTeacherInfo?.lastClickedAssignment}"
+                    (click)="viewSubmission(assignment)">
+                        <span class="text-sm">View Submissions</span>
+                        <mat-icon class="ml-1.5 icon-size-5 arrowIcon" [svgIcon]="'heroicons_solid:arrow-sm-right'"
+                            [ngClass]="{'text-white arrowAnime':assignment?.workflowId+assignment?.assignmentId==currentTeacherInfo?.lastClickedAssignment}">
+                        </mat-icon>
+                    </button>
+                </div>
+
+                <div  class="ml-6">
+                    <button class="bg-slate-50 px-2 leading-6 arrowBtn" mat-stroked-button
+                    [ngClass]="{'bg-primary-600 text-white':ass?.workflowId+ass?.assignmentId==currentTeacherInfo?.lastClickedAssignment}"
+                    (click)="viewAssignment(assignment)">
+                        <span class="text-sm">View Assignments</span>
+                        <mat-icon class="ml-1.5 icon-size-5 arrowIcon" [svgIcon]="'heroicons_solid:arrow-sm-right'"
+                            [ngClass]="{'text-white arrowAnime':ass?.workflowId+ass?.assignmentId==currentTeacherInfo?.lastClickedAssignment}">
+                        </mat-icon>
+                    </button>
+                </div>
+                <!-- <div *ngIf="!ass?.assignmentDueDate" class="ml-10">
+                    <button class="bg-slate-50 px-2 leading-6 arrowBtn" mat-stroked-button
+                    (click)="viewAssignment(assignment)">
+                        <span class="text-sm">View Assignment</span>
+                        <mat-icon class="ml-1.5 icon-size-5 arrowIcon" [svgIcon]="'heroicons_solid:arrow-sm-right'"></mat-icon>
+                    </button>
+                </div> -->
+            </div>
+
+        </div>
+    </div>
+</div>

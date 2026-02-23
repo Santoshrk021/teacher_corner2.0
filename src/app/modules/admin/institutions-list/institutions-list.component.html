@@ -1,0 +1,654 @@
+<div class="w-full h-full overflow-y-auto pt-3 ">
+    <div class="dynamicwidth flex justify-between">
+        <div class="w-[300px] text-3xl font-bold ml-1 mt-1 pl-2">
+            Institutions
+        </div>
+
+        <div class="mt-0 mb-2 w-[300px] h-[50px] ml-11 flex flex-row">
+            <mat-form-field appearance="fill" class="w-full" floatLabel="always">
+                <input matInput placeholder="Search School" [(ngModel)]="searchValue" />
+                <mat-icon matPrefix svgIcon="heroicons_solid:search"></mat-icon>
+            </mat-form-field>
+
+            <button (click)="search(searchValue)" mat-raised-button color="primary" class=" ml-2 mt-1 w-max mb-2">
+                Search
+            </button>
+        </div>
+
+        <div class="flex flex-row justify-center mt-0 ml-17">
+            <div class="mr-4">
+                <button (click)="addInstitute()" mat-raised-button color="primary" class="w-full">
+                    <mat-icon class="mr-1" svgIcon="heroicons_outline:plus-circle"></mat-icon>
+                    Add
+                </button>
+            </div>
+
+            <div class="mr-2">
+                <button mat-raised-button color="primary" class="w-full" (click)="goToTrash()">
+                    <mat-icon class="mr-1" svgIcon="heroicons_outline:trash"></mat-icon>Trash
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="dynamicwidth">
+        <div class="w-full grid">
+            <div matSort matSortDisableClear (matSortChange)="sortData($event)"
+                class="inventory-grid gap-4 z-10 sticky top-0 grid py-4 px-10 md:px-8 shadow text-md font-semibold text-secondary bg-gray-50 dark:bg-black dark:bg-opacity-5">
+                <div [mat-sort-header]="'institutionName'">
+                    School Name
+                </div>
+                <div [mat-sort-header]="'typeofSchool'">
+                    Type Of School
+                </div>
+                <div [mat-sort-header]="'registrationNumber'">
+                    Registration Number
+                </div>
+                <div [mat-sort-header]="'representativeName'">
+                    Representative Name
+                </div>
+                <div [mat-sort-header]="'representativePhoneNumber'">
+                    Representative Phone
+                </div>
+                <div [mat-sort-header]="'institutionCreatorName'">
+                    Institution Creator
+                </div>
+                <div [mat-sort-header]="'board'">
+                    Board
+                </div>
+                <div [mat-sort-header]="'creationDate'">
+                    Created On
+                </div>
+                <div [mat-sort-header]="'pincode'">
+                    Postal Code
+                </div>
+                <div [mat-sort-header]="'verificationStatus'" class="">
+                    Verification Status
+                </div>
+                <div class="">
+                    View More
+                </div>
+                <div class="">
+                    Delete
+                </div>
+            </div>
+
+            <div class="inventory-grid h-[calc(100vh_-_266px)] overflow-scroll" infiniteScroll
+                [infiniteScrollDistance]="1" [infiniteScrollUpDistance]="2" [infiniteScrollThrottle]="300"
+                [scrollWindow]="false" (scrolled)="onScroll($event)">
+                <ng-container *ngIf="!isScrollLoading">
+                    <ng-container *ngFor="let institute of institutions; let i = index">
+                        <div class="inventory-grid grid items-center text-secondary gap-4 py-3 px-10 md:px-8 border-b border-gray-400"
+                            [id]="institute.docId">
+                            <div class="break-words" (click)="copyToClipboard(institute?.institutionName)"
+                                [matTooltip]="institute?.institutionName">
+                                <ng-container *ngIf="institute?.institutionName?.length > 23; else showFullText">
+                                    {{ institute?.institutionName | slice:0:23 }}...
+                                </ng-container>
+
+                                <ng-template #showFullText>
+                                    {{ institute?.institutionName }}
+                                </ng-template>
+                            </div>
+
+                            <div (click)="copyToClipboard(institute?.typeofSchool)"
+                                [matTooltip]="institute?.typeofSchool">
+                                <ng-container *ngIf="institute?.typeofSchool?.length > 7; else showFullText1">
+                                    {{ institute?.typeofSchool | slice:0:7 }}...
+                                </ng-container>
+
+                                <ng-template #showFullText1>
+                                    {{ institute?.typeofSchool }}
+                                </ng-template>
+                            </div>
+
+                            <div (click)="copyToClipboard(institute?.registrationNumber)"
+                                [matTooltip]="institute?.registrationNumber">
+                                <ng-container *ngIf="institute?.registrationNumber?.length > 7; else showFullText2">
+                                    {{ institute?.registrationNumber | slice:0:7 }}...
+                                </ng-container>
+
+                                <ng-template #showFullText2>
+                                    {{ institute?.registrationNumber }}
+                                </ng-template>
+                            </div>
+
+                            <!-- Representative Name -->
+                            <div (click)="copyToClipboard(getRepresentativeName(institute))"
+                                [matTooltip]="getRepresentativeName(institute)"
+                                [ngClass]="{ 'not-available': isNotAvailable(getRepresentativeName(institute)) }">
+                                {{ getRepresentativeName(institute) }}
+                            </div>
+
+                            <!-- Representative Phone Number -->
+                            <div (click)="copyToClipboard(getRepresentativePhone(institute))"
+                                [matTooltip]="getRepresentativePhone(institute)"
+                                [ngClass]="{ 'not-available': isNotAvailable(getRepresentativePhone(institute)) }">
+                                {{ getRepresentativePhone(institute) }}
+                            </div>
+
+                            <div (click)="copyToClipboard(getInstitutionCreatorName(institute))"
+                                [matTooltip]="getInstitutionCreatorName(institute)" [ngClass]="{
+                                  'not-available': isNotAvailable(getInstitutionCreatorName(institute)),
+                                  'imported': isImported(getInstitutionCreatorName(institute))
+                                }">
+                                {{ getInstitutionCreatorName(institute) }}
+                            </div>
+
+                            <div (click)="copyToClipboard(institute?.board)" class="truncate"
+                                [matTooltip]="getBoardNameFromCode(institute?.board)">{{ institute?.board }}</div>
+
+                            <!-- <div class="lg:ml-2 xs:ml-0"> -->
+                            <div [matTooltip]="institute?.creationDate?.seconds*1000| date: 'dd/MM/yyyy'"
+                                (click)="copyToClipboardDate( institute?.creationDate)">
+                                {{
+                                (institute?.creationDate?.seconds * 1000
+                                | date : "dd/MM/yyyy") | slice:0:5
+                                }}...
+                            </div>
+                            <!-- </div> -->
+
+                            <!-- <div class="lg:ml-1 xs:ml-0"> -->
+                            <div [cdkCopyToClipboard]="institute?.pincode" (click)="copyToClipboard(institute?.pincode)"
+                                [matTooltip]="institute?.pincode">
+                                <ng-container *ngIf="institute?.pincode?.length > 6; else showFullText3">
+                                    {{ institute?.pincode | slice:0:6 }}...
+                                </ng-container>
+
+                                <ng-template #showFullText3>
+                                    {{ institute?.pincode }}
+                                </ng-template>
+                            </div>
+
+                            <!-- </div> -->
+                            <div [cdkCopyToClipboard]="institute?.verificationStatus"
+                                (click)="copyToClipboard(institute?.verificationStatus)"
+                                [matTooltip]="institute?.verificationStatus" class="lg:ml-3 xs:ml-0">
+                                <mat-slide-toggle [checked]="institute?.verificationStatus" [color]="'primary'"
+                                    (change)="verificationToggle($event, institute)">
+                                </mat-slide-toggle>
+                            </div>
+
+                            <!-- <div class="ml-1"> -->
+                            <div>
+                                <button class="min-w-10 min-h-7 h-7 px-2 leading-6" mat-stroked-button
+                                    (click)="toggleDetails(institute)" [ngClass]="{
+                                        'bg-slate-200':
+                                            selectedInstitute?.docId ==
+                                            institute?.docId
+                                    }">
+                                    <mat-icon class="icon-size-5" [svgIcon]="
+                                            selectedInstitute?.docId ==
+                                            institute?.docId
+                                                ? 'heroicons_solid:chevron-up'
+                                                : 'heroicons_solid:chevron-down'
+                                        ">
+                                    </mat-icon>
+                                </button>
+                            </div>
+
+                            <!-- <div class="ml-2"> -->
+                            <div class="ml-3">
+                                <div
+                                    *ngIf="deleteLoader && (institute?.docId === institutionTobeDeleted?.docId); else deleted">
+                                    <mat-spinner [diameter]="30"></mat-spinner>
+                                </div>
+                                <ng-template #deleted>
+                                    <mat-icon (click)="onDeleteInstitute(institute)"
+                                        class="text-red-500 cursor-pointer transition duration-500 transform hover:scale-[115%]"
+                                        svgIcon="delete_outline">
+                                    </mat-icon>
+                                </ng-template>
+                            </div>
+                        </div>
+                        <div class="grid">
+                            <ng-container *ngIf="
+                                    selectedInstitute?.docId ===
+                                    institute?.docId
+                                ">
+                                <ng-container *ngTemplateOutlet="
+                                        rowDetailsTemplate;
+                                        context: { $implicit: institute }
+                                    ">
+                                </ng-container>
+                            </ng-container>
+                        </div>
+                    </ng-container>
+                </ng-container>
+
+                <ng-container *ngIf="isScrollLoading" class="relative flex h-full w-full items-center justify-center">
+                    <mat-spinner class="absolute left-1/2 top-1/2" [diameter]="35"></mat-spinner>
+                </ng-container>
+            </div>
+            <p class="px-2 pt-3 text-secondary">
+                {{loadingMessage}}
+            </p>
+        </div>
+    </div>
+</div>
+
+<ng-template #rowDetailsTemplate let-institute>
+    <div class="border-b border-slate-300 overflow-scroll bg-blue-100 p-4 pt-10">
+        <form [formGroup]="instituteForm" (ngSubmit)="formSubmit(instituteForm)">
+            <mat-tab-group disablePagination="false">
+                <mat-tab label="Basic Info">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 -mt-4">
+                        <div class="sm:border-r border-primary-300 sm:pr-6">
+                            <mat-form-field class="w-full text-accent-600 text-sm" floatLabel="always">
+                                <mat-label class="text-accent-600">Institution Name</mat-label>
+                                <input class="" id="" matInput formControlName="institutionName" type="text"
+                                    placeholder="Enter institutionName Name" />
+                                <mat-icon class="icon-size-5" matPrefix [svgIcon]="'mat_solid:business'"></mat-icon>
+                            </mat-form-field>
+
+                            <mat-form-field class="w-full text-accent-600 text-sm" floatLabel="always">
+                                <mat-label class="text-accent-600">Gender Types</mat-label>
+                                <mat-select formControlName="genderType" placeholder="Boys / Girls / Co-ed">
+                                    <mat-option *ngFor="let gender of genderTypes" [value]="gender">
+                                        {{ gender }}
+                                    </mat-option>
+                                </mat-select>
+                                <mat-icon class="icon-size-5" matPrefix [svgIcon]="'mat_solid:female'"></mat-icon>
+                            </mat-form-field>
+
+                            <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                                <mat-label class="text-accent-600">Medium of Instruction</mat-label>
+                                <mat-select formControlName="medium" placeholder="Select Medium of Instruction">
+                                    <mat-option value="" disabled selected>Select</mat-option>
+                                    <mat-option *ngFor="let la of langList" [value]="la?.code">
+                                        <span class="text-sm">{{
+                                            la?.name
+                                            }}</span>
+                                    </mat-option>
+                                </mat-select>
+                                <mat-icon class="icon-size-5" matPrefix [svgIcon]="'g_translate'"></mat-icon>
+                            </mat-form-field>
+
+                            <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                                <mat-label class="text-accent-600">type of school</mat-label>
+                                <mat-select formControlName="typeofSchool" placeholder="Select Medium of Instruction">
+                                    <mat-option value="" disabled selected>Select type of school</mat-option>
+                                    <mat-option *ngFor="let type of typeofSchools " [value]="type.name">
+                                        <span class="text-sm">{{type.name}}</span>
+                                    </mat-option>
+                                </mat-select>
+                                <mat-icon class="icon-size-5" matPrefix [svgIcon]="'g_translate'"></mat-icon>
+                            </mat-form-field>
+
+                            <!-- Is Customer -->
+                            <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                                <mat-label class="text-accent-600">Customer School</mat-label>
+                                <mat-select formControlName="isCustomer" placeholder="Select Yes / No">
+                                    <mat-option value="" disabled selected>Select Customer type</mat-option>
+                                    <mat-option [value]="true">Yes</mat-option>
+                                    <mat-option [value]="false">No</mat-option>
+                                </mat-select>
+                                <mat-icon class="icon-size-5" matPrefix
+                                    [svgIcon]="instituteForm.get('isCustomer')?.value === true ? 'heroicons_solid:check-circle' : 'heroicons_solid:x-circle'"
+                                    [ngClass]="instituteForm.get('isCustomer')?.value === true ? 'text-green-500' : 'text-red-500'"></mat-icon>
+                            </mat-form-field>
+
+                            <mat-form-field class="w-full text-accent-600 text-sm" floatLabel="always">
+                                <mat-label class="text-accent-600">Registration Number</mat-label>
+                                <input class="" id="" matInput formControlName="registrationNumber" type="text"
+                                    placeholder="Enter institutionName Name" />
+                                <mat-icon class="icon-size-5" matPrefix [svgIcon]="'heroicons_solid:pencil'"></mat-icon>
+                            </mat-form-field>
+                        </div>
+                        <div class="sm:border-r border-primary-300 sm:px-6">
+                            <mat-form-field class="w-full text-accent-600 text-sm" floatLabel="always">
+                                <mat-label class="text-accent-600">Representative First Name</mat-label>
+                                <input class="" id="" matInput formControlName="representativeFirstName" type="text"
+                                    placeholder="Enter Representative First Name">
+                                <mat-icon class="icon-size-5" matPrefix
+                                    [svgIcon]="'mat_outline:person_outline'"></mat-icon>
+                            </mat-form-field>
+
+                            <mat-form-field class="w-full text-accent-600 text-sm" floatLabel="always">
+                                <mat-label class="text-accent-600">Representative Last Name</mat-label>
+                                <input class="" id="" matInput formControlName="representativeLastName" type="text"
+                                    placeholder="Enter Representative Last Name" />
+                                <mat-icon class="icon-size-5" matPrefix
+                                    [svgIcon]="'mat_outline:person_outline'"></mat-icon>
+                            </mat-form-field>
+
+                            <mat-form-field class="w-full text-accent-600 text-sm" floatLabel="always">
+                                <mat-label class="text-accent-600">Representative Email</mat-label>
+                                <input class="" id="" matInput formControlName="representativeEmail" type="text"
+                                    placeholder="Enter Representative Email" />
+                                <mat-icon class="icon-size-5" matPrefix
+                                    [svgIcon]="'mat_solid:alternate_email'"></mat-icon>
+                            </mat-form-field>
+
+                            <mat-form-field class="w-full text-accent-600 text-sm" floatLabel="always">
+                                <mat-label class="text-accent-600">Representative Phone</mat-label>
+                                <span>{{instituteForm?.get('representativeCountryCode')?.value}}</span>
+                                <input class="" id="" matInput formControlName="representativePhoneNumber" type="text"
+                                    placeholder="Enter Representative Phone" />
+                                <mat-icon class="icon-size-5" matPrefix [svgIcon]="'mat_solid:phone_iphone'"></mat-icon>
+                            </mat-form-field>
+
+                            <mat-form-field class="w-full text-accent-600 text-sm" floatLabel="always">
+                                <mat-label class="text-accent-600">Institution ID</mat-label>
+                                <input class="" id="" matInput type="text" disabled="true" readonly="true"
+                                    aria-disabled="true" [value]="institute?.docId" />
+                                <mat-icon (click)="copyToClipboard(institute?.docId)" svgIcon="mat_solid:content_copy"
+                                    matTooltip="Copy Learning Unit ID"></mat-icon>
+                            </mat-form-field>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-center items-center mt-2">
+                        <button
+                            [disabled]="disableSaveTabForm(['institutionName', 'genderType', 'medium', 'registrationNumber', 'representativeFirstName', 'representativeLastName', 'representativeEmail', 'representativePhoneNumber','typeofSchool', 'isCustomer'], 'basic') || startLoading"
+                            mat-stroked-button type="submit"
+                            class="bg-primary text-white disabled:bg-primary-300 disabled:border">
+                            <div *ngIf="startLoading; else saveButton">
+                                <mat-spinner [diameter]="30"></mat-spinner>
+                            </div>
+                            <ng-template #saveButton>
+                                Save
+                            </ng-template>
+                        </button>
+                    </div>
+                </mat-tab>
+
+                <mat-tab label="Address">
+                    <div formGroupName="institutionAddress" class="grid grid-cols-1 sm:grid-cols-2 -mt-4">
+                        <div class="sm:border-r border-primary-300 sm:pr-6">
+                            <mat-form-field class="w-full text-accent-600 text-sm" floatLabel="always">
+                                <mat-label class="text-accent-600">Street</mat-label>
+                                <input class="" id="" matInput formControlName="street" type="text"
+                                    placeholder="Enter Street Name" />
+                                <mat-icon class="icon-size-5" matPrefix
+                                    [svgIcon]="'mat_outline:location_on'"></mat-icon>
+                            </mat-form-field>
+
+                            <mat-form-field class="w-full text-accent-600 text-sm" floatLabel="always">
+                                <mat-label class="text-accent-600">City Name</mat-label>
+                                <input class="" id="" matInput formControlName="city" type="text"
+                                    placeholder="Enter City Name" />
+                                <mat-icon class="icon-size-5" matPrefix
+                                    [svgIcon]="'mat_outline:location_on'"></mat-icon>
+                            </mat-form-field>
+
+                            <mat-form-field class="w-full text-accent-600 text-sm" floatLabel="always">
+                                <mat-label class="text-accent-600">Village Name</mat-label>
+                                <input class="" id="" matInput formControlName="village" type="text"
+                                    placeholder="Enter Village Name" />
+                                <mat-icon class="icon-size-5" matPrefix
+                                    [svgIcon]="'mat_outline:location_on'"></mat-icon>
+                            </mat-form-field>
+
+                            <mat-form-field class="w-full text-accent-600 text-sm" floatLabel="always">
+                                <mat-label class="text-accent-600">Sub District Name</mat-label>
+                                <input class="" id="" matInput formControlName="subDistrict" type="text"
+                                    placeholder="Enter Sub District Name" />
+                                <mat-icon class="icon-size-5" matPrefix
+                                    [svgIcon]="'mat_outline:location_on'"></mat-icon>
+                            </mat-form-field>
+                        </div>
+
+                        <div class="sm:border-r border-primary-300 sm:px-6">
+                            <mat-form-field class="w-full text-accent-600 text-sm" floatLabel="always">
+                                <mat-label class="text-accent-600">District Name</mat-label>
+                                <input class="" id="" matInput formControlName="district" type="text"
+                                    placeholder="Enter District Name" />
+                                <mat-icon class="icon-size-5" matPrefix
+                                    [svgIcon]="'mat_outline:location_on'"></mat-icon>
+                            </mat-form-field>
+
+                            <mat-form-field class="w-full text-accent-600 text-sm" floatLabel="always">
+                                <mat-label class="text-accent-600">State
+                                </mat-label>
+                                <input class="" id="" matInput formControlName="state" type="text"
+                                    placeholder="Enter State Name" />
+                                <mat-icon class="icon-size-5" matPrefix
+                                    [svgIcon]="'mat_outline:location_on'"></mat-icon>
+                            </mat-form-field>
+
+                            <mat-form-field class="w-full text-accent-600 text-sm" floatLabel="always">
+                                <mat-label class="text-accent-600">Pincode
+                                </mat-label>
+                                <input class="" id="" matInput formControlName="pincode" type="text"
+                                    placeholder="Enter Pincode" />
+                                <mat-icon class="icon-size-5" matPrefix
+                                    [svgIcon]="'mat_outline:location_on'"></mat-icon>
+                            </mat-form-field>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-center items-center mt-2">
+                        <button
+                            [disabled]="disableSaveTabForm(['street', 'city', 'village', 'subDistrict', 'district', 'state', 'pincode'], 'address')"
+                            mat-stroked-button type="submit"
+                            class="bg-primary text-white disabled:bg-primary-300 disabled:border">
+                            Save
+                        </button>
+                    </div>
+                </mat-tab>
+
+                <mat-tab label="Chain">
+                    <div class="flex mb-2">
+                        <p class="mr-4 text-accent-600 font-medium">
+                            Is the institute part of Chain ?
+                        </p>
+                        <div>
+                            <mat-slide-toggle [checked]="instituteForm?.value?.isPartofChain"
+                                (change)="toggleChain($event)" class="ml-2" [color]="'primary'">
+                            </mat-slide-toggle>
+                        </div>
+                    </div>
+
+                    <mat-form-field *ngIf="isChainContainerActive" class="w-100 text-accent-600" floatLabel="always">
+                        <mat-label class="text-accent-600">Select Institution Chain</mat-label>
+                        <mat-select formControlName="chainName">
+                            <mat-option value="" disabled selected>Select</mat-option>
+
+                            <mat-option *ngFor="let ch of allChainInfo" [value]="ch?.chainAbbreviation">
+                                <span class="text-sm">
+                                    {{ch?.chainAbbreviation}}
+                                </span>
+                            </mat-option>
+
+                            <mat-option (click)="createChain()">
+                                <span class="bg-gray-200 rounded-full text-gray-500 py-2 px-4">
+                                    Not in the list | Create One&nbsp;&nbsp;
+                                    <mat-icon class="m-0" svgIcon="feather:plus-circle"></mat-icon>
+                                </span>
+                            </mat-option>
+                        </mat-select>
+                        <mat-icon class="icon-size-5" matPrefix [svgIcon]="'heroicons_solid:link'"></mat-icon>
+                    </mat-form-field>
+
+                    <div *ngIf="createChainContainer" class="bg-primary-50 rounded-lg p-4 shadow">
+                        <form [formGroup]="institutionsChainForm" (ngSubmit)="
+                                institutionsFormSubmit(institutionsChainForm)
+                            ">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div class=" ">
+                                    <mat-form-field class="w-full text-accent-600 text-sm" floatLabel="always">
+                                        <mat-label class="text-accent-600">Chain Name
+                                        </mat-label>
+                                        <input class="" id="" matInput formControlName="chainName" type="text"
+                                            placeholder="Enter Chain Name " />
+                                    </mat-form-field>
+
+                                    <mat-form-field class="w-full text-accent-600 text-sm" floatLabel="always">
+                                        <mat-label class="text-accent-600">Chain Abbreviation
+                                        </mat-label>
+                                        <input class="" id="" matInput formControlName="chainAbbreviation" type="text"
+                                            placeholder="Enter chain Abbreviation" />
+                                    </mat-form-field>
+
+                                    <mat-form-field class="w-full text-accent-600 text-sm" floatLabel="always">
+                                        <mat-label class="text-accent-600">Head Office Phone
+                                        </mat-label>
+                                        <input class="" id="" matInput formControlName="headOfficePhone" type="text"
+                                            placeholder="Enter head OfficePhone" />
+                                    </mat-form-field>
+
+                                    <mat-form-field class="w-full text-accent-600 text-sm" floatLabel="always">
+                                        <mat-label class="text-accent-600">Head Office Email
+                                        </mat-label>
+                                        <input class="" id="" matInput formControlName="headOfficeEmail" type="text"
+                                            placeholder="Enter head OfficePhone" />
+                                    </mat-form-field>
+                                </div>
+
+                                <div class="" formGroupName="headOfficeAddress">
+                                    <mat-form-field class="w-full text-accent-600 text-sm" floatLabel="always">
+                                        <mat-label class="text-accent-600">Head Office Pincode
+                                        </mat-label>
+                                        <input class="" id="" (change)="chaninPinCodeChange()" matInput
+                                            formControlName="pincode" type="text"
+                                            placeholder="Enter head OfficePhone " />
+                                    </mat-form-field>
+
+                                    <mat-form-field class="w-full text-accent-600 text-sm" floatLabel="always">
+                                        <mat-label class="text-accent-600">Head Office Street
+                                            Address</mat-label>
+                                        <input class="" id="" matInput formControlName="street" type="text"
+                                            placeholder="Enter head OfficePhone " />
+                                    </mat-form-field>
+
+                                    <mat-form-field class="w-full text-accent-600 text-sm" floatLabel="always">
+                                        <mat-label class="text-accent-600">Head Office Village Address
+                                        </mat-label>
+                                        <input class="" id="" matInput formControlName="village" type="text"
+                                            placeholder="Enter head OfficePhone " />
+                                    </mat-form-field>
+
+                                    <mat-form-field class="w-full text-accent-600 text-sm" floatLabel="always">
+                                        <mat-label class="text-accent-600">Head Office City Address
+                                        </mat-label>
+                                        <input class="" id="" matInput formControlName="city" type="text"
+                                            placeholder="Enter head OfficePhone " />
+                                    </mat-form-field>
+                                </div>
+
+                                <div formGroupName="headOfficeAddress">
+                                    <mat-form-field class="w-full text-accent-600 text-sm" floatLabel="always">
+                                        <mat-label class="text-accent-600">Head Office Sub District
+                                        </mat-label>
+                                        <input class="" id="" matInput formControlName="subDistrict" type="text"
+                                            placeholder="Enter head OfficePhone " />
+                                    </mat-form-field>
+
+                                    <mat-form-field class="w-full text-accent-600 text-sm" floatLabel="always">
+                                        <mat-label class="text-accent-600">Head Office District
+                                        </mat-label>
+                                        <input class="" id="" matInput formControlName="district" type="text"
+                                            placeholder="Enter head OfficePhone " />
+                                    </mat-form-field>
+
+                                    <mat-form-field class="w-full text-accent-600 text-sm" floatLabel="always">
+                                        <mat-label class="text-accent-600">Head Office State
+                                        </mat-label>
+                                        <input class="" id="" matInput formControlName="state" type="text"
+                                            placeholder="Enter head OfficePhone " />
+                                    </mat-form-field>
+
+                                    <div class="pt-6">
+                                        <button [disabled]="disableSaveTabForm(['chainName', 'headOfficeAddress', 'chainAbbreviation', 'headOfficePhone', 'headOfficeEmail', 'pincode', 'street', 'village', 'city', 'subDistrict', 'district', 'state'], 'chain')
+                                            " mat-stroked-button type="submit"
+                                            class="bg-primary text-white disabled:bg-primary-300 disabled:border">
+                                            Save Chain
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div *ngIf="isChainContainerActive" class="flex justify-center items-center mt-2">
+                        <!-- <button [disabled]="instituteForm.invalid" mat-stroked-button type="submit" -->
+                        <button [disabled]="disableSaveTabForm(['chainName'], 'nochain')" mat-stroked-button
+                            type="submit" class="bg-primary text-white disabled:bg-primary-300 disabled:border">
+                            <p *ngIf="!startLoading">Save</p>
+                            <mat-spinner *ngIf="startLoading" [diameter]="20"></mat-spinner>
+                        </button>
+                    </div>
+                </mat-tab>
+
+                <mat-tab label="Board">
+                    <div formGroupName="institutionAddress">
+                        <!-- Country Name -->
+                        <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                            <mat-label class="text-[#282B66]">Select Country</mat-label>
+                            <mat-select formControlName="country" placeholder="Select Country Name">
+                                <mat-option value="" disabled selected>Select</mat-option>
+
+                                <mat-option *ngFor="let country of countryCodes|keyvalue" [value]="country?.key"
+                                    matTooltipPosition="right"
+                                    [matTooltip]="country?.value?.displayName">{{country?.value?.displayName}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+
+                    <!-- Board -->
+                    <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                        <mat-label class="text-[#282B66]">Select Board</mat-label>
+                        <mat-select formControlName="board" placeholder="Select Board Name">
+                            <mat-option value="" disabled selected>Select</mat-option>
+
+                            <mat-option *ngFor="let board of countryBoard" [value]="board.code"
+                                matTooltipPosition="right" [matTooltip]="board?.name" class="text-sm">
+                                {{board?.name}}
+                            </mat-option>
+
+                            <mat-option
+                                *ngIf="!isAddNewBoard && schoolInfo?.get('institutionAddress')?.get('country')?.value !== 'india'">
+                                <span class="bg-gray-200 rounded-full text-gray-500 py-2 px-4"
+                                    (click)="isAddNewBoard = true;">Add A New Board&nbsp;&nbsp;
+                                    <mat-icon class="m-0" svgIcon="feather:plus-circle"></mat-icon>
+                                </span>
+                            </mat-option>
+
+                            <mat-option *ngIf="isAddNewBoard" [value]="addNewBoard.value">
+                                <div class="flex flex-row">
+                                    <input type="text" #addNewBoard matInput id="addNewBoard" formControlName="board"
+                                        (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()"
+                                        placeholder="Enter Board Name">
+                                    <span>
+                                        <mat-icon class="m-0 text-red-500" svgIcon="heroicons_solid:x-mark"
+                                            matTooltip="Clear the field"
+                                            (click)="schoolInfo?.get('board')?.reset(); isAddNewBoard = false"></mat-icon>
+                                    </span>
+                                    <span>
+                                        <mat-icon class="m-0 ml-2 text-green-500" svgIcon="heroicons_solid:check"
+                                            matTooltip="Save the new board" (click)="saveNewBoard()"></mat-icon>
+                                    </span>
+                                </div>
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+
+                    <div class="flex justify-center items-center mt-2">
+                        <button [disabled]="disableSaveTabForm(['country', 'board'], 'board')" mat-stroked-button
+                            type="submit" class="bg-primary text-white disabled:bg-primary-300 disabled:border">
+                            Save
+                        </button>
+                    </div>
+                </mat-tab>
+
+                <mat-tab label="Programmes">
+                    <div formGroupName="institutionAddress">
+                        <!-- Country Name -->
+                        <app-edit-programme-template [existingProgrammes]="institutionProgrammes"
+                            [institutionDetails]="institutionDetails">
+                        </app-edit-programme-template>
+                    </div>
+                </mat-tab>
+            </mat-tab-group>
+        </form>
+    </div>
+</ng-template>
+
+<fuse-drawer *ngIf="show" class="w-screen min-w-screen" [opened]="drawerOpened" fixed [mode]="'over'"
+    [position]="'left'">
+    <div>
+        <ng-container *ngComponentOutlet="component"></ng-container>
+    </div>
+</fuse-drawer>

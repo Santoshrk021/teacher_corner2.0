@@ -1,0 +1,18 @@
+#container {
+    display: flex !important;
+    justify-content: flex-end !important;
+    flex-direction: row-reverse !important;
+
+    mat-icon {
+        color: rgb(148 163 184 / var(--tw-text-opacity)) !important;
+        cursor: pointer !important;
+
+        &.rated,
+        &:hover,
+        &:hover~mat-icon {
+            color: rgba(var(--fuse-primary-500-rgb), var(--tw-text-opacity)) !important;
+        }
+
+        transition: 0.3s ease-in-out !important;
+    }
+}

@@ -1,0 +1,28 @@
+<div class="mt-30">
+    <div class="flex text-accent-500 font-medium text-xl mx-20   h-full flex-col">
+
+        <p>You have not been added to any classroom.</p>
+        <br>
+        <p>
+            Click
+            <a class="text-[#049CD8] underline" [routerLink]="'/registration'">
+                here
+            </a>
+            to register yourself.
+        </p>
+        <br>
+        <p>
+            Please contact us on WhatsApp at
+            <a class="text-[#049CD8] underline" target="_blank" [href]="'https://wa.me/' + environment.whatsAppSender">
+                +{{environment.whatsAppSender}}
+            </a>
+        </p>
+        <p>
+            or by email at
+            <a class="text-[#049CD8] underline" [href]="'mailto:' + environment.emailSender">
+                {{environment.emailSender}}
+            </a>
+            for further assistance.
+        </p>
+    </div>
+</div>

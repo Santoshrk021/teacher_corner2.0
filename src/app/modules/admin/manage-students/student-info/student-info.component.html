@@ -1,0 +1,226 @@
+<div [appCustomTooltip]="
+        filteredCustomAuthenticationMaster?.length != null &&
+        classroomStemClubInfo.get('selectedClassroomStemClub').value
+            ?.studentCounter != null &&
+        classroomStemClubInfo.get('selectedClassroomStemClub').value
+            ?.studentCounter !== 0 &&
+        filteredCustomAuthenticationMaster.length !==
+            classroomStemClubInfo.get('selectedClassroomStemClub').value
+                .studentCounter
+            ? 'Mismatch between existing credentials (' +
+              filteredCustomAuthenticationMaster.length +
+              ') and student counter (' +
+              classroomStemClubInfo.get('selectedClassroomStemClub').value
+                  .studentCounter +
+              ')'
+            : ''
+    ">
+    <div class="grid grid-flow-row m-auto bg-white border shadow rounded-2xl w-full sm:w-[30vw] p-6">
+        <form [formGroup]="classroomStemClubInfo" (ngSubmit)="onSubmit(classroomStemClubInfo)">
+            <div class="flex flex-col w-full">
+                <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                    <mat-label class="text-[#282B66]">
+                        Select {{ display }}
+                    </mat-label>
+
+                    <mat-select formControlName="selectedClassroomStemClub" [placeholder]="'Select a ' + display"
+                        (selectionChange)="onSelectClassroom()">
+                        <mat-option disabled>Select</mat-option>
+                        <mat-option *ngFor="let classroom of classroomStemClubArray" [value]="classroom">
+                            <span *ngIf="type === 'CLASSROOM'">
+                                {{ classroom?.classroomName }}
+                            </span>
+                            <span *ngIf="type === 'STEM-CLUB'">
+                                {{ classroom?.stemClubName }}
+                            </span>
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <div class="">
+                    <button type="button" (click)="toggleStudentsMenu()" *ngIf="!showMoreStudents &&
+                    isClassroomStemClubSelected &&
+                    (!classroomStemClubInfo.get('selectedClassroomStemClub').value.hasOwnProperty('studentCounter') ||
+                    (classroomStemClubInfo.get('selectedClassroomStemClub').value.hasOwnProperty('studentCounter') &&
+                    classroomStemClubInfo.get('selectedClassroomStemClub').value?.['studentCounter'] === 0))">
+                        <mat-icon matTooltipPosition="right" matTooltip="Add more students?"
+                            class="icon-size-8 text-primary-600 cursor-pointer plusIcon active:text-primary-500"
+                            [svgIcon]="'heroicons_solid:plus-circle'"></mat-icon>
+                    </button>
+                </div>
+
+                <div class="mx-3 mb-3">
+                    <div
+                        *ngIf="classroomStemClubInfo.get('selectedClassroomStemClub').value.hasOwnProperty('studentCounter') && classroomStemClubInfo.get('selectedClassroomStemClub').value?.['studentCounter'] > 0">
+                        <mat-label class="text-accent-600 text-md font-medium relative right-2">
+                            Number of Existing Students
+                        </mat-label>
+
+                        <div class="grid grid-cols-6 mt-1">
+                            <div class="flex flex-col bg-grey-lighter col-span-3">
+                                <label matRipple
+                                    class="border border-lighter relative w-full right-2 flex flex-col items-center rounded-lg p-2 rounded-r-none bg-slate-100">
+                                    <input class="w-full"
+                                        placeholder="Enter the number of existing students in the selected classroom"
+                                        [value]="
+                                            classroomStemClubInfo.get(
+                                                'selectedClassroomStemClub'
+                                            ).value['studentCounter']
+                                        " disabled="true" />
+                                </label>
+                            </div>
+
+                            <div class="col-span-2">
+                                <div matRipple
+                                    class="p-2 border border-primary-600 rounded-lg rounded-l-none bg-primary-600 text-white cursor-pointer relative hover:bg-primary active:bg-primary-800">
+                                    <a matTooltip="View Credential File"
+                                        class="w-full h-full flex items-center justify-center"
+                                        [href]="classroomStemClubInfo?.get('selectedClassroomStemClub')?.value?.['studentCredentialStoragePath'] | getDownloadURL"
+                                        target="_blank">
+                                        View
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="col-span-1 flex flex-row justify-center items-center">
+                                <button type="button" (click)="toggleStudentsMenu()" *ngIf="!showMoreStudents"
+                                    [disabled]="!disableToggleToCheckCounter">
+                                    <mat-icon matTooltipPosition="right" matTooltip="Add more students?"
+                                        class="icon-size-8 text-primary-600 cursor-pointer plusIcon active:text-primary-500"
+                                        [svgIcon]="
+                                            'heroicons_solid:plus-circle'
+                                        ">
+                                    </mat-icon>
+                                </button>
+
+                                <button type="button" (click)="toggleStudentsMenu()" *ngIf="showMoreStudents"
+                                    [disabled]="!disableToggleToCheckCounter">
+                                    <mat-icon matTooltipPosition="right" matTooltip="Don't add more students?"
+                                        class="icon-size-8 text-primary-600 cursor-pointer plusIcon active:text-primary-500"
+                                        [svgIcon]="
+                                            'heroicons_solid:minus-circle'
+                                        "></mat-icon>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div *ngIf="showMoreStudents">
+                    <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                        <mat-label class="text-[#282B66]">Enter number of students to be added</mat-label>
+                        <input matInput formControlName="numberOfStudents" type="number" min="1" step="1" [placeholder]="
+                                'Enter the number of students per ' +
+                                display.toLowerCase()
+                            " />
+                        <mat-error *ngIf="
+                                classroomStemClubInfo?.get('numberOfStudents')
+                                    ?.invalid
+                            ">
+                            Number of students per {{ display }} is required
+                        </mat-error>
+                    </mat-form-field>
+
+                    <!-- Register For Contest -->
+                    <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                        <mat-label class="text-[#282B66]">Register for contest</mat-label>
+                        <mat-select [(ngModel)]="isContestRegistrationRequired"
+                            (selectionChange)="onContestRegistrationChange($event.value)"
+                            [ngModelOptions]="{standalone: true}" placeholder="Register for contest">
+                            <mat-option disabled> Select </mat-option>
+                            <mat-option [value]="true">Yes</mat-option>
+                            <mat-option [value]="false">No</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+
+                    <ng-container *ngIf="isContestRegistrationRequired">
+                        <!-- <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                            <mat-label class="text-[#282B66]">Select a contest</mat-label>
+                            <mat-select [(ngModel)]="selectContest" [ngModelOptions]="{standalone: true}"  placeholder="Select a contest">
+                                <mat-option disabled> Select a contest </mat-option>
+                                <mat-option *ngFor="let contest of finalContestsLst" [value]="contest">
+                                    {{ contest.contestTitle }}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field> -->
+
+                        <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                            <mat-label class="text-[#282B66]">Select contest(s)</mat-label>
+                            <mat-select [(ngModel)]="selectContest" [ngModelOptions]="{standalone: true}"
+                                placeholder="Select contest(s)" multiple>
+                                <mat-option disabled> Select contest(s) </mat-option>
+                                <mat-option *ngFor="let contest of finalContestsLst" [value]="contest">
+                                    {{ contest.contestTitle }}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </ng-container>
+                </div>
+            </div>
+
+            <!-- older button which is having only submit button -->
+            <!-- <div class="pt-3 text-center">
+                <button
+                    type="submit"
+                    mat-stroked-button
+                    [disabled]="
+                        !classroomStemClubInfo?.get('numberOfStudents')
+                            ?.valid ||
+                        !showMoreStudents ||
+                        startSpinner
+                    "
+                    class="disabled:bg-primary-100 fuse-mat-stroked-button-large bg-primary-600 text-white hover:bg-primary-500"
+                >
+                    <ng-container *ngIf="startSpinner && !isCredentialsCreated">
+                        <mat-spinner [diameter]="20"></mat-spinner>
+                    </ng-container>
+
+                    <ng-container *ngIf="!startSpinner"> Submit </ng-container>
+                </button>
+            </div> -->
+
+            <div class="pt-3 flex justify-between items-center">
+                <!-- Remote Button on the left -->
+                <button mat-stroked-button type="button"
+                    [disabled]="!classroomStemClubInfo?.value?.selectedClassroomStemClub" (click)="openRemoteDialog()"
+                    class="disabled:bg-primary-100 fuse-mat-stroked-button-large bg-primary-500 text-white hover:bg-primary-700">
+                    Remote
+                </button>
+
+                <!-- Fix Counter Button in the middle (only show when mismatch exists) -->
+                <button *ngIf="hasMismatch()" mat-stroked-button type="button" (click)="fixCounter()"
+                    [disabled]="startSpinner || !classroomStemClubInfo?.value?.selectedClassroomStemClub"
+                    class="disabled:bg-primary-100 fuse-mat-stroked-button-large bg-primary-500 text-white hover:bg-primary-700"
+                    matTooltip="Fix the mismatch between credentials and student counter">
+                    <!-- <mat-icon class="mr-1">build</mat-icon> -->
+                    Fix Counter
+                </button>
+
+                <!-- Submit Button on the right -->
+                <button type="submit" mat-stroked-button [disabled]="
+                            !classroomStemClubInfo?.get('numberOfStudents')?.valid ||
+                            !showMoreStudents ||
+                            startSpinner
+                        "
+                    class="disabled:bg-primary-100 fuse-mat-stroked-button-large bg-primary-600 text-white hover:bg-primary-500">
+                    <ng-container *ngIf="startSpinner && !isCredentialsCreated">
+                        <mat-spinner [diameter]="20"></mat-spinner>
+                    </ng-container>
+                    <ng-container *ngIf="!startSpinner">Submit</ng-container>
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>
+<div class="flex justify-between">
+    <button type="button" matStepperPrevious mat-stroked-button [disabled]="startSpinner"
+        class="text-primary-600 fuse-mat-stroked-button-large">
+        Previous Step
+    </button>
+
+    <button *ngIf="type !== 'STEM-CLUB'" type="button" matStepperNext mat-stroked-button [disabled]="startSpinner"
+        class="text-primary-600 fuse-mat-stroked-button-large">
+        Next Step
+    </button>
+</div>

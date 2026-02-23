@@ -1,0 +1,145 @@
+<!-- Delete -->
+<div *ngIf="delete" class="flex flex-row w-full h-full">
+    <div class="m-4 pt-4 flex flex-0 items-center justify-center w-10 h-10 sm:mr-4 rounded-full text-warn-600 bg-warn-100 dark:text-warn-50 dark:bg-warn-600">
+        <mat-icon class="mt-2 ml-3.5 w-10 h-10 scale-125">
+            <svg width="14px" height="18px" viewBox="0 0 14 18" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+            <title>Delete</title>
+            <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                <g id="Two-Tone" transform="translate(-105.000000, -245.000000)">
+                    <g id="Action" transform="translate(100.000000, 100.000000)">
+                        <g id="Two-Tone-/-Action-/-Delete" transform="translate(0.000000, 142.000000)">
+                            <g>
+                                <polygon id="Path" points="0 0 24 0 24 24 0 24"></polygon>
+                                <path d="M6,19 C6,20.1 6.9,21 8,21 L16,21 C17.1,21 18,20.1 18,19 L18,7 L6,7 L6,19 Z M8,9 L16,
+                                9 L16,19 L8,19 L8,9 Z M15.5,4 L14.5,3 L9.5,3 L8.5,4 L5,4 L5,6 L19,6 L19,4 L15.5,4 Z" id="🔹-Primary-Color" fill="#f02d27"></path>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </svg>
+    </mat-icon>
+    </div>
+    <div class="ml-2 mt-3">
+        <div>
+            <h1 mat-dialog-title class="mb-0 text-2xl font-medium">Delete Component</h1>
+            <h3 mat-dialog-content class="text-slate-500">Are you sure you want to delete this Component?</h3>
+        </div>
+        <div mat-dialog-actions class="flex gap-2 justify-end ml-[200px] mt-[32px] ">
+          <button mat-button (click)="cancel()" class="bg-white text-black px-4 py-2 rounded-full shadow-md">Cancel</button>
+          <button mat-button (click)="confirm()" class="bg-red-500 text-white px-4 py-2 rounded-full shadow-md flex items-center border border-gray-300">Confirm</button>
+        </div>
+    </div>
+</div>
+
+
+<!-- empty trash -->
+<div *ngIf="emptyTrash" class="flex flex-row w-full h-full">
+    <div class="m-4 pt-4 flex flex-0 items-center justify-center w-10 h-10 sm:mr-4 rounded-full text-warn-600 bg-warn-100 dark:text-warn-50 dark:bg-warn-600">
+        <mat-icon class="mt-2 ml-3.5 w-10 h-10 scale-125">
+            <svg width="14px" height="18px" viewBox="0 0 14 18" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <title>Delete</title>
+                <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                    <g id="Two-Tone" transform="translate(-105.000000, -245.000000)">
+                        <g id="Action" transform="translate(100.000000, 100.000000)">
+                            <g id="Two-Tone-/-Action-/-Delete" transform="translate(0.000000, 142.000000)">
+                                <g>
+                                    <polygon id="Path" points="0 0 24 0 24 24 0 24"></polygon>
+                                    <path d="M6,19 C6,20.1 6.9,21 8,21 L16,21 C17.1,21 18,20.1 18,19 L18,7 L6,7 L6,19 Z M8,9 L16,
+                                    9 L16,19 L8,19 L8,9 Z M15.5,4 L14.5,3 L9.5,3 L8.5,4 L5,4 L5,6 L19,6 L19,4 L15.5,4 Z" id="🔹-Primary-Color" fill="#f02d27"></path>
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </svg>
+    </mat-icon>
+    </div>
+    <div class="ml-2 mt-3">
+        <div>
+            <h1 mat-dialog-title class="mb-0 text-2xl font-medium">Empty Trash</h1>
+            <h3 mat-dialog-content class="text-slate-500">Are you sure you want to delete All the Trash Component?</h3>
+        </div>
+        <div mat-dialog-actions class="flex gap-2 justify-end ml-[200px] mt-[32px] ">
+          <button mat-button (click)="cancel()" class="bg-white text-black px-4 py-2 rounded-full shadow-md">Cancel</button>
+          <button mat-button (click)="confirm()" class="bg-red-500 text-white px-4 py-2 rounded-full shadow-md flex items-center border border-gray-300">Confirm</button>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- restore -->
+<div *ngIf="restore" class="flex flex-row w-full h-full">
+    <div class="m-4 pt-4 flex flex-0 items-center justify-center w-10 h-10 sm:mr-4 rounded-full text-warn-600 bg-blue-100 dark:text-blue-50 dark:bg-blue-600">
+        <mat-icon class="mt-2 ml-3.5 w-10 h-10 scale-125">
+            <svg width="14px" height="18px" viewBox="0 0 14 18" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <title>restore_from_trash</title>
+                <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                    <g id="Rounded" transform="translate(-411.000000, -421.000000)">
+                        <g id="Action" transform="translate(100.000000, 100.000000)">
+                            <g id="-Round-/-Action-/-restore_from_trash" transform="translate(306.000000, 318.000000)">
+                                <g transform="translate(0.000000, 0.000000)">
+                                    <polygon id="Path" points="0 0 24 0 24 24 0 24"></polygon>
+                                    <path d="M6,19 C6,20.1 6.9,21 8,21 L16,21 C17.1,21 18,20.1 18,19 L18,9 C18,7.9 17.1,7 16,7 L8,
+                                    7 C6.9,7 6,7.9 6,9 L6,19 Z M11.65,10.35 C11.85,10.15 12.16,10.15 12.36,10.35 L16,14 L14,14 L14,18 L10,18 L10,14 L8,14 L11.65,
+                                    10.35 Z M15.5,4 L14.79,3.29 C14.61,3.11 14.35,3 14.09,3 L9.91,3 C9.65,3 9.39,3.11 9.21,3.29 L8.5,4 L6,4 C5.45,4 5,4.45 5,5 C5,5.55 5.45,6 
+                                    6,6 L18,6 C18.55,6 19,5.55 19,5 C19,4.45 18.55,4 18,4 L15.5,4 Z" 
+                                    id="🔹Icon-Color" fill="#049bd8"></path>
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </svg>
+    </mat-icon>
+    </div>
+    <div class="ml-2 mt-3">
+        <div>
+            <h1 mat-dialog-title class="mb-0 text-2xl font-medium">Restore Component</h1>
+            <h3 mat-dialog-content class="text-slate-500">Are you sure you want to Restore this Component?</h3>
+        </div>
+        <div mat-dialog-actions class="flex gap-2 justify-end ml-[200px] mt-[32px] ">
+          <button mat-button (click)="cancel()" class="bg-white text-black px-4 py-2 rounded-full shadow-md">Cancel</button>
+          <button mat-button (click)="confirm()" class="bg-red-500 text-white px-4 py-2 rounded-full shadow-md flex items-center border border-gray-300">Confirm</button>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Delete Permenantly -->
+<div *ngIf="deletePermenently" class="flex flex-row w-full h-full">
+    <div class="m-4 pt-4 flex flex-0 items-center justify-center w-10 h-10 sm:mr-4 rounded-full text-warn-600 bg-warn-100 dark:text-warn-50 dark:bg-warn-600">
+        <mat-icon class="mt-2 ml-3.5 w-10 h-10 scale-125">
+            <svg width="14px" height="18px" viewBox="0 0 14 18" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+            <title>Delete</title>
+            <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                <g id="Two-Tone" transform="translate(-105.000000, -245.000000)">
+                    <g id="Action" transform="translate(100.000000, 100.000000)">
+                        <g id="Two-Tone-/-Action-/-Delete" transform="translate(0.000000, 142.000000)">
+                            <g>
+                                <polygon id="Path" points="0 0 24 0 24 24 0 24"></polygon>
+                                <path d="M6,19 C6,20.1 6.9,21 8,21 L16,21 C17.1,21 18,20.1 18,19 L18,7 L6,7 L6,19 Z M8,9 L16,
+                                9 L16,19 L8,19 L8,9 Z M15.5,4 L14.5,3 L9.5,3 L8.5,4 L5,4 L5,6 L19,6 L19,4 L15.5,4 Z" id="🔹-Primary-Color" fill="#f02d27"></path>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </svg>
+    </mat-icon>
+    </div>
+    <div class="ml-2 mt-3">
+        <div>
+            <h1 mat-dialog-title class="mb-0 text-2xl font-medium">Delete Component</h1>
+            <h3 mat-dialog-content class="text-slate-500">Are you sure you want to delete this Component Permanently?</h3>
+        </div>
+        <div mat-dialog-actions class="flex gap-2 justify-end ml-[200px] mt-[32px] ">
+          <button mat-button (click)="cancel()" class="bg-white text-black px-4 py-2 rounded-full shadow-md">Cancel</button>
+          <button mat-button (click)="confirm()" class="bg-red-500 text-white px-4 py-2 rounded-full shadow-md flex items-center border border-gray-300">Confirm</button>
+        </div>
+    </div>
+</div>
+
+

@@ -1,0 +1,23 @@
+export interface FuseConfirmationConfig
+{
+    title?: string;
+    message?: string;
+    icon?: {
+        show?: boolean;
+        name?: string;
+        color?: 'primary' | 'accent' | 'warn' | 'basic' | 'info' | 'success' | 'warning' | 'error';
+    };
+    actions?: {
+        confirm?: {
+            show?: boolean;
+            label?: string;
+            color?: 'primary' | 'accent' | 'warn';
+            timerSeconds?: number; // Optional: delay before button becomes clickable (shows countdown)
+        };
+        cancel?: {
+            show?: boolean;
+            label?: string;
+        };
+    };
+    dismissible?: boolean;
+}

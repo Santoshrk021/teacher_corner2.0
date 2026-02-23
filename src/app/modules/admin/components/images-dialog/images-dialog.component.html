@@ -1,0 +1,49 @@
+<div>
+  <!-- Close button - only shown when showCloseButton is true -->
+  <!-- <div *ngIf="showCloseButton" class="flex justify-end">
+    <button (click)="close()" class="m-3 left-8 bottom-8 relative">
+      <mat-icon aria-hidden="false" class="text-gray-500">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+        </svg>
+      </mat-icon>
+    </button>
+  </div> -->
+
+  <div class="relative w-full max-w-md mx-auto mt-10">
+    <!-- Images -->
+    <div class="overflow-hidden rounded-2xl relative h-64">
+      <div class="flex transition-transform duration-500" [style.transform]="'translateX(-' + currentIndex * 100 + '%)'">
+        <!-- Dynamic image list using ngFor -->
+        <ng-container *ngFor="let image of images">
+          <div class="w-full flex-shrink-0">
+            <img [src]="image" class="flex justify-centerw-[250px] h-[250px] object-contain ">
+          </div>
+         </ng-container>
+      </div>
+  
+      <!-- Arrows -->
+      <button (click)="prev()" class="absolute left-0 top-1/2 transform -translate-y-1/2  text-gray-400 p-2 rounded-full">
+          <mat-icon svgIcon="heroicons_outline:chevron-left"   aria-hidden="false" class="text-gray-500 scale-110"></mat-icon>
+      </button>
+      <button (click)="next()" class="absolute right-0 top-1/2 transform -translate-y-1/2  text-gray-400 p-2 rounded-full">
+          <mat-icon svgIcon="heroicons_outline:chevron-right"   aria-hidden="false" class="text-gray-500 scale-110"></mat-icon>
+      </button>
+    </div>
+  
+    <!-- Dots -->
+    <div class="flex justify-center mt-4 space-x-2">
+      <!-- Dynamic dots using ngFor -->
+      <ng-container *ngFor="let index of getIndices()">
+        <button (click)="goToSlide(index)" 
+        [class.bg-red-400]="currentIndex === index"             
+        [class.bg-[#049BD8]]="currentIndex !== index"             
+        class="w-4 h-4 rounded-full transition duration-300 ease-in-out">
+          </button>
+      </ng-container>
+    </div>
+  </div>
+</div>
+
+
+

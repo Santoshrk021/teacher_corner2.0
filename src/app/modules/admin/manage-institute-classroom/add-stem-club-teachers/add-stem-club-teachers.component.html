@@ -1,0 +1,322 @@
+<ng-container *ngIf="isLoaded; else dataNotLoaded">
+    <div class="bg-white sm:w-[45vw] border shadow rounded-2xl  p-6 relative items-center text-center m-auto">
+        <!-- <div class="text-accent-600 font-medium mb-4 flex items-center flex-row-reverse ">
+            <mat-slide-toggle class="ml-2" [color]="'primary'" (change)="bulkUploadEnable($event)">
+            </mat-slide-toggle>
+            <p>Bulk Upload Teachers</p>
+        </div> -->
+
+        <ng-container *ngIf="isBulkUpload">
+
+            <!-- <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                <mat-label class="text-[#282B66]">Select a classroom</mat-label>
+                <mat-select [(ngModel)]="selectCls" placeholder="Select a classroom">
+                    <mat-option disabled> Select a classroom </mat-option>
+                    <mat-option *ngFor="let cls of classrooms" [value]="cls">
+                        {{cls.classroomName}} , {{cls.institutionName}} </mat-option>
+                </mat-select>
+            </mat-form-field> -->
+
+            <div class="flex items-start ">
+                <div class=" bg-white w-full text-left">
+                    <!-- <mat-label class="text-accent-600 font-medium ">Bulk Upload Teachers</mat-label> -->
+
+                    <button (click)="downloadTemplate()"
+                        class="flex items-center ml-2 mt-6 text-primary-600 hover:underline w-max mb-4">
+                        <span>Download Template</span>
+                        <mat-icon svgIcon="heroicons_outline:arrow-circle-down"
+                            class="ml-1  text-primary-600"></mat-icon>
+                    </button>
+
+                    <label
+                        class="-ml-3 mt-2 flex p-[22px]  active:bg-primary-400 flex-col items-center scale-90 mat-flat-button bg-primary text-white hover:bg-primary-700">
+                        <div class="flex items-center ">
+                            <span class="m-1">
+                                <mat-icon svgIcon="heroicons_outline:upload"></mat-icon>
+                            </span>
+                            <span class="mr-1">
+                            </span>
+                            <!-- <span class=" mr-2 text-base"> Select csv file</span> -->
+                            <span class=" mr-2 text-base"> Select xlsx file</span>
+                        </div>
+                        <!-- <input type='file' class="hidden" accept=".CSV" #teachersFileInputRef
+                            (change)="onSelectCsvFile($event)" /> -->
+                        <input type='file' class="hidden" accept=".xlsx" #teachersFileInputRef
+                            (change)="onSelectCsvFile($event)" />
+                    </label>
+
+                    <span *ngIf="teacherInputFile" class="text-xs text-secondary line-clamp-1 ml-1">{{teacherInputFile}}
+                    </span>
+                    <div class="pl-4 mt-3 " [style.visibility]=" isActiveloader ? 'visible' : 'hidden'">
+                        <span class="loader ml-32"></span>
+                    </div>
+                </div>
+                <div class="mt-16">
+                    <button [disabled]="!this.teacherInputFile" (click)="uploadCsvData()"
+                        class=" disabled:bg-primary-100 hover:bg-primary-500 text-end mat-stroked-button bg-primary-600 text-white "
+                        mat-stroked-button>
+                        Upload</button>
+                    <!-- Old Code -->
+                    <!-- <button [disabled]="!this.teacherInputFile ||!selectCls" (click)="uploadCsvData()"
+                        class=" disabled:bg-primary-100 hover:bg-primary-500 text-end mat-stroked-button bg-primary-600 text-white "
+                        mat-stroked-button>
+                        Upload</button> -->
+                </div>
+            </div>
+            <div [hidden]="!logfileDownload">
+                <button (click)="downloadLogFile()"
+                    class="flex items-center ml-2 text-primary-600 hover:underline w-max mb-4">
+                    <span>Download Log File</span>
+                    <mat-icon svgIcon="heroicons_outline:arrow-circle-down" class="ml-1  text-primary-600"></mat-icon>
+                </button>
+            </div>
+            <!-- Old Code -->
+            <!-- <a href=`https://firebasestorage.googleapis.com/v0/b/${environment.firebase.projectId}.appspot.com/o/templates%2Fteachers%20upload%20template.csv?alt=media&token=33fda505-00a9-400f-b261-8984a2ee147b`
+                target="_blank" class="flex items-center mt-6 text-primary-600 hover:underline w-max">
+                <span>Download Template</span>
+                <mat-icon svgIcon="heroicons_outline:arrow-circle-down" class="ml-1  text-primary-600"></mat-icon>
+            </a> -->
+        </ng-container>
+
+        <ng-container *ngIf="!isBulkUpload">
+            <form [formGroup]="userForm" (ngSubmit)="onSubmit(userForm)" #Form
+                class="flex flex-col items-center w-full">
+                <div class="grid grid-cols-7 gap-4 w-full">
+                    <!-- phone -->
+                    <mat-form-field appearance="fill" class="w-full text-accent-600 col-span-3" floatLabel="always">
+                        <mat-label>Phone</mat-label>
+                        <span>{{countryCode}}</span>
+                        <input id="phone" [maxLength]="10" pattern="^[0-9]{10}" matInput class="ml-4"
+                            placeholder="Enter valid 10 digits phone number" formControlName="phone">
+                        <mat-error *ngIf="(userForm?.get('phone')?.dirty ||userForm?.get('phone')?.touched)">Please
+                            enter 10
+                            digit valid phone number</mat-error>
+                    </mat-form-field>
+
+                    <!-- email -->
+                    <mat-form-field appearance="fill" class="w-full text-accent-600 col-span-4" floatLabel="always">
+                        <mat-label>Email (optional)</mat-label>
+                        <input matInput formControlName="email"
+                            [attr.disabled]="userForm?.value?.isEmailAutoField? '' : null"
+                            placeholder="Enter your email address">
+                    </mat-form-field>
+                </div>
+
+                <!-- first name -->
+                <mat-form-field appearance="fill" class="w-full text-accent-600" floatLabel="always">
+                    <mat-label>First Name</mat-label>
+                    <input matInput formControlName="fName"
+                        [attr.disabled]="userForm?.value?.isFNameAutoField? '' : null"
+                        placeholder="Enter your first name">
+                </mat-form-field>
+
+                <!-- last name -->
+                <mat-form-field appearance="fill" class="w-full text-accent-600" floatLabel="always">
+                    <mat-label>Last Name</mat-label>
+                    <input matInput formControlName="lName"
+                        [attr.disabled]="userForm?.value?.isLNameAutoField? '' : null"
+                        placeholder="Enter your last name">
+                </mat-form-field>
+
+                <!-- teacher role -->
+                <mat-form-field appearance="fill" class="w-full text-accent-600" floatLabel="always">
+                    <mat-label>Teacher Role</mat-label>
+                    <mat-select formControlName="userRole" placeholder="Select Teacher Role">
+                        <mat-option value="" disabled>Select</mat-option>
+                        <mat-option *ngFor="let role of teacherRoles | keyvalue" [value]="role.value.fieldName">
+                            {{ role.value.displayName }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <!-- stem clubs -->
+                <div class="block mt-4 w-full">
+                    <!-- no collpase block -->
+                    <div class="grid grid-flow-row">
+                        <div formArrayName="stemclubsinfo">
+                            <div *ngFor="let cls of stemclubsInfo()?.controls; let i=index">
+                                <div *ngIf="i<2" class="grid grid-cols-1 md:grid-cols-12 md:gap-2 items-start"
+                                    [formGroupName]="i">
+
+                                    <!-- stem club name -->
+                                    <div class="col-span-5">
+                                        <mat-form-field class="w-full text-accent-600">
+                                            <mat-label class="text-accent-600">Stem Club Name</mat-label>
+                                            <mat-select matTooltip="Stem club name" formControlName="selectedStemclub"
+                                                placeholder="Select stem club"
+                                                (selectionChange)="onSelectStemClub($event,i)">
+                                                <mat-option value="" disabled selected>Select</mat-option>
+                                                <mat-option *ngFor="let stemClubName of cls.get('stemclubList')?.value"
+                                                    [value]="stemClubName">
+                                                    {{ stemClubName }}
+                                                </mat-option>
+                                            </mat-select>
+                                        </mat-form-field>
+                                    </div>
+
+                                    <!-- stem club programme name -->
+                                    <div class="col-span-6">
+                                        <mat-form-field class="w-full text-accent-600">
+                                            <mat-label class="text-accent-600">
+                                                Programme
+                                            </mat-label>
+                                            <mat-select [compareWith]="attributeDisplay"
+                                                (selectionChange)="onSelectProgramme($event,i)"
+                                                formControlName="selectedProgrammes" [multiple]="true"
+                                                placeholder="Select Programmes">
+                                                <mat-option disabled>Select</mat-option>
+                                                <div *ngFor="let pr of cls.get('programmesList')?.value ">
+                                                    <mat-option *ngIf=" pr.programmeName" [value]="pr">
+                                                        {{ pr.displayName ? pr?.displayName : pr?.programmeName }}
+                                                    </mat-option>
+                                                </div>
+                                            </mat-select>
+                                        </mat-form-field>
+                                    </div>
+
+                                    <!-- delete stem club -->
+                                    <div class="mt-8" *ngIf="this.stemclubsInfo().length>1">
+                                        <button type="button" matTooltipPosition="above" matTooltip="Delete stem club"
+                                            (click)="removeStemClubInfo(i,cls)">
+                                            <mat-icon
+                                                class="text-red-500 icon-size-6 scale_on_hover125 active:text-red-200"
+                                                svgIcon="mat_solid:delete"></mat-icon>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- add stem club -->
+                        <div *ngIf="!isCollapseActive" class="grid grid-cols-1 ">
+                            <div class="col-span-1 flex flex-row-reverse ">
+                                <button type="button" (click)="addStemclubInfo()" [disabled]="addButtonDisabled || userForm.invalid">
+                                    <mat-icon matTooltipPosition="above" matTooltip="Add Stem Club"
+                                        class="icon-size-8 text-primary-600 cursor-pointer plusIcon active:text-primary-500"
+                                        [svgIcon]="'heroicons_solid:plus-circle'"></mat-icon>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- submit -->
+                        <div *ngIf="!isCollapseActive" class="grid grid-cols-3 ">
+                            <div class="col-start-2 text-center ">
+                                <button [disabled]="!isSubmitReady()" (click)="onSubmit(userForm)"
+                                    type="button"
+                                    class="disabled:bg-primary-100 fuse-mat-stroked-button-large bg-primary-600 text-white hover:bg-primary-500"
+                                    mat-stroked-button>
+                                    {{ uploading?'':'Submit'}}
+                                    <mat-progress-spinner *ngIf="uploading" [diameter]="24" [mode]="'indeterminate'">
+                                    </mat-progress-spinner>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- collapse block -->
+                    <div *ngIf="isCollapseActive" class="grid  grid-flow-row ">
+                        <!-- collapse -->
+                        <div class="flex flex-row-reverse">
+                            <div *ngIf="stemclubsInfo().length>2"
+                                class="flex rounded-full w-max border-2 p-[2px] border-blue-500 scale-75 -mr-1">
+                                <mat-icon matTooltip="Collapse" (click)="collapse=!collapse" *ngIf="!collapse"
+                                    class="text-primary-600 cursor-pointer" svgIcon="feather:chevrons-down"></mat-icon>
+                                <mat-icon matTooltip="Open Collapsed Layout" (click)="collapse=!collapse"
+                                    *ngIf="collapse" class="text-primary-600 cursor-pointer"
+                                    svgIcon="feather:chevrons-up"></mat-icon>
+                            </div>
+                        </div>
+
+                        <div class="animated-box animated-box-content" *ngIf="!collapse" @expandCollapse>
+                            <div formArrayName="stemclubsinfo">
+                                <div *ngFor="let cls of stemclubsInfo()?.controls; let i=index">
+                                    <div *ngIf="i>1" class="grid grid-cols-1 md:grid-cols-12 md:gap-2 items-start"
+                                        [formGroupName]="i">
+
+                                        <!-- stem club name -->
+                                        <div class="col-span-5">
+                                            <mat-form-field class="w-full text-accent-600">
+                                                <mat-label class="text-accent-600">Stem Club Name</mat-label>
+                                                <mat-select matTooltip="Stemclub Name"
+                                                    formControlName="selectedStemclub" placeholder="Select stem club"
+                                                    (selectionChange)="onSelectStemClub($event,i)">
+                                                    <mat-option value="" disabled selected>Select</mat-option>
+                                                    <mat-option
+                                                        *ngFor="let stemClubName of cls.get('stemclubList')?.value"
+                                                        [value]="stemClubName">
+                                                        {{ stemClubName }}
+                                                    </mat-option>
+                                                </mat-select>
+                                            </mat-form-field>
+                                        </div>
+
+                                        <!-- stem club programme name -->
+                                        <div class="col-span-6">
+                                            <mat-form-field class="w-full text-accent-600">
+                                                <mat-label class="text-accent-600">Programme</mat-label>
+                                                <mat-select [compareWith]="attributeDisplay"
+                                                    (selectionChange)="onSelectProgramme($event,i)"
+                                                    formControlName="selectedProgrammes" [multiple]="true"
+                                                    placeholder="Select Programmes">
+                                                    <mat-option disabled>Select</mat-option>
+                                                    <div *ngFor="let pr of cls.get('programmesList')?.value">
+                                                        <mat-option *ngIf="pr.programmeName" [value]="pr">
+                                                            {{ pr.displayName ? pr?.displayName : pr?.programmeName }}
+                                                        </mat-option>
+                                                    </div>
+                                                </mat-select>
+                                            </mat-form-field>
+                                        </div>
+
+                                        <!-- delete stem club -->
+                                        <div class="mt-8" *ngIf="this.stemclubsInfo().length>1">
+                                            <button type="button" matTooltipPosition="above"
+                                                matTooltip="Delete Stem Club" (click)="removeStemClubInfo(i,cls)">
+                                                <mat-icon
+                                                    class="text-red-500 icon-size-6 scale_on_hover125 active:text-red-200"
+                                                    svgIcon="mat_solid:delete"></mat-icon>
+                                            </button>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- add stem club -->
+                            <div class="grid grid-cols-1" *ngIf="!removeAddbutton">
+                                <div class="col-span-1 flex flex-row-reverse ">
+                                    <button type="button" (click)="addStemclubInfo()" [disabled]="addButtonDisabled || userForm.invalid">
+                                        <mat-icon matTooltipPosition="above" matTooltip="Add Stem Club"
+                                            class="icon-size-8 text-primary-600 cursor-pointer plusIcon active:text-primary-500"
+                                            [svgIcon]="'heroicons_solid:plus-circle'"></mat-icon>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- submit -->
+                            <div class="grid grid-cols-3">
+                                <div class="col-start-2 text-center">
+                                    <button [disabled]="!isSubmitReady()" (click)="onSubmit(userForm)"
+                                        type="button"
+                                        class="disabled:bg-primary-100 fuse-mat-stroked-button-large bg-primary-600 text-white hover:bg-primary-500"
+                                        mat-stroked-button>
+                                        {{ uploading?'':'Submit'}}
+                                        <mat-progress-spinner *ngIf="uploading" [diameter]="24"
+                                            [mode]="'indeterminate'">
+                                        </mat-progress-spinner>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </ng-container>
+    </div>
+</ng-container>
+
+<ng-template #dataNotLoaded>
+    <div class="flex items-center justify-center">
+        <mat-spinner diameter="40"></mat-spinner>
+    </div>
+</ng-template>

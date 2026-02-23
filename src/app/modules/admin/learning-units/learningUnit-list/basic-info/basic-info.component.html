@@ -1,0 +1,179 @@
+<form [formGroup]="basicInfoForm" (ngSubmit)="saveBasicInfo(basicInfoForm)">
+    <div class="grid grid-cols-2 sm:grid-cols-2 md:h-64 xs:h-64 -mt-4">
+        <div class="sm:border-r border-primary-300 sm:pr-6">
+            <mat-form-field class="w-full text-accent-600 text-sm ">
+                <mat-label class="text-accent-600">Learning Unit Name</mat-label>
+                <input class="" matInput formControlName='learningUnitName' type="text"
+                    [title]="trashUINotEditable?matTooltipMsg:''" placeholder="Enter Learning Unit Name">
+                <mat-icon class="icon-size-5" matPrefix [svgIcon]="'heroicons_solid:pencil'"></mat-icon>
+            </mat-form-field>
+
+            <mat-form-field class="w-full text-accent-600 text-sm ">
+                <mat-label class="text-accent-600">Learning Unit Display Name</mat-label>
+                <input class="" matInput formControlName='learningUnitDisplayName' type="text"
+                    [title]="trashUINotEditable?matTooltipMsg:''" placeholder="Enter Learning Unit Display Name">
+                <mat-icon class="icon-size-5" matPrefix [svgIcon]="'heroicons_solid:pencil'"></mat-icon>
+            </mat-form-field>
+
+            <p class="text-red-500 mb-4 -mt-4" *ngIf="basicInfoForm.controls['learningUnitDisplayName'].hasError('maxlength')">
+                Lerning unit name cannot exceed 60 characters.
+            </p>
+
+            <mat-form-field class="w-full text-accent-600 text-sm ">
+                <mat-label class="text-accent-600">Learning Unit Type</mat-label>
+                <mat-select formControlName="type" placeholder="Select subject" disabled="true"
+                    [title]="trashUINotEditable?matTooltipMsg:''">
+                    <mat-option value="" disabled selected>Select</mat-option>
+                    <mat-option *ngFor="let lu of luType" [value]="lu.name">
+                        {{ lu.name }}
+                    </mat-option>
+
+                    <mat-option *ngIf="userAccessLevel>10" class="">
+                        <div class="">
+                            <span
+                            class="bg-gray-200 rounded-full text-gray-500 py-2 px-4"
+                            (click)="addnewLUtype()"
+                        >Add a New Learning Unit Type &nbsp;&nbsp;
+                            <mat-icon class="m-0" svgIcon="feather:plus-circle"></mat-icon>
+                        </span>
+                        </div>
+
+                    </mat-option>
+                </mat-select>
+                <mat-icon svgIcon="mat_solid:auto_awesome_motion" matPrefix></mat-icon>
+            </mat-form-field>
+            <mat-form-field class="w-full text-accent-600 text-sm ">
+                <mat-label class="text-accent-600">Learning Unit Difficulties Level</mat-label>
+                <mat-select formControlName="difficultiesLevel" placeholder="Select Difficulties Level"
+                    [title]="trashUINotEditable?matTooltipMsg:''">
+                    <mat-option value="" disabled selected>Select</mat-option>
+                    <mat-option *ngFor="let d of difficultiesLevel" [value]="d.code">{{d.name}}</mat-option>
+                </mat-select>
+                <mat-icon svgIcon="mat_solid:blur_linear" matPrefix></mat-icon>
+            </mat-form-field>
+            <mat-form-field *ngIf="this.userAccessLevel>10 ;else showdisabled" class=" text-accent-600 text-sm w-full ">
+                <mat-label class="text-accent-600">Status</mat-label>
+                <mat-select [title]="trashUINotEditable?matTooltipMsg:''" placeholder="Select Difficulties Level"
+                    class="h-max" formControlName="status">
+                    <mat-option *ngFor="let option of options" [value]="option">{{option}}</mat-option>
+                </mat-select>
+                <mat-icon svgIcon="mat_solid:blur_linear" matPrefix></mat-icon>
+            </mat-form-field>
+            <ng-template #showdisabled>
+                <mat-form-field   class=" text-accent-600 text-sm w-full ">
+                    <mat-label class="text-accent-600">Status</mat-label>
+                    <mat-select [title]="trashUINotEditable?matTooltipMsg:''" [disabled]="true" [ariaDisabled]="true" placeholder="Select Difficulties Level"
+                        class="h-max" formControlName="status">
+                        <mat-option *ngFor="let option of options" [value]="option">{{option}}</mat-option>
+                    </mat-select>
+                    <mat-icon svgIcon="mat_solid:blur_linear" matPrefix></mat-icon>
+                </mat-form-field>
+            </ng-template>
+
+            <mat-form-field class=" text-accent-600 text-sm w-full bg-slate">
+                <mat-label class="text-accent-600">Learning Unit ID</mat-label>
+                <input class="" matInput readonly="true" type="text" disabled="true" aria-disabled="true"
+                [title]="trashUINotEditable?matTooltipMsg:''" value="{{luDetails.docId}}">
+                <mat-icon (click)="copyToClipboard(luDetails.docId)" svgIcon="mat_solid:content_copy" matTooltip="Copy Learning Unit ID"></mat-icon>
+
+            </mat-form-field>
+
+
+
+            <mat-form-field class=" text-accent-600 text-sm w-full bg-slate">
+                <mat-label class="text-accent-600">Sub-Domain Code</mat-label>
+                <input class="" matInput readonly="true" type="text" disabled="true" aria-disabled="true"
+                [title]="trashUINotEditable?matTooltipMsg:''" value="{{luDetails.subDomainCode}}">
+                <!-- <mat-icon (click)="copyToClipboard(luDetails.docId)" svgIcon="mat_solid:content_copy" matTooltip="Copy Learning Unit ID"></mat-icon> -->
+
+            </mat-form-field>
+
+            <mat-form-field class=" text-accent-600 text-sm w-full bg-slate">
+                <mat-label class="text-accent-600">Sub-Domain Name</mat-label>
+                <input class="" matInput readonly="true" type="text" disabled="true" aria-disabled="true"
+                [title]="trashUINotEditable?matTooltipMsg:''" value="{{luDetails.subDomainName}}">
+                <!-- <mat-icon (click)="copyToClipboard(luDetails.docId)" svgIcon="mat_solid:content_copy" matTooltip="Copy Learning Unit ID"></mat-icon> -->
+
+            </mat-form-field>
+
+            <mat-form-field class=" text-accent-600 text-sm w-full bg-slate">
+                <mat-label class="text-accent-600">Composite Code</mat-label>
+                <input class="" matInput readonly="true" disabled="true" type="text"  aria-disabled="true"
+                [title]="trashUINotEditable?matTooltipMsg:''" value="{{luDetails.compositeCode}}">
+                <!-- <mat-icon (click)="copyToClipboard(luDetails.docId)" svgIcon="mat_solid:content_copy" matTooltip="Copy Learning Unit ID"></mat-icon> -->
+
+            </mat-form-field>
+        </div>
+        <div class=" border-primary-300  sm:px-6 ">
+            <mat-form-field class="w-full text-accent-600 text-sm ">
+                <mat-label class="text-accent-600">Learning Unit Explore Time (in minutes)</mat-label>
+                <input class="" id="exploreTime" matInput formControlName='exploreTime' type="number"
+                    placeholder="Enter Learning Unit Explore Time" [title]="trashUINotEditable?matTooltipMsg:''">
+                <mat-icon svgIcon="mat_solid:access_time" matPrefix></mat-icon>
+            </mat-form-field>
+            <mat-form-field class="w-full text-accent-600 text-sm ">
+                <mat-label class="text-accent-600">Learning Time (in minutes)</mat-label>
+                <input class="" id="learnTime" matInput formControlName='learnTime' type="number"
+                    placeholder="Enter Learning Unit Learning Time" [title]="trashUINotEditable?matTooltipMsg:''">
+                <mat-icon svgIcon="mat_solid:access_time" matPrefix></mat-icon>
+            </mat-form-field>
+            <mat-form-field class="w-full text-accent-600 text-sm ">
+                <mat-label class="text-accent-600">Learning Unit Total Time (in minutes)</mat-label>
+                <input class="" id="totalTime" matInput formControlName='totalTime' type="number"
+                    placeholder="Enter Learning Unit Total Time" [title]="trashUINotEditable?matTooltipMsg:''">
+                <mat-icon svgIcon="mat_solid:access_time" matPrefix></mat-icon>
+            </mat-form-field>
+            <mat-form-field class=" text-accent-600 text-sm w-full ">
+                <mat-label class="text-accent-600">Maturity</mat-label>
+                <mat-select [title]="trashUINotEditable?matTooltipMsg:''" placeholder="Select Difficulties Level"
+                    class="h-max" formControlName="Maturity">
+                    <mat-option *ngFor="let option of maturityValues" [value]="option">{{option}}</mat-option>
+                </mat-select>
+                <mat-icon svgIcon="mat_solid:blur_linear" matPrefix></mat-icon>
+            </mat-form-field>
+
+
+            <mat-form-field class="w-full text-accent-600 text-sm ">
+                <mat-label class="text-accent-600">Subject Code</mat-label>
+                <input class="" matInput readonly="true" disabled="true" matInput value="{{luDetails.subjectCode}}" type="text"
+                    [title]="trashUINotEditable?matTooltipMsg:''" placeholder="subjectCode">
+                <mat-icon class="icon-size-5" matPrefix [svgIcon]="'heroicons_solid:pencil'"></mat-icon>
+            </mat-form-field>
+
+            <mat-form-field class="w-full text-accent-600 text-sm ">
+                <mat-label class="text-accent-600">Subject Name</mat-label>
+                <input class="" matInput readonly="true" disabled="true" matInput value="{{luDetails.subjectName}}" type="text"
+                    [title]="trashUINotEditable?matTooltipMsg:''" placeholder="SubjectName">
+                <mat-icon class="icon-size-5" matPrefix [svgIcon]="'heroicons_solid:pencil'"></mat-icon>
+            </mat-form-field>
+
+            <mat-form-field class="w-full text-accent-600 text-sm ">
+                <mat-label class="text-accent-600">Domain Code</mat-label>
+                <input class="" matInput readonly="true" disabled="true" matInput value="{{luDetails.domainCode}}" type="text"
+                    [title]="trashUINotEditable?matTooltipMsg:''" placeholder="DomainCode">
+                <mat-icon class="icon-size-5" matPrefix [svgIcon]="'heroicons_solid:pencil'"></mat-icon>
+            </mat-form-field>
+
+            <mat-form-field class="w-full text-accent-600 text-sm ">
+                <mat-label class="text-accent-600">Domain Name</mat-label>
+                <input class="" matInput readonly="true" disabled="true" matInput value="{{luDetails.domainName}}" type="text"
+                    [title]="trashUINotEditable?matTooltipMsg:''" placeholder="DomainName">
+                <mat-icon class="icon-size-5" matPrefix [svgIcon]="'heroicons_solid:pencil'"></mat-icon>
+            </mat-form-field>
+
+        </div>
+
+    </div>
+    <div [ngClass]="trashUINotEditable==true?'hidden':''" class="sm:px-6 w-full text-center mt-[190px] -mb-5">
+        <button type="submit" color="primary" mat-raised-button  [disabled]="basicInfoForm.invalid  || basicInfoForm.pristine"
+            class=" px-2 leading-6 mt-90 ">
+            <div *ngIf="startLoading; else saveButton">
+                <mat-spinner [diameter]="30"></mat-spinner>
+            </div>
+            <ng-template #saveButton>
+                Save
+            </ng-template>
+        </button>
+        <!-- [disabled]="!basicInfoForm.valid || !enableForm" -->
+    </div>
+</form>

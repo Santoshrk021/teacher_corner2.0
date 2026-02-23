@@ -1,0 +1,11 @@
+:host::ng-deep .mat-dialog-container {
+    // overflow-x: scroll !important;
+    position: relative;
+    padding: 0 !important;
+}
+::ng-deep .mat-option-text:nth-child(6){
+    margin-left:-15px !important;
+}
+// .blue-icon {
+//     color: blue;
+//   }

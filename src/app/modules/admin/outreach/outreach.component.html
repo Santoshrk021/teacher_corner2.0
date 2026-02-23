@@ -1,0 +1,36 @@
+<div class="flex flex-col w-full bg-white ">
+    <div class="flex items-center justify-between bg-gray-100 p-2">
+        <div class="text-3xl font-bold">Outreach</div>
+
+        <div class="flex gap-2 justify-end font-semibold pt-2">
+
+            <button class="flex items-center gap-2 bg-[#049BD8] text-white px-4 py-2 rounded-full shadow-md"
+                (click)="addDialog()">
+                <mat-icon svgIcon="heroicons_outline:plus-circle" aria-hidden="false" class="text-white scale-110">
+                </mat-icon>Add
+            </button>
+
+            <button class="flex items-center gap-2 bg-primary-500 text-white px-4 py-2 rounded-full shadow-md"
+                (click)="trashDialog()">
+                <mat-icon svgIcon="heroicons_outline:trash" aria-hidden="false" class="text-white scale-110"></mat-icon>
+                Trash
+            </button>
+
+            <button class="flex items-center gap-2 bg-[#049BD8] text-white px-4 py-2 rounded-full shadow-md"
+                (click)="export()">
+                <mat-icon class="mr-1 text-white">cloud_download</mat-icon>
+                Export
+            </button>
+        </div>
+    </div>
+
+    <div class="flex flex-col w-full  justify-start ">
+        <app-outreach-list></app-outreach-list>
+    </div>
+</div>
+
+<fuse-drawer *ngIf="show" class="w-screen min-w-screen" [opened]="drawerOpened" fixed [mode]="'over'" [position]="'left'">
+    <div>
+        <ng-container *ngComponentOutlet="component"></ng-container>
+    </div>
+</fuse-drawer>

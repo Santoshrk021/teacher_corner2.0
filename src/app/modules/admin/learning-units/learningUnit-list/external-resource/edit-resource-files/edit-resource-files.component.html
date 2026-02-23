@@ -1,0 +1,176 @@
+<header class="sticky top-0 z-50">
+    <button mat-dialog-close class="absolute right-2 -top-4" type="button" (click)="close()">
+        <mat-icon class=" hover:scale-110 transition duration-5000 transform" svgIcon="mat_outline:close">
+        </mat-icon>
+    </button>
+</header>
+<div class="w-[50vw]">
+
+    <div class="w-full grid d-flex">
+        <div class="inventory-grid items-center text-secondary gap-3 py-3 px-8 md:px-8 border-b border-gray-300">
+            <div>SLno</div>
+            <div>Name</div>
+            <div>Resource View</div>
+            <div class="">Remove</div>
+        </div>
+        <div>
+            <ng-container *ngFor="let elem of fileList; let i = index;">
+                <div class="inventory-grid items-center text-secondary gap-3 py-3 px-8 md:px-8 border-b border-gray-300"
+                    matSort matSortDisableClear>
+                    <div [title]="index" class="truncate" [matTooltip]="i" matTooltipPosition="above"
+                        [cdkCopyToClipboard]="i">
+                        {{i}}
+
+
+                    </div>
+
+                    <div class=" " [title]="elem?.name" [matTooltip]="elem?.name" matTooltipPosition="above"
+                        [cdkCopyToClipboard]="elem?.name">
+                        {{elem?.name}}
+                    </div>
+
+                    <div class=" ml-1" [title]="">
+                        <div class="grid grid-cols-2 gap-2 ">
+                            <div class="flex flex-col bg-grey-lighter">
+                                <label matRipple
+                                    class="border border-primary relative w-full right-2 flex flex-col items-center rounded-lg p-2 cursor-pointer rounded-r-none bg-slate-100 text-primary-600"
+                                    [ngClass]="trashUINotEditable ? '' : 'hover:bg-slate-200'">
+                                    <span class="md:mx-2 absolute left-0 sm:mr-2 mt-[-2px]">
+                                        <mat-icon class="text-primary"
+                                            svgIcon="heroicons_outline:arrow-circle-up"></mat-icon>
+                                    </span>
+                                    <div class="flex items-center">
+                                        <mat-spinner *ngIf="loading[elem.name]==true ;else showsupload" [diameter]="20"
+                                            class="mt-[2px]"></mat-spinner>
+                                        <ng-template #showsupload>
+                                            <span class="md:mr-2 md:text-base relative sm:text-[10px] sm:ml-6">
+                                                {{elem?.url ?
+                                                'Re-Upload' :
+                                                'Upload'}}
+                                            </span>
+                                        </ng-template>
+
+                                    </div>
+                                    <input [disabled]="trashUINotEditable == true ? true : false" type="file"
+                                        class="hidden" (change)="selectFile($event, elem?.name,elem.url)" #guideRef />
+                                </label>
+                            </div>
+
+                            <div class="">
+                                <div matRipple
+                                    class="w-3/5 md:ml-1 sm:mr-1 p-2 border border-primary-600 rounded-lg rounded-l-none bg-primary-600 text-white cursor-pointer relative md:left-1 sm:left-0 md:text-base sm:text-[10px]"
+                                    [ngClass]="{
+                            'hover:bg-primary active:bg-primary-800': elem.url,
+                            'disableDiv': !elem.url
+                        }">
+                                    <a *ngIf="elem.url; else viewDisabled" [ariaDisabled]="true" target="_blank"
+                                        class="w-full h-full flex items-center justify-center"
+                                        [href]="elem.url | getDownloadURL">
+                                        <p>View</p>
+                                    </a>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <div class=" ml-2">
+                        <div class="mt-2">
+                            <mat-icon
+                                class="text-red-500  cursor-pointer transition duration-500 transform  hover:scale-[115%]"
+                                svgIcon="delete_outline" matTooltip="Delete"
+                                (click)="deleteFile(elem?.url,i)"></mat-icon>
+                        </div>
+                    </div>
+                </div>
+
+            </ng-container>
+
+        </div>
+
+
+    </div>
+    <!-- <div class="relative overflow-scroll h-[25vw] ">
+        <mat-list role="list" class="mt-12 ml-6">
+            <mat-list-item *ngFor="let elem of fileList" role="listitem" class="mb-8">
+                <div matListItemTitle class="mt-3">
+                    <div class="mt-2">
+                        <mat-label class="text-accent-600 text-sm font-medium relative right-2">
+                            {{elem?.name}}
+                        </mat-label>
+                        <div class="grid grid-cols-3 gap-2 ">
+                            <div class="flex flex-col bg-grey-lighter">
+                                <label matRipple
+                                    class="border border-primary relative w-full right-2 flex flex-col items-center rounded-lg p-2 cursor-pointer rounded-r-none bg-slate-100 text-primary-600"
+                                    [ngClass]="trashUINotEditable ? '' : 'hover:bg-slate-200'">
+                                    <span class="md:mx-2 absolute left-0 sm:mr-2 mt-[-2px]">
+                                        <mat-icon class="text-primary"
+                                            svgIcon="heroicons_outline:arrow-circle-up"></mat-icon>
+                                    </span>
+                                    <div class="flex items-center">
+                                        <span class="md:mr-2 md:text-base relative sm:text-[10px] sm:ml-6">
+                                            {{externalResourcePath?.[mValue]?.graphics?.[resource.key] ?
+                                            'Re-Upload' :
+                                            'Upload'}}
+                                        </span>
+                                    </div>
+                                    <input [disabled]="trashUINotEditable == true ? true : false" type="file"
+                                        class="hidden" (change)="selectFile($event, elem.key)" #guideRef />
+                                </label>
+                            </div>
+
+                            <div class="">
+                                <div matRipple
+                                    class="w-3/5 md:ml-1 sm:mr-1 p-2 border border-primary-600 rounded-lg rounded-l-none bg-primary-600 text-white cursor-pointer relative md:left-1 sm:left-0 md:text-base sm:text-[10px]"
+                                    [ngClass]="{
+                            'hover:bg-primary active:bg-primary-800': externalResourcePath?.[mValue]?.graphics?.variableMatrix,
+                            'disableDiv': !externalResourcePath?.[mValue]?.graphics?.[resource.key]
+                        }">
+                                    <a *ngIf="externalResourcePath?.[mValue]?.graphics?.[elem.key]; else viewDisabled"
+                                        [ariaDisabled]="true" target="_blank"
+                                        class="w-full h-full flex items-center justify-center"
+                                        [href]="externalResourcePath?.[mValue]?.graphics?.[elem.key] | getDownloadURL">
+                                        <p>View</p>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <mat-icon
+                                class="text-red-500  cursor-pointer transition duration-500 transform  hover:scale-[115%]"
+                                svgIcon="delete_outline" matTooltip="Delete" (click)="deleteFile(elem?.url,i)"></mat-icon>
+                            </div>
+                        </div>
+
+                        <ng-container
+                            *ngTemplateOutlet="uploadProgress; context: {$implicit: bytesTransferred?.[resource.key]}"></ng-container>
+                    </div>
+                </div>
+            </mat-list-item>
+        </mat-list>
+    </div> -->
+</div>
+
+<ng-template #viewDisabled>
+    <a [ariaDisabled]="true" target="_blank" class="w-full h-full flex items-center justify-center"
+        matTooltip="This resource has not been added. Please add a resource to continue">
+        <p>View</p>
+    </a>
+</ng-template>
+
+
+<ng-template #uploadProgress let-bytesTransferred>
+    <!-- <div *ngIf="bytesTransferred !== 0 && bytesTransferred < 100"
+        class="mt-2 pl-2 grid grid-cols-1 gap-1 justify-center">
+        <mat-progress-bar mode="buffer" [value]="bytesTransferred">
+        </mat-progress-bar>
+        <p class="mb-3" class="text-yellow-500">
+            {{bytesTransferred}}% uploaded
+        </p>
+    </div>
+    <p *ngIf="bytesTransferred == 100" class="mb-3" class="text-green-500">
+        Successfully Uploaded
+    </p> -->
+</ng-template>

@@ -1,0 +1,34 @@
+<!-- <div>
+    {{quizInfo|json}}
+</div> -->
+
+<div [ngSwitch]="quizInfo.questionType">
+    <div *ngSwitchCase="'MCQ'" class="p-2">
+        <app-mcq [quizData]="quizInfo" [indexObj]="indexObj"></app-mcq>
+    </div>
+
+    <div *ngSwitchCase="'FILL_IN_THE_BLANKS'" class="p-2">
+        <!-- <div>
+            {{quizInfo|json}}
+        </div> -->
+        <app-fill-blanks [quizData]="quizInfo" [indexObj]="indexObj"></app-fill-blanks>
+    </div>
+   
+    <div *ngSwitchCase="'TEXT'" class="p-2">
+        <app-text [quizData]="quizInfo" [indexObj]="indexObj"></app-text>
+    </div>
+    <div *ngSwitchCase="'FILL_IN_THE_BLANKS'" class="p-2">
+        <app-fill-blanks [quizData]="quizInfo" [indexObj]="indexObj"></app-fill-blanks>
+    </div>
+    <div *ngSwitchCase="'RICH_BLANKS'" class="p-2">
+        <!-- <app-rich-blanks [quizData]="quizInfo" [indexObj]="indexObj"></app-rich-blanks> -->
+    </div>
+
+    <div *ngSwitchCase="'TEXT'" class="p-2">
+        <div>
+            {{quizInfo|json}}
+        </div>
+        <!-- <app-text [quizData]="quizInfo" [indexObj]="indexObj"></app-text> -->
+    </div>
+
+</div>

@@ -1,0 +1,27 @@
+<div class="p-6 max-w-md mx-auto">
+    <div class="flex flex-col items-center">
+        <h2 class="text-2xl font-bold mb-4">Export Components</h2>
+        
+        <p class="text-gray-600 mb-6 text-center">
+            Click the button below to export all Components data to an Excel file.
+            <br>
+            <small>(The export will exclude all the Material Details)</small>
+        </p>
+        
+        <div class="flex gap-4">
+            <button 
+                class="bg-[#049BD8] text-white px-6 py-2 rounded-full shadow-md flex items-center gap-2 hover:scale-110 transition duration-5000 transform"
+                (click)="exportComponentsToExcel()" 
+                [disabled]="isExporting">
+                <mat-icon class="mr-1 text-white">cloud_download</mat-icon>
+                <span class="text-white">{{ isExporting ? 'Exporting...' : 'Export to Excel' }}</span>
+            </button>
+            
+            <button 
+                class="bg-white text-black px-6 py-2 rounded-full border border-gray-300 flex items-center hover:scale-110 transition duration-5000 transform"
+                (click)="closeDialog()">
+                Cancel
+            </button>
+        </div>
+    </div>
+</div>

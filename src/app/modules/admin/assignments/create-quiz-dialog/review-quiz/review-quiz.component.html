@@ -1,0 +1,326 @@
+<div class="h-[57vh]">
+    <div class="pt-1 h-full">
+        <div class="h-full overflow-auto bg-primary-50 rounded-xl p-4">
+            <!-- Quiz Basic Info -->
+            <div class="grid grid-cols-5 mb-6">
+                <div class="col-span-2 text-accent font-semibold">
+                    <p class="mb-2">Quiz Title</p>
+                    <p class="mb-2">Creator</p>
+                    <p class="mb-2">Author</p>
+                    <p class="mb-2">Authentication Type</p>
+                    <p class="mb-2">Number Of Allowed Submissions</p>
+                    <p class="mb-2">Duration</p>
+                    <p class="mb-2">Allow Exit And ReEntry</p>
+                    <p class="mb-2">Display Correct Answers</p>
+                </div>
+                <div class="col-span-3 text-accent font-medium">
+                    <p class="mb-2">{{quizBasicInfo?.displayName}}</p>
+                    <p class="mb-2">{{quizBasicInfo?.creator}}</p>
+                    <p class="mb-2">{{quizBasicInfo?.author}}</p>
+                    <p class="mb-2">{{quizBasicInfo?.authenticationType}}</p>
+                    <p class="mb-2">{{quizBasicInfo?.numberOfAllowedSubmissions}}</p>
+                    <p class="mb-2">
+                        {{quizBasicInfo?.totalDurationInHours || 0}}h
+                        {{quizBasicInfo?.totalDurationInMinutes || 0}}m
+                        {{quizBasicInfo?.totalDurationInSeconds || 0}}s
+                    </p>
+                    <p class="mb-2">{{quizBasicInfo?.allowExitAndReEntry}}</p>
+                    <p class="mb-2">{{quizBasicInfo?.displayCorrectAnswers}}</p>
+                </div>
+            </div>
+
+            <!-- Case Study / Background Info Section -->
+            <div *ngIf="backgroundInfo" class="bg-primary-100 shadow border rounded-xl p-4 mb-6">
+                <div class="flex items-center mb-4">
+                    <mat-icon class="text-primary-600 mr-2">description</mat-icon>
+                    <h3 class="text-lg font-semibold text-accent">Case Study Background Information</h3>
+                </div>
+
+                <!-- Case Study Title -->
+                <div *ngIf="backgroundInfo?.title" class="grid grid-cols-5 mb-3">
+                    <div class="col-span-2 text-accent font-semibold">
+                        Case Study Title
+                    </div>
+                    <div class="col-span-3 text-accent font-medium">
+                        {{backgroundInfo?.title}}
+                    </div>
+                </div>
+
+                <!-- Background Description (contains inline images & PDFs) -->
+                <div *ngIf="backgroundInfo?.description" class="grid grid-cols-5 mb-3">
+                    <div class="col-span-2 text-accent font-semibold">
+                        Background Description
+                    </div>
+                    <div class="col-span-3 text-accent font-medium">
+                        <div class="bg-card border shadow rounded-xl p-3 case-study-preview">
+                            <quill-view-html [content]="backgroundInfo?.description"></quill-view-html>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Info about inline media -->
+                <div *ngIf="backgroundInfo?.images?.length > 0" class="grid grid-cols-5 mb-3">
+                    <div class="col-span-2 text-accent font-semibold">
+                        Attached Media
+                    </div>
+                    <div class="col-span-3 text-accent font-medium">
+                        <div class="flex items-center text-sm text-gray-600">
+                            <mat-icon class="text-cyan-600 icon-size-5 mr-1">attach_file</mat-icon>
+                            <span>{{backgroundInfo?.images?.length}} file(s) embedded in description</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Preview Quiz Questions -->
+            <div *ngFor="let quiz of quizQusInfo?.questions; let i = index">
+                <div class="bg-primary-100 shadow border rounded-xl p-4 mb-3">
+                    <!-- Question Title -->
+                    <div class="grid grid-cols-5 mb-2">
+                        <div class="col-span-2 text-accent font-semibold">
+                            Question {{i + 1}}
+                        </div>
+                        <div *ngIf="quiz?.questionType === 'MCQ'; else not_mcq_question_type"
+                            class="bg-card border shadow rounded-xl col-span-3 text-accent font-medium">
+                            <quill-view-html class="card" [content]="quiz.questionTitle"></quill-view-html>
+                        </div>
+                        <ng-template #not_mcq_question_type>
+                            <div class="bg-card border shadow rounded-xl col-span-3 text-accent font-medium">
+                                {{quiz?.questionTitle}}
+                            </div>
+                        </ng-template>
+                    </div>
+
+                    <!-- Question Type -->
+                    <div class="grid grid-cols-5 mb-2">
+                        <div class="col-span-2 text-accent font-semibold">
+                            Question Type
+                        </div>
+                        <div class="col-span-3 text-accent font-medium">
+                            {{quiz?.questionType}}
+                        </div>
+                    </div>
+
+                    <!-- Pedagogy Type -->
+                    <div class="grid grid-cols-5 mb-2">
+                        <div class="col-span-2 text-accent font-semibold">
+                            Pedagogy Type
+                        </div>
+                        <div class="col-span-3 text-accent font-medium">
+                            {{quiz?.pedagogyType}}
+                        </div>
+                    </div>
+
+                    <!-- Marks -->
+                    <div class="grid grid-cols-5 mb-2">
+                        <div class="col-span-2 text-accent font-semibold">
+                            Marks
+                        </div>
+                        <div class="col-span-3 text-accent font-medium">
+                            {{quiz?.marks}}
+                        </div>
+                    </div>
+
+                    <!-- Answer (for TEXT type) -->
+                    <div *ngIf="quiz?.answer" class="grid grid-cols-5 mb-2">
+                        <div class="col-span-2 text-accent font-semibold">
+                            Answer
+                        </div>
+                        <div class="col-span-3 text-accent font-medium">
+                            {{quiz?.answer}}
+                        </div>
+                    </div>
+
+                    <!-- Optional Resources -->
+                    <ng-container *ngIf="quiz?.optionalResource?.length > 0">
+                        <div class="grid grid-cols-5 mb-2">
+                            <div class="col-span-2 text-accent font-semibold pt-3">
+                                Resources
+                            </div>
+                            <div class="col-span-3 text-accent font-medium">
+                                <div *ngFor="let res of quiz?.optionalResource; let resourceIndex = index">
+                                    <div class="bg-primary-50 p-4 border shadow rounded-xl mb-3">
+                                        <p class="mb-3">{{resourceIndex + 1}}</p>
+                                        <div class="mb-3 grid grid-cols-3">
+                                            <p class="col-span-1 text-primary-700">Display Title&nbsp;:&nbsp;</p>
+                                            <p class="col-span-2">{{res?.resourceName}}</p>
+                                        </div>
+                                        <div class="mb-3 grid grid-cols-3">
+                                            <p class="col-span-1 text-primary-700">Type&nbsp;:&nbsp;</p>
+                                            <p class="col-span-2">{{res?.type}}</p>
+                                        </div>
+                                        <div class="mb-3 grid grid-cols-3">
+                                            <p class="col-span-1 text-primary-700">Resource Path&nbsp;:&nbsp;</p>
+                                            <p [matTooltip]="res?.resourcePath" class="col-span-2 line-clamp-1">
+                                                {{res?.resourcePath}}</p>
+                                        </div>
+                                        <div *ngIf="res?.resourcePath" class="mb-3 grid grid-cols-3">
+                                            <p class="col-span-1 text-primary-700"></p>
+                                            <div class="col-span-2">
+                                                <a *ngIf="res?.type !== 'VIDEO'" mat-stroked-button target="_blank"
+                                                    [href]="res?.resourcePath | getDownloadURL">
+                                                    View
+                                                </a>
+                                                <a *ngIf="res?.type === 'VIDEO'" mat-stroked-button target="_blank"
+                                                    [href]="res?.resourcePath">
+                                                    Watch Video
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+
+                    <!-- Options (MCQ) -->
+                    <ng-container *ngIf="quiz?.options?.length > 0">
+                        <div class="grid grid-cols-5 mb-2">
+                            <div class="col-span-2 text-accent font-semibold pt-3">
+                                Options
+                            </div>
+                            <div class="col-span-3 text-accent font-medium">
+                                <div class="bg-primary-50 p-4 border shadow rounded-xl mb-3">
+                                    <div *ngFor="let opt of quiz?.options; let optionIndex = index"
+                                        class="flex mb-2 items-start">
+                                        <p>{{ optionIndex + 1 }}:&nbsp;</p>
+                                        <div class="flex items-center">
+                                            <ng-container *ngIf="opt?.optionType === 'TEXT'">
+                                                <p>{{ opt?.name }}</p>
+                                            </ng-container>
+                                            <ng-container *ngIf="opt?.optionType === 'IMAGE'">
+                                                <img *ngIf="opt.imagePath?.startsWith('blob:')"
+                                                    [src]="sanitizeBlobUrl(opt.imagePath)"
+                                                    class="h-16 w-16 object-contain border rounded"
+                                                    alt="Option image (blob)" />
+                                                <img *ngIf="!opt.imagePath?.startsWith('blob:')"
+                                                    [src]="opt.imagePath | getDownloadURL"
+                                                    class="h-16 w-16 object-contain border rounded"
+                                                    alt="Option image (firebase)" />
+                                            </ng-container>
+                                            <p class="pt-1" *ngIf="opt?.isCorrect">
+                                                <mat-icon class="text-green-600 ml-1 icon-size-4"
+                                                    svgIcon="heroicons_solid:check-circle">
+                                                </mat-icon>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+
+                    <!-- Blanks (FILL_IN_THE_BLANKS / RICH_BLANKS) -->
+                    <ng-container *ngIf="quiz?.blanks">
+                        <div class="grid grid-cols-5 mb-2">
+                            <div class="col-span-2 text-accent font-semibold pt-3">
+                                Options
+                            </div>
+                            <div class="col-span-3 text-accent font-medium">
+                                <div *ngFor="let blank of quiz?.blanks | keyvalue; let blankIndex = index">
+                                    <div class="bg-primary-50 p-4 border shadow rounded-xl mb-3">
+                                        <p class="text-primary font-medium mb-2">{{blank.key}}</p>
+                                        <div *ngFor="let opt of blank?.value; let optionIndex = index" class="flex mb-2">
+                                            <p>{{optionIndex + 1}}&nbsp;:&nbsp;</p>
+                                            <div class="flex items-center">
+                                                <p>{{opt?.name}}</p>
+                                                <p class="pt-1" *ngIf="opt?.isCorrect">
+                                                    <mat-icon class="text-green-600 ml-1 icon-size-4"
+                                                        svgIcon="heroicons_solid:check-circle"></mat-icon>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+
+                    <!-- Sub-Parts Section -->
+                    <ng-container *ngIf="quiz?.hasSubParts && quiz?.subParts?.length > 0">
+                        <div class="grid grid-cols-5 mb-2">
+                            <div class="col-span-2 text-accent font-semibold pt-3">
+                                Sub-Parts
+                            </div>
+                            <div class="col-span-3 text-accent font-medium">
+                                <!-- Note Banner -->
+                                <div class="bg-blue-50 border-l-4 border-blue-500 text-blue-700 p-3 mb-3 rounded">
+                                    <div class="flex items-center">
+                                        <mat-icon class="text-blue-500 mr-2 icon-size-5">info</mat-icon>
+                                        <span class="text-sm font-medium">
+                                            <strong>Note:</strong> This is a multistep question - marks given only when all sub-parts are correct.
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- Sub-Parts List -->
+                                <div *ngFor="let subPart of quiz?.subParts; let subPartIndex = index">
+                                    <div class="bg-primary-50 p-4 border shadow rounded-xl mb-3">
+                                        <div class="flex justify-between items-center mb-2">
+                                            <p class="text-primary font-bold text-lg">Sub-Part ({{subPart?.label}})</p>
+                                            <span class="text-sm text-gray-600">[{{subPart?.marks}} marks]</span>
+                                        </div>
+                                        <!-- Sub-Part Title with Quill content -->
+                                        <div class="mb-3 text-gray-700 question-title-container">
+                                            <quill-view-html [content]="subPart?.subPartTitle"></quill-view-html>
+                                        </div>
+
+                                        <!-- Sub-Part Options (styled like main question options) -->
+                                        <div *ngIf="subPart?.options?.length > 0" class="ml-4">
+                                            <p class="text-sm text-gray-500 mb-2">
+                                                {{subPart?.oneCorrectOption ? '(Single correct)' : '(Multiple correct)'}}
+                                            </p>
+                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                                <div *ngFor="let opt of subPart?.options; let optIndex = index"
+                                                    class="flex items-center gap-3 py-1">
+                                                    <span class="text-xl font-bold text-gray-700">{{ getAlphabet(optIndex) }}.</span>
+                                                    <!-- TEXT option -->
+                                                    <ng-container *ngIf="opt?.optionType === 'TEXT' || !opt?.optionType; else imageOption">
+                                                        <span class="text-base">{{opt?.name}}</span>
+                                                    </ng-container>
+                                                    <!-- IMAGE option -->
+                                                    <ng-template #imageOption>
+                                                        <img [src]="opt?.imagePath | getDownloadURL"
+                                                            alt="Option image"
+                                                            class="h-16 w-16 object-contain border rounded" />
+                                                    </ng-template>
+                                                    <mat-icon *ngIf="opt?.isCorrect" class="text-green-600 ml-2 icon-size-5"
+                                                        svgIcon="heroicons_solid:check-circle">
+                                                    </mat-icon>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Total Sub-Parts Marks -->
+                                <div class="text-right text-sm text-gray-600">
+                                    Total Sub-Parts Marks: <span class="font-bold text-primary">{{getTotalSubPartMarks(quiz)}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer Buttons -->
+<div class="flex justify-between pt-3">
+    <button matStepperPrevious mat-stroked-button type="submit"
+        class="bg-primary text-white arrowBtnBack disabled:bg-primary-100">
+        <mat-icon class="mr-2 icon-size-5 text-white arrowIconBack"
+            [svgIcon]="'heroicons_solid:arrow-sm-left'"></mat-icon>
+        Back
+    </button>
+    <button [disabled]="btnDisable" (click)="quizSave(quizInfo?.docId)" matStepperNext mat-stroked-button type="submit"
+        class="bg-primary text-white arrowBtn disabled:bg-primary-100">
+        <span *ngIf="!btnDisable">{{this.quizInfo?.questionsData ? 'Update Quiz' : 'Save Quiz'}}</span>
+        <span *ngIf="btnDisable">Saving...</span>
+        <mat-icon *ngIf="!btnDisable" class="ml-2 icon-size-5 text-white arrowIcon"
+            [svgIcon]="'heroicons_solid:arrow-sm-right'"></mat-icon>
+        <mat-spinner *ngIf="btnDisable" diameter="20" class="ml-2"></mat-spinner>
+    </button>
+</div>

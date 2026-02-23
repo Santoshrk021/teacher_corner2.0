@@ -1,0 +1,323 @@
+<!-- <div *ngIf="programmes; else noClassroomTemplate" class="absolute inset-0 flex flex-col min-w-0 overflow-y-auto" -->
+<div *ngIf="contestandClassrooms$.length!==0 && selectedIndex !== undefined; else noClassroomTemplate"
+    class="absolute inset-0 flex flex-col min-w-0 overflow-y-auto" cdkScrollable>
+    <!-- <mat-tab-group class="" #tabGroup animationDuration="0"> -->
+    <!-- <mat-tab-group class="" #tabGroup animationDuration="0" [selectedIndex]="selectedIndex"> -->
+
+    <!-- <mat-tab-group #tabGroup animationDuration="0" [selectedIndex]="selectedIndex"> -->
+    <mat-tab-group #tabGroup animationDuration="0" [selectedIndex]="selectedIndex"
+        (selectedTabChange)="onClickTab($event,false)">
+        <div *ngFor="let programme of  contestandClassrooms$ ; let i = index">
+            <mat-tab *ngIf="programme.programmeName ; else showcontest"
+                [disabled]="(arrayofTabs[i]==false) && (loadingClassroomData || loadingdata)">
+                <ng-template mat-tab-label>
+                    <!-- <span (click)="onClickTab(programme)"> -->
+                    <span>
+                        {{
+                        programme?.displayName ? programme?.displayName : programme?.programmeName
+                        }}
+                    </span>
+                    <span (click)="openRemoteDialog()" matTooltip="Link Remotes"
+                        class="cursor-pointer ml-2 -mb-1 transform transition duration-500 hover:scale-110">
+                        <mat-icon class="text-primary icon-size-5" svgIcon="heroicons_outline:device-phone-mobile"></mat-icon>
+                    </span>
+                    <span (click)="toggle()" matTooltip="View Students/Teachers Info"
+                        class="cursor-pointer ml-2 -mb-1 transform transition duration-500 hover:scale-110">
+                        <mat-icon class="text-primary icon-size-5 settingIcon" svgIcon="mat_solid:settings"></mat-icon>
+                        <!-- <mat-icon class="text-primary" svgIcon="mat_outline:edit_note"></mat-icon> -->
+                    </span>
+                </ng-template>
+                <div class="flex flex-auto">
+                    <div class="flex flex-col flex-auto w-full max-w-xs sm:max-w-5xl mx-auto">
+                        <!-- Filters -->
+                        <div
+                            class="flex flex-col sm:flex-row items-center justify-between w-full max-w-xs sm:max-w-none scale-95">
+
+                            <!-- Label + Select: stacked on mobile, inline on desktop -->
+                            <div class="flex flex-col sm:flex-row items-start sm:items-center mr-3 sm:-ml-6">
+                                <div class="text-slate-500 mb-2 sm:mb-0 sm:mr-3">
+                                    Learning Unit Type
+                                </div>
+
+                                <mat-form-field class="fuse-mat-no-subscript w-full sm:w-36 sm:mr-3">
+                                    <mat-select [(ngModel)]="selectedGame.code"
+                                        (selectionChange)="selectedType($event)">
+                                        <mat-option *ngFor="let elem of luType" [value]="elem.code">
+                                            {{elem.name}}
+                                        </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+
+                            <!-- Search + Toggle: stacked on mobile, inline on desktop with 40px gap -->
+                            <div class="flex flex-col sm:flex-row items-center w-full sm:w-auto">
+                                <mat-form-field class="fuse-mat-no-subscript w-full sm:w-72 mt-4 sm:mt-0"
+                                    [floatLabel]="'always'">
+                                    <mat-icon matPrefix class="icon-size-5"
+                                        [svgIcon]="'heroicons_solid:search'"></mat-icon>
+                                    <input (input)="filterByQuery(query.value)"
+                                        placeholder="Search by learning unit code or name" matInput #query />
+                                </mat-form-field>
+
+                                <!-- Mobile: below search & centered. Desktop: right of search with 40px space -->
+                                <div class="mt-4 sm:mt-0 sm:ml-[40px] self-center sm:self-auto text-secondary">
+                                    <mat-slide-toggle *ngIf="filterProgramme" [color]="'primary'"
+                                        (change)="toggleList($event)" [(ngModel)]="listView" [checked]="listView">
+                                        List View Toggle
+                                    </mat-slide-toggle>
+                                </div>
+                            </div>
+
+                            <!-- Progress toggle unchanged -->
+                            <div class="mt-8 sm:mt-0 sm:ml-auto text-secondary" *ngIf="!disableProgressToggle">
+                                <mat-slide-toggle [color]="'primary'" (change)="toggleProgressMonitoring($event)"
+                                    [(ngModel)]="monitorProgress" [checked]="monitorProgress">
+                                    Progress Toggle
+                                </mat-slide-toggle>
+                            </div>
+                        </div>
+
+                        <!--  card -->
+                        <ng-container *ngIf="!listView">
+                            <ng-container *ngIf="filterProgramme; else notactivities">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-8 sm:mt-10"
+                                    *ngIf="loadingdata==false;else bb">
+                                    <!-- <ng-container *ngFor="
+                                            let tac of filterProgramme;
+                                            trackBy: trackByFn
+                                        "> -->
+                                    <ng-container *ngFor="
+                                        let tac of filteredLearningUnitsinprogram;
+                                        let i = index;
+                                        trackBy: trackByFn
+                                    ">
+                                        <!-- tactivity -->
+                                        <!-- <div *ngIf="tac | async as tactivity"> -->
+                                        <div *ngIf="tac as tactivity">
+                                            <app-learning-unit-card [tactivity]="tactivity"
+                                                [teacherInfo]="currentTeacherInfo"
+                                                [workflowCompletion]="workflowCompletionList[tactivity.docId]"
+                                                [workflowId]="workflowIds ? (workflowIds|arrayToNestedObject)[tactivity.docId] : ''"
+                                                [trackProgress]="monitorProgress"
+                                                [sequentiallyLocked]="sequentiallyLocked"
+                                                [allTactivities]="filteredLearningUnitsinprogram" [index]="i"
+                                                [noWorkflow]="learningUnitsWithoutWorkflow.includes(tactivity.docId)"
+                                                [privilege]="privilege" [stepsUnlocked]="stepsUnlockedArray[i]"
+                                                [dateLocked]="dateLockArray[i]"
+                                                [lockUnlockDate]="lockUnlockDateArray[i]"></app-learning-unit-card>
+                                            <!-- [workflowId]="programme?.workflowIds ? (programme?.workflowIds|arrayToNestedObject)[tactivity.docId] : ''" -->
+                                        </div>
+
+                                    </ng-container>
+                                </div>
+                                <ng-template #bb>
+                                    <div
+                                        class="flex flex-auto flex-col items-center justify-center mt-40 ml-4 bg-gray-100 dark:bg-transparent scale-50">
+                                        <mat-spinner></mat-spinner>
+                                    </div>
+                                </ng-template>
+                            </ng-container>
+                        </ng-container>
+
+                        <!-- No tactivities -->
+                        <ng-template #notactivities>
+                            <ng-container *ngIf="!isSpinner; else spinner">
+                                <div
+                                    class="flex flex-auto flex-col items-center justify-center mt-24 bg-gray-100 dark:bg-transparent">
+                                    <mat-icon class="icon-size-24" [svgIcon]="'mat_outline:science'"></mat-icon>
+                                    <div class="mt-6 text-2xl font-semibold tracking-tight text-secondary">
+                                        No tactivities found!
+                                    </div>
+                                </div>
+                            </ng-container>
+                            <ng-template #spinner>
+                                <div
+                                    class="flex flex-auto flex-col items-center justify-center mt-30 bg-gray-100 dark:bg-transparent scale-75">
+                                    <mat-spinner></mat-spinner>
+                                </div>
+                            </ng-template>
+                        </ng-template>
+
+                        <!-- list view -->
+                        <ng-container *ngIf="listView">
+                            <app-learning-unit-list [filterProgramme]="filterProgramme" [selecttype]="selectedElem"
+                                [searchSub]="filters.query$" [programLUs]="learingUnitsinProgram"
+                                [learningType]="selectedTypeCode$" [teacherInfo]="currentTeacherInfo"
+                                [sequentiallyLocked]="sequentiallyLocked"
+                                [allTactivities]="filteredLearningUnitsinprogram"
+                                [lusWithoutWorkflows]="learningUnitsWithoutWorkflow" [privilege]="privilege"
+                                [stepsUnlocked]="stepsUnlockedArray" [dateLocked]="dateLockArray"
+                                [lockUnlockDate]="lockUnlockDateArray"></app-learning-unit-list>
+                        </ng-container>
+
+                        <!-- assignments table -->
+                        <div *ngIf="assignmentInfoArr.length > 0">
+                            <app-assignments-table [currentTeacherInfo]="currentTeacherInfo"
+                                [assignmentData]="assignmentInfoArr"></app-assignments-table>
+                        </div>
+
+                        <!-- <app-buynow></app-buynow> -->
+                    </div>
+                </div>
+            </mat-tab>
+            <ng-template #showcontest>
+
+                <mat-tab [disabled]="(arrayofTabs[i]==false) && (loadingClassroomData || loadingdata)">
+                    <ng-template mat-tab-label>
+                        <!-- <span (click)="onClickTab(programme)"> -->
+                        <span>
+                            {{programme.contest?.contestTitle}} - {{programme?.stageName?.stageName}}
+                        </span>
+
+                    </ng-template>
+                    <div class="flex flex-auto">
+                        <div class="flex flex-col flex-auto w-full max-w-xs sm:max-w-5xl mx-auto">
+
+                            <!--  card -->
+                            <ng-container class="w-full">
+                                <ng-container class="w-full">
+                                    <div class="" *ngIf="loadingdata==false;else bb">
+                                        <app-classroom-contest-card class="w-full" [stageData]="programme"
+                                            [currentQueryparams]="currentQueryparams"></app-classroom-contest-card>
+                                    </div>
+                                    <ng-template #bb>
+                                        <div
+                                            class="flex flex-auto flex-col items-center justify-center mt-40 ml-4 bg-gray-100 dark:bg-transparent scale-50">
+                                            <mat-spinner></mat-spinner>
+                                        </div>
+                                    </ng-template>
+                                </ng-container>
+                            </ng-container>
+
+                            <!-- No tactivities -->
+                            <ng-template #notactivities>
+                                <ng-container *ngIf="!isSpinner; else spinner">
+                                    <div
+                                        class="flex flex-auto flex-col items-center justify-center mt-24 bg-gray-100 dark:bg-transparent">
+                                        <mat-icon class="icon-size-24" [svgIcon]="'mat_outline:science'"></mat-icon>
+                                        <div class="mt-6 text-2xl font-semibold tracking-tight text-secondary">
+                                            No tactivities found!
+                                        </div>
+                                    </div>
+                                </ng-container>
+                                <ng-template #spinner>
+                                    <div
+                                        class="flex flex-auto flex-col items-center justify-center mt-30 bg-gray-100 dark:bg-transparent scale-75">
+                                        <mat-spinner></mat-spinner>
+                                    </div>
+                                </ng-template>
+                            </ng-template>
+
+                            <!-- assignments table -->
+                            <div *ngIf="assignmentInfoArr.length > 0">
+                                <app-assignments-table [currentTeacherInfo]="currentTeacherInfo"
+                                    [assignmentData]="assignmentInfoArr"></app-assignments-table>
+                            </div>
+
+                        </div>
+                    </div>
+                </mat-tab>
+
+            </ng-template>
+
+            <ng-template mat-tab-label>
+                <span>label{{ programme.value.programmeName }}</span>
+            </ng-template>
+        </div>
+        <!-- <div *ngFor="let stage of  flattenedStages ">
+            <mat-tab>
+                <ng-template mat-tab-label>
+                    <span>
+                        {{stage.contest?.contestTitle}} - {{stage?.stageName?.stageName}}
+                    </span>
+
+                </ng-template>
+                <div class="flex flex-auto">
+                    <div class="flex flex-col flex-auto w-full max-w-xs sm:max-w-5xl mx-auto">
+
+                        <ng-container  class="w-full">
+                            <ng-container class="w-full">
+                                <div class=""
+                                    *ngIf="loadingdata==false;else bb">
+                                    <app-classroom-contest-card class="w-full" [stageData]="stage" ></app-classroom-contest-card>
+                                </div>
+                                <ng-template #bb>
+                                    <div
+                                        class="flex flex-auto flex-col items-center justify-center mt-40 ml-4 bg-gray-100 dark:bg-transparent scale-50">
+                                        <mat-spinner></mat-spinner>
+                                    </div>
+                                </ng-template>
+                            </ng-container>
+                        </ng-container>
+
+                        <ng-template #notactivities>
+                            <ng-container *ngIf="!isSpinner; else spinner">
+                                <div
+                                    class="flex flex-auto flex-col items-center justify-center mt-24 bg-gray-100 dark:bg-transparent">
+                                    <mat-icon class="icon-size-24" [svgIcon]="'mat_outline:science'"></mat-icon>
+                                    <div class="mt-6 text-2xl font-semibold tracking-tight text-secondary">
+                                        No tactivities found!
+                                    </div>
+                                </div>
+                            </ng-container>
+                            <ng-template #spinner>
+                                <div
+                                    class="flex flex-auto flex-col items-center justify-center mt-30 bg-gray-100 dark:bg-transparent scale-75">
+                                    <mat-spinner></mat-spinner>
+                                </div>
+                            </ng-template>
+                        </ng-template>
+
+                        <div *ngIf="assignmentInfoArr.length > 0">
+                            <app-assignments-table [currentTeacherInfo]="currentTeacherInfo"
+                                [assignmentData]="assignmentInfoArr"></app-assignments-table>
+                        </div>
+
+                    </div>
+                </div>
+            </mat-tab>
+
+            <ng-template mat-tab-label>
+            </ng-template>
+        </div> -->
+    </mat-tab-group>
+</div>
+
+<ng-template #noClassroomTemplate>
+    <div *ngIf="!enabledSpinner; else spinnerTemplate"
+        class="flex text-accent-500 -ml-20 font-medium text-xl justify-center items-center w-[80vw] h-full flex-col">
+        <!-- <div class="">
+            Oops, Your are not belong to any classroom.Click here for
+            <a href="registration" class="text-blue-600 visited:text-purple-600 underline">
+                self registration.</a>
+        </div> -->
+        <p>No programme has been assigned to this classroom.</p>
+        <br>
+        <p>
+            Please contact us on WhatsApp at
+            <a class="text-[#049CD8] underline" target="_blank" [href]="'https://wa.me/' + environment.whatsAppSender">
+                +{{environment.whatsAppSender}}
+            </a>
+        </p>
+        <p>or by email at
+            <a class="text-[#049CD8] underline" [href]="'mailto:' + environment.emailSender">
+                {{environment.emailSender}}
+            </a>
+            for further assistance.
+        </p>
+    </div>
+</ng-template>
+
+<ng-template #spinnerTemplate>
+    <div
+        class="flex text-accent-500 font-medium text-2xl w-[80vw] h-full flex-auto flex-col items-center justify-center bg-gray-100 dark:bg-transparent scale-50">
+        <mat-spinner></mat-spinner>
+    </div>
+</ng-template>
+
+<fuse-drawer class="w-screen min-w-screen z-999" [opened]="drawerOpened" fixed [mode]="'over'" [name]="'settingsDrawer'"
+    [position]="'left'" #settingsDrawer>
+    <div>
+        <ng-container *ngComponentOutlet="component"></ng-container>
+    </div>
+</fuse-drawer>

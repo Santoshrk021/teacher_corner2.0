@@ -1,0 +1,93 @@
+<div class="h-[calc(100vh_-_250px)]">
+    <div class="pt-1 h-full">
+        <div class=" h-full overflow-auto bg-primary-50  rounded-xl p-4">
+            <!-- quiz info -->
+            <div class="grid grid-cols-5 mb-6">
+                <div class="col-span-2 text-accent font-semibold">
+                    <p class="mb-2">Country</p>
+                    <p class="mb-2">Board</p>
+                    <p class="mb-2">School Affiliation Number or UDISE Code</p>
+                    <p class="mb-2">School Name</p>
+                    <p class="mb-2">Medium of Instruction</p>
+                    <p class="mb-2">Type of school</p>
+                    <p class="mb-2">Boys / Girls / Co-ed</p>
+                    <p class="mb-2">School Pincode</p>
+                    <p class="mb-2">Street Name</p>
+                    <p class="mb-2">Locality Name</p>
+                    <p class="mb-2">Landmark</p>
+                    <p class="mb-2">City Name</p>
+                    <p class="mb-2">Sub District Name</p>
+                    <p class="mb-2">District Name</p>
+                    <p class="mb-2">State Name</p>
+                    <p class="mb-2">School Representative Contact Number</p>
+                    <p class="mb-2">School Representative First Name</p>
+                    <p class="mb-2">School Representative Last Name</p>
+                    <p class="mb-2">School Representative Email</p>
+                </div>
+
+                <div class="col-span-3 text-accent font-medium">
+                    <p class="mb-2">{{instituteInfo?.institutionAddress.country}}</p>
+                    <p class="mb-2">{{instituteInfo?.board}}</p>
+                    <p class="mb-2">{{instituteInfo?.registrationNumber}}</p><br />
+                    <p class="mb-2">{{instituteInfo?.institutionName}}</p>
+                    <p class="mb-2">{{instituteInfo?.medium}}</p>
+                    <p class="mb-2">{{instituteInfo?.typeofSchool}}</p>
+                    <p class="mb-2">{{instituteInfo?.genderType}}</p>
+                    <p class="mb-2">{{instituteInfo?.institutionAddress.pincode}}</p>
+                    <p class="mb-2">{{instituteInfo?.institutionAddress.street}}</p>
+                    <p class="mb-2">{{instituteInfo?.institutionAddress.village}}</p>
+                    <p class="mb-2">{{instituteInfo?.institutionAddress.landmark}}</p>
+                    <p class="mb-2">{{instituteInfo?.institutionAddress.city}}</p>
+                    <p class="mb-2">{{instituteInfo?.institutionAddress.subDistrict}}</p>
+                    <p class="mb-2">{{instituteInfo?.institutionAddress.district}}</p>
+                    <p class="mb-2">{{instituteInfo?.institutionAddress.state}}</p>
+                    <p class="mb-2">
+                        {{instituteInfo?.representativeCountryCode}}{{instituteInfo?.representativePhoneNumber}}</p>
+                    <br />
+                    <p class="mb-2">{{instituteInfo?.representativeFirstName}}</p>
+                    <p class="mb-2">{{instituteInfo?.representativeLastName}}</p>
+                    <p class="mb-2">{{instituteInfo?.representativeEmail}}</p>
+                </div>
+            </div>
+
+            <div class="font-semibold">
+                <p class="text-accent mb-3">Programme Templates :</p>
+                <ng-container *ngIf="programmeTemplateInfo?.classInfoArray?.length; else defaultTemplateMessage">
+                    <div class="" class="flex" *ngFor="let pr of programmeTemplateInfo?.classInfoArray">
+                        <div class="mr-2 mb-3 rounded-full px-2 bg-primary-200 text-primary-500">Grade : {{pr?.grade}}</div>
+                        <div class="mr-2 mb-3 rounded-full px-2 bg-primary-200 text-primary-500">Section : {{pr?.section}}
+                        </div>
+                        <div class="mr-2 mb-3 rounded-full px-2 bg-primary-200 text-primary-500">Subject : {{pr?.subject}}
+                        </div>
+                        <div class="rounded-full mb-3 px-2 bg-primary-200 text-primary-500">Template :
+                            {{pr?.programmeTemplate}}</div>
+                    </div>
+                </ng-container>
+
+                <ng-template #defaultTemplateMessage>
+                    <p class="text-accent">Programme templates will be created from the CBSE templates</p>
+                </ng-template>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="flex justify-between pt-3">
+    <button matStepperPrevious mat-stroked-button type="button"
+        class="text-primary-600 fuse-mat-stroked-button-large  arrowBtnBack disabled:bg-primary-100">
+        <mat-icon class="mr-2 icon-size-5  text-primary-600 arrowIconBack"
+            [svgIcon]="'heroicons_solid:arrow-sm-left'"></mat-icon>
+        Back
+    </button>
+    <div *ngIf="deleteLoader; else deleted">
+        <mat-spinner [diameter]="30"></mat-spinner>
+    </div>
+    <ng-template #deleted>
+        <button (click)="onSave()" mat-stroked-button type="button"
+            class="text-primary-600 fuse-mat-stroked-button-large arrowBtn disabled:bg-primary-100">
+            Save
+            <mat-icon class="ml-2 icon-size-5  text-primary-600 arrowIcon"
+                [svgIcon]="'heroicons_solid:arrow-sm-right'"></mat-icon>
+        </button>
+    </ng-template>
+</div>

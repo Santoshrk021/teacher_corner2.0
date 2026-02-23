@@ -1,0 +1,154 @@
+.selected-grades-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+  margin-bottom: 8px;
+  align-items: center;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+}
+
+.selected-grade {
+  display: flex;
+  align-items: center;
+  background-color: #e1e8f0;
+  padding: 4px 8px;
+  border-radius: 16px;
+  font-size: 14px;
+  color: #252d39;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.selected-grade:hover {
+  background-color: #c1c1c4;
+}
+
+.selected-grade.disabled {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.remove-grade-icon {
+  font-size: 16px;
+  margin-left: 4px;
+  cursor: pointer;
+  color: #939ba8;
+  transition: color 0.3s ease;
+}
+
+.remove-grade-icon:hover {
+  color: #b91c1c;
+}
+
+.mat-form-field.mat-form-field-disabled {
+  pointer-events: none;
+  border: none;
+}
+
+.mat-form-field.mat-form-field-disabled .mat-form-field-wrapper {
+  border-color: transparent !important;
+}
+
+.mat-form-field-disabled .mat-form-field-flex {
+  opacity: 0.6;
+}
+
+.mat-input-element {
+  min-width: 120px;
+  max-width: 100%;
+  flex-grow: 1;
+  font-size: 14px;
+}
+
+// Upload Tiles
+.grade-tile {
+  padding: 1rem;
+  background-color: #f3f4f6;
+  border-radius: 0.5rem;
+  box-shadow: 0 0 4px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.grade-title {
+  font-weight: 600;
+  text-align: center;
+  margin-top: 0.25rem;
+}
+
+.upload-label {
+  border: 1px solid #049BD8;
+  background-color: #ffffff;
+  color: #049BD8;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  cursor: pointer;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: background-color 0.2s ease;
+}
+
+.upload-label:hover {
+  background-color: #f1f5f9;
+}
+
+.upload-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.view-btn {
+  background-color: #049BD8;
+  color: white;
+  padding: 0.5rem 1.25rem;
+  border-radius: 9999px;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+
+.view-btn:hover {
+  background-color: #049BD8;
+}
+
+.loader {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: block;
+  position: relative;
+  background: #FFF;
+  box-shadow: -24px 0 #FFF, 24px 0 #FFF;
+  animation: shadowPulse 1s linear infinite;
+}
+
+@keyframes shadowPulse {
+  33% {
+    background: #73afc6;
+    box-shadow: -24px 0 #049BD8, 24px 0 #FFF;
+  }
+  66% {
+    background: #049BD8;
+    box-shadow: -24px 0 #FFF, 24px 0 #FFF;
+  }
+  100% {
+    background: #036890;
+    box-shadow: -24px 0 #FFF, 24px 0 #049BD8;
+  }
+}
+
+

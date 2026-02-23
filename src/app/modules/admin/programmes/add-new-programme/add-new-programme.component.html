@@ -1,0 +1,214 @@
+<div *ngIf="!isLoading; else dataLoading">
+  <form *ngIf="newProgramme" [formGroup]="newProgramme" (ngSubmit)="onSubmit(newProgramme)">
+    <div class="h-[63vh] overflow-y-auto md:w-[calc(75vw_-_48px)] sm:w-full mt-2">
+      <div class=" overflow-auto bg-primary-50 rounded-xl p-9 w-140 m-auto">
+
+        <mat-form-field appearance="fill" class="w-full" floatLabel="always">
+          <mat-label class="text-accent-600">Programme Name</mat-label>
+          <input matInput name="programmeName" class="form-contol" placeholder="Enter programme name" required
+            formControlName="programmeName">
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="w-full" floatLabel="always">
+          <mat-label class="text-accent-600">Display Name</mat-label>
+          <input matInput name="displayName" class="form-contol" placeholder="Enter Display name" required
+            formControlName="displayName">
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="w-full" floatLabel="always">
+          <mat-label class="text-accent-600">Programme Code</mat-label>
+          <input type="text" [readonly]="true" matInput name="programmeCode" class="form-contol"
+            placeholder="Enter Programme Code" formControlName="programmeCode">
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="w-full" floatLabel="always">
+          <mat-label class="text-accent-600">Select Programme Status</mat-label>
+          <mat-select formControlName="programmeStatus" placeholder="Select Programme Status">
+            <mat-option *ngFor="let option of programStatus" [value]="option">
+              {{option}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="w-full" floatLabel="always">
+          <mat-label class="text-accent-600">Programme Description</mat-label>
+          <textarea id="message" rows="1" matInput placeholder="Programme description..."
+            formControlName="programDescription"></textarea>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="w-full" floatLabel="always">
+          <mat-label class="text-accent-600">Select Programme Type</mat-label>
+          <mat-select formControlName="type" placeholder="Select Programme Type">
+            <mat-option *ngFor="let option of programType" [value]="option">
+              {{option}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <div class="flex mb-4">
+          <div>
+            <mat-label class="font-medium text-accent-600">Programme Image</mat-label>
+            <div class="mt-1" [ngClass]="{'pointer-events-none':loader}">
+              <div class="flex flex-row w-50">
+                <div class="flex flex-col bg-grey-lighter w-50">
+                  <!-- <label matRipple class=" border border-primary relative right-0
+                    flex flex-col items-center rounded-lg p-2 h-12 cursor-pointer
+                    bg-white text-primary-600 hover:bg-slate-200"> -->
+                  <label matRipple [matRippleDisabled]="disableUploadButton" [ngClass]="{
+                      'disableUpload': disableUploadButton,
+                      'border border-primary rounded-lg text-primary-600 hover:bg-slate-200': !disableUploadButton
+                    }">
+                    <span
+                      class="relative right-0 flex flex-col items-center rounded-lg p-2 h-12 cursor-pointer bg-white">
+                      <span class="absolute left-0 mt-1 ml-2">
+                        <!-- <mat-icon *ngIf="!loader" class="text-primary"
+                          svgIcon="heroicons_outline:arrow-circle-down"></mat-icon> -->
+                        <mat-icon *ngIf="!loader"
+                          [ngClass]="{ 'text-gray-400': disableUploadButton, 'text-primary': !disableUploadButton }"
+                          svgIcon="heroicons_outline:arrow-circle-down"></mat-icon>
+                        <mat-spinner *ngIf="loader" [diameter]="20"></mat-spinner>
+                      </span>
+                      <div class="flex items-center mt-1 ">
+                        <span class=" md:text-base relative sm:text-[10px]">
+                          {{programDetails?.programmeImagePath?'Re-upload':'Upload'}}
+                        </span>
+                      </div>
+                      <input type='file' class="hidden h-12" accept=".png,.jpeg" (change)="selectFile($event)"
+                        [disabled]="disableUploadButton" />
+                    </span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="programDetails?.programmeImagePath || imagePath" class="w-50 ml-6 mt-7">
+            <div matRipple class=" mat-stroked-button right-2 bg-primary text-white
+                      active:bg-primary-800 cursor-pointer text-center ">
+              <a target="_blank" [href]="programDetails?.programmeImagePath ||imagePath | getDownloadURL"
+                class="  h-full flex items-center justify-center">
+                View
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- institution -->
+        <mat-form-field *ngIf="!addNewProgramFlag" appearance="fill" class="w-full ">
+          <mat-label class="text-accent-600">Institution</mat-label>
+          <input readonly matInput name="institutionName" placeholder="Enter Institution name" required
+            formControlName="institutionName">
+        </mat-form-field>
+
+
+        <!-- age/grade -->
+        <div *ngIf="showAgeGrade">
+          <div class="flex items-center scale-90 -ml-6">
+            <button [disabled]="isGrade" (click)="isGrade=!isGrade;ageGradeSelection()" type="button"
+              class="bg-primary-200 text-white mat-stroked-button disabled:bg-primary disabled:text-white disabled:pointer-events-none">
+              Grade
+            </button>
+            <p class="mx-2 font-semibold text-accent">OR</p>
+            <button [disabled]="!isGrade" (click)="isGrade=!isGrade;ageGradeSelection()" type="button"
+              class="bg-primary-200 text-white mat-stroked-button disabled:bg-primary disabled:text-white disabled:pointer-events-none">
+              Age
+            </button>
+          </div>
+          <div class="flex mt-2 ">
+            <p class="font-medium text-accent">
+              {{
+              isGrade ?
+              'Is this programme mapped to a Grade range?' :
+              'Is this programme mapped to a Age range?'
+              }}
+            </p>
+            <mat-slide-toggle class="ml-2" [color]="'primary'" [checked]="showRangeUi"
+              (change)="rangeToggle($event)"></mat-slide-toggle>
+          </div>
+          <ng-container *ngIf="!showRangeUi">
+            <div class="grid grid-cols-2 gap-4 mt-3">
+              <mat-form-field *ngIf="isGrade" class="w-full text-accent-600" floatLabel="always">
+                <mat-label class="text-accent-600">Grade</mat-label>
+                <!-- <mat-select [disabled]="!isGrade" formControlName="grades"  placeholder="Select Grade"> -->
+                <mat-select formControlName="grades" placeholder="Select Grade">
+                  <mat-option value="" disabled selected>Select</mat-option>
+                  <mat-option *ngFor="let gr of gradeList" [value]="gr">
+                    Class {{ gr }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field *ngIf="!isGrade" appearance="fill" class="w-full">
+                <mat-label class="text-accent-600" floatLabel="always">Age (in years)</mat-label>
+                <input matInput type="number" [min]="1" [max]="16" name="age" placeholder="Enter Age"
+                  formControlName="age">
+              </mat-form-field>
+            </div>
+          </ng-container>
+
+          <ng-container *ngIf="showRangeUi">
+            <div class="mt-2">
+              <div *ngIf="isGrade">
+                <mat-label class="text-accent-600 font-medium ">Grade Range</mat-label>
+                <ngx-slider formControlName="grades" class="w-full " [(value)]="lowValueGrade"
+                  [(highValue)]="highValueGrade" [options]="optionsGrade"></ngx-slider>
+              </div>
+
+              <div *ngIf="!isGrade">
+                <mat-label class="text-accent-600 font-medium ">Age Range (in years)</mat-label>
+                <ngx-slider formControlName="age" class="w-full " [(value)]="lowValueAge" [(highValue)]="highValueAge"
+                  [options]="optionsAge"></ngx-slider>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="addNewProgramFlag" class="z-99 pt-1 flex justify-between">
+      <!-- <button mat-raised-button matStepperNext color="primary" type="submit"
+      [disabled]="!newProgramme.valid">{{addNewProgramFlag?'continue':'save'}}</button> -->
+
+      <!-- <button matStepperNext mat-stroked-button type="submit" [disabled]="!newProgramme.valid"
+        class="bg-primary text-white arrowBtn disabled:bg-primary-100">
+        {{addNewProgramFlag?'Continue':'Save'}}
+        <mat-icon class="ml-2 icon-size-5  text-white arrowIcon" [svgIcon]="'heroicons_solid:arrow-sm-right'"></mat-icon>
+      </button> -->
+
+      <button matStepperPrevious mat-stroked-button type="button"
+        class="bg-primary text-white  arrowBtnBack disabled:bg-primary-100">
+        <mat-icon class="mr-2 icon-size-5  text-white arrowIconBack"
+          [svgIcon]="'heroicons_solid:arrow-sm-left'"></mat-icon>
+        Back
+      </button>
+
+      <button matStepperNext mat-stroked-button type="submit" [disabled]="!newProgramme?.valid"
+        class="bg-primary text-white arrowBtn disabled:bg-primary-100">
+        Continue
+        <mat-icon class="ml-2 icon-size-5  text-white arrowIcon"
+          [svgIcon]="'heroicons_solid:arrow-sm-right'"></mat-icon>
+      </button>
+    </div>
+
+    <div *ngIf="!addNewProgramFlag" class="text-center pt-2">
+      <button mat-stroked-button type="submit" class="bg-primary text-white  disabled:bg-primary-100"
+        [disabled]="loading">
+        <div *ngIf="loading; else saveButton">
+          <mat-spinner [diameter]="30"></mat-spinner>
+        </div>
+        <ng-template #saveButton>
+          Save
+        </ng-template>
+      </button>
+    </div>
+  </form>
+</div>
+
+<ng-template #dataLoading>
+  <div class="flex justify-center items-center">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+</ng-template>
+<!-- <div *ngIf="!addNewProgramFlag" matStepperNext class="z-99 pt-1 flex flex-row-reverse">
+  <button mat-raised-button color="primary" type="submit" [disabled]="!newProgramme.valid">save</button>
+</div> -->

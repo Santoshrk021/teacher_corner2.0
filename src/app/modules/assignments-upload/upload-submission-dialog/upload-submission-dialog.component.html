@@ -1,0 +1,29 @@
+<div class="px-4 pt-4 relative">
+    <button mat-dialog-close class="m-4 sm:m-6 sm:mx-7 absolute -top-10 -right-10 z-40">
+        <mat-icon class=" hover:scale-110 transition duration-5000 transform" svgIcon="mat_outline:close">
+        </mat-icon>
+    </button>
+
+    <div class="bg-white rounded-2xl  flex flex-col  mb-4 font-medium">
+        <div class="grid grid-cols-12 mb-2">
+            <div class="col-span-4 text-primary ">Name</div>
+            <div class="col-span-1">:</div>
+            <div class="col-span-7">{{this.data?.quizInfo?.studentInfo?.firstName}} {{this.data?.quizInfo?.studentInfo?.lastName}}</div>
+        </div>
+        <div class="grid grid-cols-12 mb-2">
+            <div class="col-span-4 text-primary ">Id</div>
+            <div class="col-span-1">:</div>
+            <div class="col-span-7">{{this.data?.quizInfo?.studentInfo?.docId}}</div>
+        </div>
+        <div class="grid grid-cols-12 mb-2">
+            <div class="col-span-4 text-primary ">Due Date</div>
+            <div class="col-span-1">:</div>
+            <div class="col-span-7">{{this.data?.quizInfo?.assignmentDueDate.seconds * 1000 | date:'medium'}}</div>
+        </div>
+        <div class="grid grid-cols-12 mb-2">
+            <div class="col-span-4 text-primary ">Attempt Time</div>
+            <div class="col-span-1">:</div>
+            <div class="col-span-7">{{this.data?.quizInfo?.attemptTime.seconds * 1000 | date:'medium'}}</div>
+        </div>
+    </div>
+</div>

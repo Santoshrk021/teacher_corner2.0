@@ -1,0 +1,137 @@
+<ng-container *ngIf="isLoaded; else notLoaded">
+    <form [formGroup]="infoForm" (ngSubmit)="onSubmit(infoForm)">
+        <div class="h-[63vh] overflow-y-auto w-[calc(75vw_-_48px)] mt-2">
+            <div class=" overflow-auto bg-primary-50 rounded-xl p-9 w-140 m-auto">
+
+                <!-- country -->
+                <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                    <mat-label class="text-[#282B66]">Select Country</mat-label>
+                    <mat-select formControlName="country" placeholder="Select Country Name">
+                        <mat-option value="" disabled selected>Select</mat-option>
+                        <mat-option *ngFor="let country of countryCodes|keyvalue" [value]="country?.key" matTooltipPosition="right" [matTooltip]="country?.value?.displayName">{{country?.value?.displayName}}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <!-- pin code -->
+                <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                    <mat-label class="text-[#282B66]">Search a school from pincode</mat-label>
+                    <input id="pincode" maxlength="9" matInput formControlName="pincode" type="text"
+                        placeholder="Enter School Pincode">
+                    <mat-error *ngIf="infoForm.get('pincode').invalid">
+                        School Pincode is required
+                    </mat-error>
+                </mat-form-field>
+
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="col-span-2">
+                        <!-- school board -->
+                        <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                            <mat-label class="text-[hsl(237,44%,28%)]">Select Board</mat-label>
+                            <mat-select formControlName="board" placeholder="Select Board Name">
+                                <mat-option value="" disabled selected>Select</mat-option>
+                                <mat-option *ngFor="let board of countryBoard" [value]="board?.code" matTooltipPosition="right" [matTooltip]="board?.name" class="text-sm">
+                                    {{board?.name}}
+                                </mat-option>
+                                <mat-option *ngIf="!isAddNewBoard && infoForm?.get('country')?.value !== 'india'">
+                                    <span
+                                        class="bg-gray-200 rounded-full text-gray-500 py-2 px-4"
+                                        (click)="isAddNewBoard = true;"
+                                    >Add A New Board&nbsp;&nbsp;
+                                        <mat-icon class="m-0" svgIcon="feather:plus-circle"></mat-icon>
+                                    </span>
+                                </mat-option>
+                                <mat-option *ngIf="isAddNewBoard" [value]="addNewBoard.value">
+                                    <div class="flex flex-row">
+                                        <input
+                                            type="text"
+                                            #addNewBoard
+                                            matInput
+                                            id="addNewBoard"
+                                            formControlName="board"
+                                            (click)="$event.stopPropagation()"
+                                            (keydown)="$event.stopPropagation()"
+                                            placeholder="Enter Board Name"
+                                        >
+                                        <span>
+                                            <mat-icon
+                                                class="m-0 text-red-500"
+                                                svgIcon="heroicons_solid:x-mark"
+                                                matTooltip="Clear the field"
+                                                (click)="schoolInfo?.get('board')?.reset(); isAddNewBoard = false"
+                                            ></mat-icon>
+                                        </span>
+                                        <span>
+                                            <mat-icon
+                                                class="m-0 ml-2 text-green-500"
+                                                svgIcon="heroicons_solid:check"
+                                                matTooltip="Save the new board"
+                                                (click)="saveNewBoard()"
+                                            ></mat-icon>
+                                        </span>
+                                    </div>
+                                </mat-option>
+                            </mat-select>
+
+                            <mat-error *ngIf="infoForm.get('board')?.invalid &&infoForm.get('board')?.touched">
+                                School Board is required
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div>
+                        <button type="button" color="brand"
+                            class="fuse-mat-stroked-button-large w-full mt-6 bg-primary text-white disabled:bg-slate-300"
+                            mat-flat-button
+                            color="primary"
+                            mat-flat-button
+                            (click)="onClickSearch()"
+                            [disabled]="!searchBtnClick"
+                            #search
+                        >
+                            Search
+                        </button>
+                        <!-- [disabled]="!infoForm?.value?.board || infoForm?.value?.pincode?.errors" -->
+                    </div>
+                </div>
+                <!-- school -->
+                <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                    <mat-label class="text-[#282B66]">Select School</mat-label>
+                    <mat-select formControlName="institution" placeholder="Select School form the list" [compareWith]="compareInstitutions">
+                        <!-- [disabled]="!searchBtnClick || infoForm?.value?.pincode?.invalid" -->
+                        <!-- <mat-select formControlName="institutionName" placeholder="Select School form the list"
+                        (infiniteScroll)="getNextBatch()" msInfiniteScroll [disabled]="!searchBtnClick"> -->
+                        <!-- [complete]="offset === school$?.length" -->
+                        <mat-option value="" disabled selected>Select school from the list</mat-option>
+                        <mat-option *ngFor="let school of institutions$ | async" [value]="school.payload.doc.data()">
+                            {{school.payload.doc.data().institutionName}} </mat-option>
+                        <mat-option (click)="createSchool()"><span
+                                class="bg-gray-200 rounded-full text-gray-500 py-2 px-4">Add a New Institution&nbsp;&nbsp;
+                                <mat-icon class="m-0" svgIcon="feather:plus-circle"></mat-icon>
+                            </span>
+                        </mat-option>
+                        <!-- <mat-option (click)="createSchool()" *ngIf="isLast"><span
+                                class="bg-gray-200 rounded-full text-gray-500 py-2 px-4">Add a New Institution&nbsp;&nbsp;
+                                <mat-icon class="m-0" svgIcon="feather:plus-circle"></mat-icon>
+                            </span>
+                        </mat-option> -->
+                    </mat-select>
+                    <mat-error *ngIf="infoForm.get('institutionName')?.invalid &&infoForm.get('institutionName')?.touched">
+                        School Board is required
+                    </mat-error>
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="flex flex-row-reverse pt-1">
+            <button [disabled]="infoForm.invalid" (click)="onSubmit(infoForm)" matStepperNext mat-stroked-button
+                type="submit" class="bg-primary text-white arrowBtn disabled:bg-primary-100">
+                Continue
+                <mat-icon class="ml-2 icon-size-5  text-white arrowIcon"
+                    [svgIcon]="'heroicons_solid:arrow-sm-right'"></mat-icon>
+            </button>
+        </div>
+    </form>
+</ng-container>
+<ng-template #notLoaded>
+    <div class="flex justify-center items-center">
+        <mat-spinner diameter="40"></mat-spinner>
+    </div>
+</ng-template>

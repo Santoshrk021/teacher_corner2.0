@@ -1,0 +1,166 @@
+<div class="flex flex-col w-full">
+  <!-- Header -->
+  <div class="flex items-center justify-between px-6 py-4 border-b">
+    <div class="flex items-center">
+      <mat-icon class="mr-3 text-primary-600">people</mat-icon>
+      <h2 class="text-lg font-semibold">Map Students to Remotes</h2>
+    </div>
+    <div class="flex items-center">
+      <button mat-icon-button (click)="resetMappings()" matTooltip="Reset mapping">
+        <mat-icon>restart_alt</mat-icon>
+      </button>
+      <button mat-icon-button (click)="close()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- Progress Bar -->
+  <div class="px-6 py-2 bg-gray-50">
+    <div class="flex items-center justify-between text-sm text-gray-600 mb-1">
+      <span>Mapping Progress</span>
+      <span>{{ getProgress().assigned }} / {{ getProgress().total }}</span>
+    </div>
+    <mat-progress-bar
+      mode="determinate"
+      [value]="(getProgress().assigned / getProgress().total) * 100"
+      color="primary">
+    </mat-progress-bar>
+  </div>
+
+  <!-- Content -->
+  <div class="p-4 relative">
+    <!-- Loading Overlay -->
+    <div *ngIf="loading" class="absolute inset-0 bg-white bg-opacity-80 flex items-center justify-center z-10">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+
+    <!-- Instructions -->
+    <div class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+      <div class="flex items-start">
+        <mat-icon class="text-blue-500 mr-2">info</mat-icon>
+        <p class="text-blue-800 text-sm">
+          Press remotes in order. Teacher first, then students by roll number.
+          The highlighted row is waiting for input.
+        </p>
+      </div>
+    </div>
+
+    <!-- Teacher Section -->
+    <div class="mb-4">
+      <label class="block text-sm font-medium text-gray-700 mb-2">Teacher Remote</label>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div class="relative rounded-lg border bg-white px-4 py-3 transition-all duration-200"
+          [ngClass]="{
+            'border-green-500 bg-green-50': isTeacherAssigned,
+            'border-blue-400 bg-blue-50 animate-pulse shadow-lg': !isTeacherAssigned && currentAssignmentIndex === -1,
+            'border-gray-200': !isTeacherAssigned && currentAssignmentIndex !== -1
+          }">
+          <div class="flex items-start justify-between gap-3">
+            <div class="min-w-0">
+              <div class="flex items-center gap-2">
+                <mat-icon class="text-base" [ngClass]="isTeacherAssigned ? 'text-green-600' : 'text-gray-400'">
+                  {{ isTeacherAssigned ? 'check_circle' : 'radio_button_unchecked' }}
+                </mat-icon>
+                <div class="text-xs font-medium text-gray-600">Teacher</div>
+              </div>
+              <div class="mt-1 text-sm font-mono break-all" [ngClass]="isTeacherAssigned ? 'text-green-700' : 'text-gray-600'">
+                {{ teacherMac || (currentAssignmentIndex === -1 ? 'Press remote...' : 'Waiting...') }}
+              </div>
+            </div>
+
+            <div class="shrink-0 flex items-center gap-1">
+              <button *ngIf="isTeacherAssigned" mat-icon-button color="warn" (click)="unassignTeacher()" matTooltip="Reassign">
+                <mat-icon>refresh</mat-icon>
+              </button>
+              <button *ngIf="!isTeacherAssigned" mat-icon-button color="accent" (click)="openSpareSelection('teacher')" matTooltip="Use Spare Remote">
+                <mat-icon>swap_horiz</mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Students Section -->
+    <div class="mb-4">
+      <label class="block text-sm font-medium text-gray-700 mb-2">
+        Student Remotes ({{ mappings.length }} students)
+      </label>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        <div *ngFor="let mapping of mappings; let i = index"
+          class="relative rounded-lg border bg-white px-4 py-3 transition-all duration-200"
+          [ngClass]="{
+            'border-green-500 bg-green-50': mapping.mac,
+            'border-blue-400 bg-blue-50 animate-pulse shadow-lg': !mapping.mac && currentAssignmentIndex === i,
+            'border-gray-200': !mapping.mac && currentAssignmentIndex !== i
+          }">
+          <div class="flex items-start justify-between gap-3">
+            <div class="min-w-0">
+              <div class="flex items-center gap-2">
+                <div class="h-6 w-6 rounded-full flex items-center justify-center text-xs font-bold"
+                  [ngClass]="mapping.mac ? 'bg-green-600 text-white' : 'bg-gray-300 text-gray-700'">
+                  {{ i + 1 }}
+                </div>
+                <div class="text-sm font-medium text-gray-800 truncate">{{ mapping.accessCode }}</div>
+              </div>
+              <div class="mt-1 text-xs font-mono break-all" [ngClass]="mapping.mac ? 'text-green-700' : 'text-gray-600'">
+                {{ mapping.mac || (currentAssignmentIndex === i ? 'Press remote...' : 'Waiting...') }}
+              </div>
+            </div>
+
+            <div class="shrink-0 flex items-center gap-1">
+              <button *ngIf="mapping.mac" mat-icon-button color="warn" (click)="unassignStudent(i)" matTooltip="Reassign">
+                <mat-icon>refresh</mat-icon>
+              </button>
+              <button *ngIf="!mapping.mac" mat-icon-button color="accent" (click)="openSpareSelection('student', i)" matTooltip="Use Spare Remote">
+                <mat-icon>swap_horiz</mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Spare Remotes Info -->
+    <div *ngIf="spareRemotes.length > 0" class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+      <div class="flex items-center">
+        <mat-icon class="text-yellow-600 mr-2">inventory_2</mat-icon>
+        <span class="text-yellow-800 text-sm">
+          {{ spareRemotes.length }} spare remote(s) available. Click <mat-icon class="icon-size-4 align-middle">swap_horiz</mat-icon> to use.
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Spare Remote Selection Modal -->
+  <div *ngIf="showSpareRemoteSelection" class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-20">
+    <div class="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full mx-4">
+      <h3 class="text-lg font-semibold mb-4">Select Spare Remote</h3>
+      <div class="space-y-2 max-h-48 overflow-y-auto">
+        <button *ngFor="let spare of spareRemotes"
+          mat-stroked-button
+          class="w-full justify-start"
+          (click)="selectSpareRemote(spare)">
+          <mat-icon class="mr-2">settings_remote</mat-icon>
+          Slot {{ spare.slotNumber }} - {{ spare.mac }}
+        </button>
+      </div>
+      <div class="mt-4 flex justify-end">
+        <button mat-button (click)="cancelSpareSelection()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="flex justify-between items-center px-6 py-4 bg-gray-50 border-t">
+    <button mat-stroked-button (click)="close()" class="text-gray-600">
+      Cancel
+    </button>
+    <button mat-raised-button color="primary" (click)="startQuiz()" [disabled]="!canStart()">
+      Save
+      <mat-icon class="ml-2 icon-size-5 text-white arrowIcon" [svgIcon]="'heroicons_solid:arrow-sm-right'"></mat-icon>
+    </button>
+  </div>
+</div>

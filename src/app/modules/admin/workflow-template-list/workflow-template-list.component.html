@@ -1,0 +1,98 @@
+<div class="w-full h-full overflow-y-auto  py-4">
+    <div class="mx-4 flex ">
+        <div>
+            <button matTooltipPosition="above" matTooltip="" mat-stroked-button
+                class="quizCreateBtn text-primary bg-gray-50" (click)="createWorkflowTemplate()">
+                Create New Workflow Template
+                <mat-icon class="ml-4 icon-size-8 text-primary-600 cursor-pointer plusIcon active:text-primary-500"
+                    [svgIcon]="'heroicons_solid:plus-circle'">
+                </mat-icon>
+            </button>
+        </div>
+        <div class="w-full relative">
+            <button mat-raised-button color="primary" class="w-max absolute right-2" (click)="goToTrash()">
+                <mat-icon class="mr-1 " svgIcon="heroicons_outline:trash"></mat-icon>Trash
+            </button>
+        </div>
+    </div>
+    <!-- <div class="w-full relative">
+       
+    </div> -->
+    <div class="w-full ">
+        <div class="grid mt-4 dynamicwidth">
+            <div class="inventory-grid z-10 sticky top-0 grid gap-4 py-4 px-10 md:px-8 shadow text-md font-semibold text-secondary bg-gray-50 dark:bg-black dark:bg-opacity-5"
+                matSort matSortDisableClear (matSortChange)="sortData($event)">
+                <div [mat-sort-header]="'templateName'">Workflow Template Name</div>
+                <div [mat-sort-header]="'learningUnitType'">LearningUnit Type</div>
+                <div [mat-sort-header]="'maturity'">Maturity</div>
+                <div [mat-sort-header]="'subject'">Subject</div>
+                <div [mat-sort-header]="'type'">Type</div>
+                <div [mat-sort-header]="'createdAt'">Created at</div>
+                <div [mat-sort-header]="'UpdatedAt'">Updated at</div>
+                <div [mat-sort-header]="'templateId'">Template Id</div>
+                <div>Edit</div>
+                <div>Delete </div>
+
+            </div>
+
+            <div class="overflow-y-auto h-[calc(100vh_-_212px)] dynamicwidth">
+                <!-- <pre>{{ workflowTemplatesData | async | json }}</pre> -->
+
+                <!-- <ng-container *ngIf="data?.templateId"> -->
+                <div *ngFor="let data of workflowTemplates"
+                    class="inventory-grid grid items-center text-secondary gap-4 py-3 px-10 md:px-8 border-b border-gray-400 ">
+                    <!-- <ng-container *ngIf="data?.templateId"> -->
+                    <div [matTooltip]="data?.templateName" matTooltipPosition="above" class="lg:ml-0 sm:ml-0">
+                        {{data?.templateName}}
+                    </div>
+                    <div [matTooltip]="data?.learningUnitType" matTooltipPosition="above"
+                        class="lg:ml-0 sm:ml-0 truncate">
+                        {{data?.learningUnitType || 'Not Available'}}
+                    </div>
+                    <div [matTooltip]="data?.maturity" matTooltipPosition="above" class="lg:ml-0 sm:ml-0">
+                        {{data?.maturity || 'Not Available'}}
+                    </div>
+                    <div [matTooltip]="data?.subject" matTooltipPosition="above" class="lg:ml-0 sm:ml-0">
+                        {{data?.subject || 'Not Available'}}
+                    </div>
+                    <div [matTooltip]="data?.type" matTooltipPosition="above" class="lg:ml-0 sm:ml-0">
+                        {{data?.type || 'Not Available'}}
+                    </div>
+                    <div [matTooltip]="data?.createdAt?.seconds*1000| date: 'dd/MM/yyyy'" matTooltipPosition="above"
+                        class="lg:ml-0 sm:ml-0 truncate">
+                        {{data?.createdAt?.seconds*1000| date: 'dd/MM/yyyy'}}
+                    </div>
+                    <div [matTooltip]="data?.updatedAt?.seconds*1000| date: 'dd/MM/yyyy'" matTooltipPosition="above"
+                        class="lg:ml-0 sm:ml-0">
+                        {{data?.updatedAt?.seconds*1000 || '' | date: 'dd/MM/yyyy'}}
+                    </div>
+                    <div [matTooltip]="data?.templateId" matTooltipPosition="above" class="lg:ml-0 sm:ml-0">
+                        {{data?.templateId | slice:0:6}}...
+                    </div>
+                    <div>
+                        <mat-icon (click)="onEdit(data, data?.templateId)"
+                            class="text-primary icon-size-5 cursor-pointer transition duration-500 transform  hover:scale-[115%] ml-2"
+                            svgIcon="feather:edit">
+                        </mat-icon>
+                    </div>
+
+                    <div>
+                        <mat-icon (click)="onDelete(data.templateId, data)"
+                            class="text-red-500  cursor-pointer transition duration-500 transform  hover:scale-[115%] ml-2"
+                            svgIcon="delete_outline">
+                        </mat-icon>
+                    </div>
+                    <!-- </ng-container> -->
+                </div>
+                <!-- </ng-container> -->
+            </div>
+        </div>
+    </div>
+
+    <fuse-drawer class="w-screen min-w-screen" [opened]="drawerOpened" fixed [mode]="'over'" [position]="'left'">
+        <div>
+            <ng-container *ngComponentOutlet="component"></ng-container>
+        </div>
+    </fuse-drawer>
+
+</div>

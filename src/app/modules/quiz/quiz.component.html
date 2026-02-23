@@ -1,0 +1,892 @@
+<!-- Mobile View -->
+<!-- ✅ FULLSCREEN CASE STUDY OVERLAY -->
+<div *ngIf="showCaseStudy" class="fixed inset-0 z-[9999] bg-[#EFEFF2] flex flex-col">
+    <!-- Header -->
+    <div class="px-6 py-4 border-b flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <div class="text-2xl sm:text-2xl font-bold text-gray-800">
+                {{ caseStudyTitle || 'Case Study' }}
+            </div>
+        </div>
+        <button mat-stroked-button (click)="closeCaseStudy()">
+            Back
+        </button>
+    </div>
+
+    <!-- Case Study content -->
+    <div class="flex-1 overflow-auto">
+        <app-quiz-case-study [html]="quizInfo?.backgroundInfo?.description || ''"></app-quiz-case-study>
+    </div>
+
+    <!-- Fixed Footer -->
+    <div class="px-6 py-4 border-t flex justify-end gap-3">
+        <button mat-stroked-button color="primary" class="bg-primary text-white" (click)="onContinueFromCaseStudy()">
+            Continue to Questions
+        </button>
+    </div>
+</div>
+
+<!-- Desktop View -->
+<div class="" *ngIf="isAssignmentUi; else assignmentDeleted" [ngClass]="{'hidden':!isQuizStart || showCaseStudy}">
+    <div *ngIf="overlayActive" class="zoom-backdrop" (click)="clearAllZooms(innerStepper?.selectedIndex || 0)"></div>
+    <div *ngIf="!isExceededAttempts; else exceededAttempts">
+        <div class="w-full h-full">
+            <div class="flex mx-1 items-center justify-between">
+               <!-- Quiz title, only shown if NOT remote -->
+                <div *ngIf="!isRemoteInput" class="text-xl sm:text-2xl font-semibold">
+                    {{quizInfo.displayName}}
+                </div>
+                <!-- Event source badge for remote mode -->
+                <div *ngIf="isRemoteInput && eventSource !== 'NONE'" class="flex items-center gap-2">
+                    <span class="text-xs px-2 py-1 rounded-full"
+                        [ngClass]="eventSource === 'USB' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'">
+                        Input: {{ eventSource }}
+                    </span>
+                    <span *ngIf="eventSource === 'FIRESTORE'" class="text-xs text-blue-600">
+                        (Cloud Fallback)
+                    </span>
+                </div>
+            </div>
+
+            <mat-stepper linear #innerStepper labelPosition="bottom"
+                [ngClass]="{'step-labels-hidden': isRemoteInput && !showStepperLabels,'step-labels-visible': isRemoteInput && showStepperLabels}"
+                (selectionChange)="onStepChange($event)">
+                <ng-container [formGroup]="questionsFormGroup">
+                    <div formArrayName="questions">
+                        <div *ngFor="let question of questions.controls;let questionIndex =index;" class="">
+                            <mat-step [formGroupName]="questionIndex.toString()" class="">
+                                <ng-template matStepLabel></ng-template>
+                                <div [ngSwitch]="question.value.questionType" class="">
+                                    <!-- MCQ Questions -->
+                                    <div *ngSwitchCase="'MCQ'" class="flex flex-col h-full w-full">
+
+                                        <!-- Title -->
+                                        <div>
+                                            <!-- <p class="mb-4">{{question.value.questionTitle}}</p> -->
+                                            <h1 class="mb-2">
+                                                <div class="question-title-container text-base sm:text-2xl leading-snug sm:leading-tight font-semibold"
+                                                    [ngStyle]="getQuestionZoomStyle(questionIndex)">
+                                                    <quill-view-html
+                                                        [content]="question.value.questionTitle"></quill-view-html>
+                                                </div>
+                                            </h1>
+                                        </div>
+
+
+
+                                        <!-- resources -->
+                                        <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
+                                            <mat-tab label="{{res?.resourceName}}"
+                                                *ngFor="let res of question.value.optionalResource ; let i = index">
+                                                <div class="max-h-10vh">
+                                                    <div *ngIf="res.type === 'IMAGE'; else otherRes">
+                                                        <div *ngIf="res?.resourcePath; else noThumb">
+                                                            <img [src]="res.resourcePath | getDownloadURL"
+                                                                alt="Image loading..."
+                                                                class="max-h-60 sm:h-100 object-contain w-full">
+                                                        </div>
+                                                        <ng-template #noThumb class="w-10 h-10">
+                                                            <div class="w-10 text-center tracking-tighter">
+                                                                NO THUMB
+                                                            </div>
+                                                        </ng-template>
+                                                    </div>
+                                                    <ng-template #otherRes>
+                                                        <div *ngIf="res.type ==='VIDEO' ;else pdfContainer" class="">
+                                                            <div *ngIf="res?.resourcePath">
+                                                                <app-video [videoUrl]="res.resourcePath"></app-video>
+                                                            </div>
+                                                        </div>
+                                                    </ng-template>
+                                                    <ng-template #pdfContainer>
+                                                        <ng-container class="pdf-container" *ngIf="res.type ==='PDF'">
+                                                            <div class="flex justify-center items-center  h-100 pb-2">
+                                                                <app-pdf [pdfUrl]="res.resourcePath | getDownloadURL"
+                                                                    class='w-full h-full'></app-pdf>
+                                                            </div>
+                                                        </ng-container>
+                                                    </ng-template>
+                                                </div>
+                                            </mat-tab>
+                                        </mat-tab-group>
+
+                                        <!-- ✅ View Case Study button (ONLY if quiz has case study) -->
+                                        <div class="flex justify-end mb-3" *ngIf="hasCaseStudy">
+                                            <button mat-stroked-button class="bg-primary text-white"
+                                                (click)="openCaseStudyDialog()">
+                                                View Case Study
+                                            </button>
+                                        </div>
+
+                                        <!-- Options -->
+                                        <div class="grid ml-3 grid-cols-1 gap-2 h-full w-full">
+                                            <div formArrayName="options">
+                                                <div class="text-sm text-gray-600 mb-2" *ngIf="isQuizSubmitted">
+                                                    <span
+                                                        class="inline-block w-4 h-4 bg-green-200 border border-green-600 mr-1 align-middle"></span>
+                                                    Correct
+                                                    <span
+                                                        class="inline-block ml-4 w-4 h-4 bg-red-200 border border-red-600 mr-1 align-middle"></span>
+                                                    Incorrect
+                                                </div>
+
+                                                <!-- <label class="uppercase text-primary font-medium">
+                                                                Options
+                                                                <small class="uppercase text-muted">
+                                                                    {{ question.get('oneCorrectOption').value
+                                                                    ? "(Select the correct option)"
+                                                                    : "(Tick the correct options)" }}
+                                                                </small>
+                                                            </label> -->
+
+                                                <!-- SINGLE-CORRECT OPTIONS (RADIO) -->
+                                                <ng-container
+                                                    *ngIf="question.get('oneCorrectOption').value; else multiSelectOptions">
+                                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-6">
+                                                        <div
+                                                            *ngFor="let option of getOptions(questionIndex).controls; let optionIndex = index">
+                                                            <div [formGroupName]="optionIndex"
+                                                                class="flex items-start sm:items-center gap-2 sm:gap-3 py-1"
+                                                                [ngClass]="{'ring-2 ring-blue-400': focusedTargetIndex[questionIndex] === optionIndex}">
+                                                                <div class=" text-3xl font-bold mr-4">
+                                                                    {{ getAlphabet(optionIndex) }}.
+                                                                </div>
+                                                                <div class="mt-2 flex flex-row items-center font-bold">
+                                                                    <!-- <input type="radio"
+                                                                                    name="mcqSingleSelect{{ questionIndex }}"
+                                                                                    [checked]="!isRemoteInput && option.get('attemptedOption')?.value"
+                                                                                    (click)="onOptionManuallySelected(questionIndex, optionIndex)"
+                                                                                    [disabled]="isQuizSubmitted" /> -->
+
+                                                                    <mat-radio-button *ngIf="!isRemoteInput"
+                                                                        name="mcqSingleSelect{{ questionIndex }}"
+                                                                        [checked]="!isRemoteInput && option.get('attemptedOption')?.value"
+                                                                        (click)="onOptionManuallySelected(questionIndex, optionIndex)"
+                                                                        [disabled]="isQuizSubmitted"
+                                                                        color="primary"></mat-radio-button>
+
+                                                                    <!-- TEXT or IMAGE -->
+                                                                    <ng-container
+                                                                        *ngIf="option.get('optionType').value === 'TEXT'; else imageOptionRadio">
+                                                                        <label class="font-weight-normal ml-2">
+                                                                            {{ option.get('name').value }}
+                                                                        </label>
+                                                                    </ng-container>
+
+                                                                    <ng-template #imageOptionRadio>
+                                                                        <img [src]="option.value.imagePath | getDownloadURL"
+                                                                            alt="Option image"
+                                                                            class="h-20 w-20 object-contain border rounded ml-2"
+                                                                            [ngStyle]="getZoomStyle(questionIndex, optionIndex)" />
+                                                                    </ng-template>
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                </ng-container>
+
+                                                <!-- MULTI-CORRECT OPTIONS (CHECKBOX) -->
+                                                <ng-template #multiSelectOptions>
+                                                    <div class="grid grid-cols-2 gap-6">
+                                                        <div
+                                                            *ngFor="let option of getOptions(questionIndex).controls; let optionIndex = index">
+                                                            <div class="flex py-1 items-center" [ngClass]="{
+                                                                            'bg-green-100 border border-green-500': isQuizSubmitted && option.get('isCorrect')?.value,
+                                                                            'bg-red-100 border border-red-500': isQuizSubmitted && !option.get('isCorrect')?.value && option.get('attemptedOption')?.value
+                                                                        }" [formGroupName]="optionIndex">
+                                                                <div class=" text-3xl font-bold mr-4">
+                                                                    {{ getAlphabet(optionIndex) }}.
+                                                                </div>
+                                                                <div class="form-check flex items-center font-bold">
+                                                                    <!-- <input type="checkbox" formControlName="attemptedOption"
+                                                                                (change)="onOptionManuallySelected(questionIndex, optionIndex)"
+                                                                                [disabled]="isQuizSubmitted" /> -->
+
+                                                                    <mat-checkbox *ngIf="!isRemoteInput"
+                                                                        formControlName="attemptedOption"
+                                                                        (change)="onOptionManuallySelected(questionIndex, optionIndex)"
+                                                                        [disabled]="isQuizSubmitted"
+                                                                        color="primary"></mat-checkbox>
+
+                                                                    <!-- TEXT or IMAGE -->
+                                                                    <ng-container
+                                                                        *ngIf="option.get('optionType').value === 'TEXT'; else imageOptionCheckbox">
+                                                                        <label class="font-weight-normal ml-2">
+                                                                            {{ option.get('name').value }}
+                                                                        </label>
+                                                                    </ng-container>
+
+                                                                    <ng-template #imageOptionCheckbox>
+                                                                        <img [src]="option.value.imagePath | getDownloadURL"
+                                                                            alt="Option image"
+                                                                            class="h-20 w-20 object-contain border rounded ml-2"
+                                                                            [ngStyle]="getZoomStyle(questionIndex, optionIndex)" />
+                                                                    </ng-template>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </ng-template>
+                                            </div>
+                                        </div>
+
+
+                                        <!-- ===================== SUB-PARTS SECTION ===================== -->
+                                        <div *ngIf="hasSubPartsEnabled(questionIndex) && getSubParts(questionIndex)?.length > 0"
+                                            class="mt-4 border-t pt-4">
+
+                                            <!-- Note Banner -->
+                                            <div
+                                                class="bg-blue-50 border-l-4 border-blue-500 text-blue-700 p-2 mb-4 rounded">
+                                                <div class="flex items-center">
+                                                    <mat-icon class="text-blue-500 mr-2 icon-size-5">info</mat-icon>
+                                                    <span class="text-sm font-medium">
+                                                        <strong>Note:</strong> This is a multistep question and marks
+                                                        would be given only when all sub-parts are correct.
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            <!-- Sub-Parts Stepper -->
+                                            <div
+                                                class="sub-parts-stepper-container flex justify-center items-center mb-6 py-2">
+                                                <div class="flex items-center">
+                                                    <ng-container
+                                                        *ngFor="let subPart of getSubParts(questionIndex).controls; let subPartIndex = index; let last = last">
+                                                        <div (click)="setActiveSubPart(questionIndex, subPartIndex)"
+                                                            class="w-16 h-16 flex items-center justify-center cursor-pointer rounded-full"
+                                                            [ngClass]="{
+                        'sub-part-active-bg': activeSubPartIndex[questionIndex] === subPartIndex
+                    }">
+                                                            <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium"
+                                                                [ngClass]="{
+                            'bg-primary text-white': activeSubPartIndex[questionIndex] === subPartIndex || getSubPartCompletionStatus(questionIndex)[subPartIndex],
+                            'bg-gray-500 text-white': activeSubPartIndex[questionIndex] !== subPartIndex && !getSubPartCompletionStatus(questionIndex)[subPartIndex]
+                        }">
+                                                                <ng-container
+                                                                    *ngIf="getSubPartCompletionStatus(questionIndex)[subPartIndex] && activeSubPartIndex[questionIndex] !== subPartIndex; else showLabel">
+                                                                    <mat-icon
+                                                                        class="icon-size-5 text-white">check</mat-icon>
+                                                                </ng-container>
+                                                                <ng-template #showLabel>
+                                                                    <ng-container
+                                                                        *ngIf="activeSubPartIndex[questionIndex] === subPartIndex; else showLetterLabel">
+                                                                        <mat-icon
+                                                                            class="icon-size-5 text-white">edit</mat-icon>
+                                                                    </ng-container>
+                                                                    <ng-template #showLetterLabel>
+                                                                        {{ subPart.value.label }}
+                                                                    </ng-template>
+                                                                </ng-template>
+                                                            </div>
+                                                        </div>
+                                                        <div *ngIf="!last" class="w-16 h-px bg-gray-200"></div>
+                                                    </ng-container>
+                                                </div>
+                                            </div>
+
+                                            <!-- Sub-Part Content Display -->
+                                            <div formArrayName="subParts">
+                                                <ng-container
+                                                    *ngFor="let subPart of getSubParts(questionIndex).controls; let subPartIndex = index">
+                                                    <div *ngIf="activeSubPartIndex[questionIndex] === subPartIndex"
+                                                        [formGroupName]="subPartIndex">
+
+                                                        <div class="mb-4">
+                                                            <h4 class="font-bold text-lg text-primary mb-2">
+                                                                Sub-Part ({{ subPart.value.label }})
+                                                                <span class="text-sm text-gray-500 ml-2">[{{
+                                                                    subPart.value.marks }} marks]</span>
+                                                            </h4>
+                                                            <div
+                                                                class="question-title-container text-base sm:text-xl leading-snug font-medium">
+                                                                <quill-view-html
+                                                                    [content]="subPart.value.subPartTitle"></quill-view-html>
+                                                            </div>
+                                                        </div>
+
+                                                        <div formArrayName="options"
+                                                            class="grid ml-3 grid-cols-1 gap-2">
+                                                            <ng-container
+                                                                *ngIf="subPart.value.oneCorrectOption; else multiSelectSubPartOptions">
+                                                                <div
+                                                                    class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-6">
+                                                                    <div *ngFor="let option of getSubPartOptions(questionIndex, subPartIndex)?.controls; let optionIndex = index"
+                                                                        [formGroupName]="optionIndex"
+                                                                        class="flex items-start sm:items-center gap-2 sm:gap-3 py-1">
+                                                                        <div class="text-3xl font-bold mr-4">
+                                                                            {{ getAlphabet(optionIndex) }}.
+                                                                        </div>
+                                                                        <div
+                                                                            class="mt-2 flex flex-row items-center font-bold">
+                                                                            <mat-radio-button *ngIf="!isRemoteInput"
+                                                                                [checked]="option.get('attemptedOption')?.value"
+                                                                                (click)="onSubPartOptionSelected(questionIndex, subPartIndex, optionIndex)"
+                                                                                [disabled]="isQuizSubmitted"
+                                                                                color="primary">
+                                                                            </mat-radio-button>
+                                                                            <ng-container
+                                                                                *ngIf="option.get('optionType')?.value === 'TEXT'; else subPartImageOption">
+                                                                                <label class="font-weight-normal ml-2">
+                                                                                    {{ option.get('name').value }}
+                                                                                </label>
+                                                                            </ng-container>
+                                                                            <ng-template #subPartImageOption>
+                                                                                <img [src]="option.value.imagePath | getDownloadURL"
+                                                                                    alt="Option image"
+                                                                                    class="h-20 w-20 object-contain border rounded ml-2" />
+                                                                            </ng-template>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </ng-container>
+
+                                                            <ng-template #multiSelectSubPartOptions>
+                                                                <div
+                                                                    class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-6">
+                                                                    <div *ngFor="let option of getSubPartOptions(questionIndex, subPartIndex)?.controls; let optionIndex = index"
+                                                                        [formGroupName]="optionIndex"
+                                                                        class="flex items-start sm:items-center gap-2 sm:gap-3 py-1">
+                                                                        <div class="text-3xl font-bold mr-4">
+                                                                            {{ getAlphabet(optionIndex) }}.
+                                                                        </div>
+                                                                        <div
+                                                                            class="form-check flex items-center font-bold">
+                                                                            <mat-checkbox *ngIf="!isRemoteInput"
+                                                                                [checked]="option.get('attemptedOption')?.value"
+                                                                                (change)="onSubPartOptionSelected(questionIndex, subPartIndex, optionIndex)"
+                                                                                [disabled]="isQuizSubmitted"
+                                                                                color="primary">
+                                                                            </mat-checkbox>
+                                                                            <ng-container
+                                                                                *ngIf="option.get('optionType')?.value === 'TEXT'; else subPartImageOptionMulti">
+                                                                                <label class="font-weight-normal ml-2">
+                                                                                    {{ option.get('name').value }}
+                                                                                </label>
+                                                                            </ng-container>
+                                                                            <ng-template #subPartImageOptionMulti>
+                                                                                <img [src]="option.value.imagePath | getDownloadURL"
+                                                                                    alt="Option image"
+                                                                                    class="h-20 w-20 object-contain border rounded ml-2" />
+                                                                            </ng-template>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </ng-template>
+                                                        </div>
+                                                    </div>
+                                                </ng-container>
+                                            </div>
+                                        </div>
+                                        <!-- ===================== END SUB-PARTS SECTION ===================== -->
+
+                                    </div>
+
+                                    <!-- Fill in the Blanks Questions -->
+                                    <div *ngSwitchCase="'FILL_IN_THE_BLANKS'" class="flex flex-col h-full w-full">
+                                        <div>
+                                            <!-- <h4 class="mb-3"> -->
+                                            <h5 class="text-justify ques_title">
+                                                <span
+                                                    *ngFor="let obj of question.get('blanksObj').value|keyvalue;
+                                                                        let blankIndex=index;let blankLastIndex = last;">
+                                                    <span [formGroupName]="obj.key">
+                                                        {{question.get('quesSplit').value[blankIndex]}}
+                                                        <select (change)="onClickOption(questionIndex,obj.key)"
+                                                            formControlName="selectedOption"
+                                                            class="font-italic border-2 border-gray-200 rounded-md"
+                                                            style="border:2px solid lightgrey;">
+                                                            <option [value]="defaultOption" selected>---
+                                                            </option>
+                                                            <option *ngFor="let op of obj.value" [ngValue]="op">
+                                                                {{op.name}}
+                                                            </option>
+                                                        </select>
+                                                        <span *ngIf="blankLastIndex">
+                                                            {{question.get('quesSplit').value[blankIndex+1]}}
+                                                        </span>
+                                                    </span>
+                                                </span>
+                                            </h5>
+                                        </div>
+
+                                        <!-- resources -->
+                                        <mat-tab-group mat-align-tabs="start">
+                                            <mat-tab label="{{res?.resourceName}}"
+                                                *ngFor="let res of question.value.optionalResource ; let i = index">
+                                                <div>
+                                                    <div *ngIf="res.type === 'IMAGE'; else otherRes">
+                                                        <div *ngIf="res?.resourcePath; else noThumb">
+                                                            <img [src]="res.resourcePath | getDownloadURL"
+                                                                alt="Image loading..." class=" h-100 object-contain ">
+                                                        </div>
+                                                        <ng-template #noThumb class="w-10 h-10">
+                                                            <div class="w-10 text-center tracking-tighter">
+                                                                NO THUMB
+                                                            </div>
+                                                        </ng-template>
+                                                    </div>
+                                                    <ng-template #otherRes>
+                                                        <div *ngIf="res.type ==='VIDEO' ;else pdfContainer" class="">
+                                                            <div *ngIf="res?.resourcePath">
+                                                                <app-video [videoUrl]="res.resourcePath"></app-video>
+                                                            </div>
+                                                        </div>
+                                                    </ng-template>
+                                                    <ng-template #pdfContainer>
+                                                        <ng-container class="pdf-container" *ngIf="res.type ==='PDF'">
+                                                            <div *ngIf="res?.resourcePath"
+                                                                class="flex justify-center items-center  h-100 pb-2">
+                                                                <app-pdf [pdfUrl]="res.resourcePath | getDownloadURL"
+                                                                    class='w-full h-full'></app-pdf>
+                                                            </div>
+                                                        </ng-container>
+                                                    </ng-template>
+                                                </div>
+                                            </mat-tab>
+                                        </mat-tab-group>
+
+                                        <!-- ✅ View Case Study button (ONLY if quiz has case study) -->
+                                        <div class="flex justify-end mb-3" *ngIf="hasCaseStudy">
+                                            <button mat-stroked-button class="bg-primary text-white"
+                                                (click)="openCaseStudyDialog()">
+                                                View Case Study
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Rich blanks -->
+                                    <div *ngSwitchCase="'RICH_BLANKS'" class="flex flex-col h-full w-full">
+                                        <div>
+                                            <!-- Title -->
+                                            <div class="text-justify ques_title"
+                                                [innerHTML]="question.get('questionTitle').value"></div>
+
+                                            <div class="rounded p-2">
+                                                <!-- <label class="uppercase text-primary font-medium">Options <small
+                                                                    class="">(Select the
+                                                                    correct
+                                                                    Answer)</small>
+                                                            </label> -->
+                                                <div class="text-justify ques_title">
+                                                    <div
+                                                        *ngFor="let obj of question.get('blanksObj').value|keyvalue;let blankIndex=index;let blankLastIndex = last;">
+                                                        <div [formGroupName]="obj.key" class="flex pb-1">
+                                                            <div class="col-1">({{(obj.key).split(' ')[1]}})
+                                                            </div>
+                                                            <div class="col-11 flex flex-col mt-1">
+                                                                <select class="ml-1 border-2 border-gray-200 rounded-md"
+                                                                    style="border:2px solid lightgrey;"
+                                                                    (change)="onClickOption(questionIndex,obj.key)"
+                                                                    formControlName="selectedOption">
+                                                                    <option [value]="defaultOption" selected>---
+                                                                    </option>
+                                                                    <option
+                                                                        (click)="onClickOption(questionIndex,obj.key,obj.value)"
+                                                                        *ngFor="let op of obj.value" [ngValue]="op">
+                                                                        {{op.name}}</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- resources -->
+                                            <mat-tab-group mat-align-tabs="start">
+                                                <mat-tab label="{{res?.resourceName}}"
+                                                    *ngFor="let res of question.value.optionalResource ; let i = index">
+                                                    <div>
+                                                        <div *ngIf="res.type === 'IMAGE'; else otherRes">
+                                                            <div *ngIf="res?.resourcePath; else noThumb">
+                                                                <img [src]="res.resourcePath | getDownloadURL"
+                                                                    alt="Image loading..."
+                                                                    class=" h-100 object-contain ">
+                                                            </div>
+                                                            <ng-template #noThumb class="w-10 h-10">
+                                                                <div class="w-10 text-center tracking-tighter">
+                                                                    NO THUMB
+                                                                </div>
+                                                            </ng-template>
+                                                        </div>
+                                                        <ng-template #otherRes>
+                                                            <div *ngIf="res.type ==='VIDEO' ;else pdfContainer"
+                                                                class="">
+                                                                <div *ngIf="res?.resourcePath">
+                                                                    <app-video
+                                                                        [videoUrl]="res.resourcePath"></app-video>
+                                                                </div>
+                                                            </div>
+                                                        </ng-template>
+                                                        <ng-template #pdfContainer>
+                                                            <ng-container class="pdf-container"
+                                                                *ngIf="res.type ==='PDF'">
+                                                                <div
+                                                                    class="flex justify-center items-center  h-100 pb-2">
+                                                                    <app-pdf
+                                                                        [pdfUrl]="res.resourcePath | getDownloadURL"
+                                                                        class='w-full h-full'></app-pdf>
+                                                                </div>
+                                                            </ng-container>
+                                                        </ng-template>
+                                                    </div>
+                                                </mat-tab>
+                                            </mat-tab-group>
+
+                                            <!-- ✅ View Case Study button (ONLY if quiz has case study) -->
+                                            <div class="flex justify-end mb-3" *ngIf="hasCaseStudy">
+                                                <button mat-stroked-button class="bg-primary text-white"
+                                                    (click)="openCaseStudyDialog()">
+                                                    View Case Study
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Text -->
+                                    <div *ngSwitchCase="'TEXT'">
+                                        <!-- Title -->
+                                        <div>
+                                            <p class="mb-4">{{question.value.questionTitle}}</p>
+                                        </div>
+
+                                        <!-- resources -->
+                                        <mat-tab-group mat-align-tabs="start">
+                                            <mat-tab label="{{res?.resourceName}}"
+                                                *ngFor="let res of question.value.optionalResource ; let i = index">
+                                                <div>
+                                                    <div *ngIf="res.type === 'IMAGE'; else otherRes">
+                                                        <div *ngIf="res?.resourcePath; else noThumb">
+                                                            <img [src]="res.resourcePath | getDownloadURL"
+                                                                alt="Image loading..." class=" h-100 object-contain ">
+                                                        </div>
+                                                        <ng-template #noThumb class="w-10 h-10">
+                                                            <div class="w-10 text-center tracking-tighter">
+                                                                NO THUMB
+                                                            </div>
+                                                        </ng-template>
+                                                    </div>
+                                                    <ng-template #otherRes>
+                                                        <div *ngIf="res.type ==='VIDEO' ;else pdfContainer" class="">
+                                                            <div *ngIf="res?.resourcePath">
+                                                                <app-video [videoUrl]="res.resourcePath"></app-video>
+                                                            </div>
+                                                        </div>
+                                                    </ng-template>
+                                                    <ng-template #pdfContainer>
+                                                        <ng-container class="pdf-container" *ngIf="res.type ==='PDF'">
+                                                            <div class="flex justify-center items-center  h-100 pb-2">
+                                                                <app-pdf [pdfUrl]="res.resourcePath | getDownloadURL"
+                                                                    class='w-full h-full'></app-pdf>
+                                                            </div>
+                                                        </ng-container>
+                                                    </ng-template>
+                                                </div>
+                                            </mat-tab>
+                                        </mat-tab-group>
+
+                                        <!-- ✅ View Case Study button (ONLY if quiz has case study) -->
+                                        <div class="flex justify-end mb-3" *ngIf="hasCaseStudy">
+                                            <button mat-stroked-button class="bg-primary text-white"
+                                                (click)="openCaseStudyDialog()">
+                                                View Case Study
+                                            </button>
+                                        </div>
+
+                                        <!-- text answer - Quill editor -->
+                                        <div class="w-full">
+                                            <quill-editor
+                                                formControlName="text"
+                                                [modules]="textAnswerQuillModules"
+                                                [placeholder]="'Write your answer here'"
+                                                (onContentChanged)="onTextAnswerContentChanged($event, questionIndex)"
+                                                class="quiz-text-answer-editor">
+                                            </quill-editor>
+                                        </div>
+                                        <div class="flex justify-between items-center mt-1">
+                                            <div *ngIf="getTextCharCount(questionIndex) >= question.get('maxCharLength').value"
+                                                class="error-text">
+                                                <small class="text-danger">Max.
+                                                    {{question.get('maxCharLength').value}}
+                                                    Characters are
+                                                    allowed.</small>
+                                            </div>
+                                            <small class="text-muted ml-auto">
+                                                {{getTextCharCount(questionIndex)}} / {{question.get('maxCharLength').value}}
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- <button
+                                            mat-stroked-button
+                                            (click)="goToNextStepsForManual()"
+                                            [disabled]="!isAnyOptionSelected(innerStepper.selectedIndex)"
+                                            class="mainBtn"
+                                            style="float:right;">
+                                            <span class="inline-flex items-center">
+                                                <span>Next</span>
+                                                <mat-icon class="ml-1.5 icon-size-5 arrowIcon" [svgIcon]="'heroicons_solid:arrow-sm-right'">
+                                                </mat-icon>
+                                            </span>
+                                            </button> -->
+                                <div class="flex items-center justify-between gap-4 mt-4">
+
+                                    <!-- ⬅️ Previous Button (hide on first question) -->
+                                    <button mat-stroked-button class="mainBtn" (click)="goToPreviousStepsForManual()"
+                                        *ngIf="innerStepper?.selectedIndex > 0">
+                                        <span class="inline-flex items-center">
+                                            <mat-icon class="mr-1.5 icon-size-5 arrowIcon"
+                                                [svgIcon]="'heroicons_solid:arrow-sm-left'"></mat-icon>
+                                            <span>Previous</span>
+                                        </span>
+                                    </button>
+
+                                    <!-- Right side: timer + next -->
+                                    <div class="flex items-center gap-4 ml-auto">
+
+                                        <!-- ⏱ Timer -->
+                                        <div *ngIf="getDisplayTime() > 0"
+                                            class="flex items-center justify-center min-w-14 min-h-14 p-2 rounded-full border-2"
+                                            [ngClass]="{
+                'border-red-600 text-red-600': isGracePeriod,
+                'border-blue-600 text-blue-600': !isGracePeriod
+            }">
+                                            <div
+                                                class="text-lg font-extrabold text-center leading-none whitespace-nowrap">
+                                                {{ formatTimeDisplay(getDisplayTime()) }}
+                                            </div>
+                                        </div>
+
+                                        <!-- 👉 Next Button -->
+                                        <button mat-stroked-button (click)="goToNextStepsForManual()"
+                                            [disabled]="!isAnyOptionSelected(innerStepper.selectedIndex)"
+                                            class="mainBtn">
+                                            <span class="inline-flex items-center">
+                                                <span>Next</span>
+                                                <mat-icon class="ml-1.5 icon-size-5 arrowIcon"
+                                                    [svgIcon]="'heroicons_solid:arrow-sm-right'"></mat-icon>
+                                            </span>
+                                        </button>
+
+                                    </div>
+                                </div>
+
+                            </mat-step>
+                        </div>
+                    </div>
+                </ng-container>
+
+                <mat-step [editable]="true" [completed]="false" state="final">
+                    <ng-template matStepLabel>Done</ng-template>
+                    <p>You are now done.</p>
+                    <div *ngIf="showSubmitButton" class="my-4">
+                        <button mat-stroked-button (click)="onSubmit()" [disabled]="hasSubmittedResults">Submit</button>
+
+                    </div>
+                </mat-step>
+
+
+                <ng-template matStepperIcon="final">
+                    <mat-icon svgIcon="heroicons_outline:check-circle"></mat-icon>
+                </ng-template>
+            </mat-stepper>
+        </div>
+    </div>
+</div>
+
+<!-- Start Button -->
+<div class="flex justify-center items-center w-full h-full" [ngClass]="{'hidden':isQuizStart || showCaseStudy}"
+    *ngIf="!isExceededAttempts; else isExceededAttempts">
+    <!-- <div class="flex justify-center items-center w-full h-full " [ngClass]="{'hidden':isQuizStart}"> -->
+    <div class="flex flex-col h-80 shadow rounded-2xl overflow-hidden bg-card  font-medium">
+        <div class="flex flex-col p-6">
+            <div class="mt-4 text-lg font-medium text-slate-700">{{quizInfo?.displayName}}</div>
+            <div class="mt-4 line-clamp-2 text-secondary">
+                Teacher Name:&nbsp;<span class="text-primary">{{currentTeacher?.teacherMeta?.firstName}}
+                    {{currentTeacher?.teacherMeta?.lastName}}</span>
+            </div>
+            <div class="mt-8 line-clamp-2 text-secondary">
+                Duration:&nbsp;<span [ngClass]="{'text-red-600': isGracePeriod, 'text-primary': !isGracePeriod}">
+                    <span *ngIf="isGracePeriod" class="font-semibold">{{getTimeLabel()}}: </span>{{getDisplayTime() |
+                    formatTimeConditional}}
+                </span>
+            </div>
+            <!-- !-- <div class="w-12 h-1 my-6 border-t-2"></div> -- -->
+        </div>
+
+        <div class="flex flex-col w-full mt-auto">
+            <div class="relative h-0.5">
+                <div class="h-0.5 bg-primary-100 w-full">
+                </div>
+            </div>
+
+            <div class="px-6 py-4 text-right bg-gray-50 dark:bg-transparent">
+                <button mat-stroked-button (click)="openStartModeDialog()" class="mainBtn">
+                    <span class="inline-flex items-center">
+                        <span>Start Quiz</span>
+                        <mat-icon class="ml-1.5 icon-size-5 arrowIcon"
+                            [svgIcon]="'heroicons_solid:arrow-sm-right'"></mat-icon>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #startModeDialog>
+    <div class="flex flex-col w-full">
+        <div class="flex items-center justify-between px-6 py-4 border-b">
+            <div class="text-lg font-semibold text-slate-800">Start Quiz</div>
+            <button mat-icon-button (click)="closeStartModeDialog()">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+        <div class="px-6 py-5">
+            <div class="text-sm text-slate-600">Choose how you want to start the quiz:</div>
+            <div class="mt-4 grid grid-cols-1 gap-3">
+                <button mat-raised-button color="primary" (click)="startQuizManual()" class="w-full"
+                    [disabled]="isStartingRemote">
+                    Manual
+                </button>
+                <button mat-raised-button color="primary" (click)="startQuizRemote()" class="w-full"
+                    [disabled]="isStartingRemote">
+                    <span class="inline-flex items-center justify-center w-full">
+                        <span *ngIf="!isStartingRemote">Remote</span>
+                        <span *ngIf="isStartingRemote" class="inline-flex items-center gap-2">
+                            <mat-spinner diameter="18"></mat-spinner>
+                            Loading...
+                        </span>
+                    </span>
+                </button>
+            </div>
+
+            <div *ngIf="isStartingRemote" class="mt-3 text-xs text-slate-600">
+                Please wait while we load your mapping and prepare remote mode.
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #exceededAttempts>
+    <div
+        class="flex flex-col h-80 shadow rounded-2xl overflow-hidden bg-card font-medium justify-center items-center text-center">
+        <div class="flex flex-col p-6">
+            <div class="mt-4 text-lg font-medium text-slate-700">
+                You have completed the number of allowed attempts for the assignment titled "<span
+                    class="font-bold">{{quizInfo?.displayName}}</span>"
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #assignmentDeleted>
+    <div class="text-slate-600 font-medium text-lg h-[300px] w-full flex justify-center items-center">
+        <div>
+            <p>
+                The assignment titled
+                <span class="text-primary">
+                    "{{contentInfo?.assignmentName}}"
+                </span>
+                has been deleted.
+            </p>
+            <div class="mt-3 flex flex-wrap ">
+                <span>Please&nbsp;contact&nbsp;us&nbsp;at</span>
+                <span class="text-primary">&nbsp;+{{environment.whatsAppSender}}</span>
+                <span>&nbsp;or&nbsp;</span>
+                <span class="flex  items-center bg-white h-max w-max px-1 py-0.5 rounded shadow">
+                    <img class="h-4 w-4 mr-1 " src="https://static.whatsapp.net/rsrc.php/v3/yz/r/ujTY9i_Jhs1.png">
+                    <a class="text-[#049CD8] text-base hover:underline underline-offset-2 " target="_blank"
+                        [href]="'https://api.whatsapp.com/send/?phone=' + environment.whatsAppSender +'&text=Greetings%21+I+have+a+question+regarding+Teacher+Corner&type=phone_number&app_absent=0'">
+                        {{environment.projectName}}
+                    </a>
+                </span>
+                <span>&nbsp;,&nbsp;</span>
+                <span>for&nbsp;further assistance.</span>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+
+<!-- Outer container: align response tracker left and timer right -->
+<div class="mt-8 w-full flex justify-between items-center px-4" *ngIf="showResponseTracker">
+    <!-- 🟩 Student Response Tracker -->
+    <div class="inline-block p-4 rounded-lg shadow-lg border border-gray-300 bg-white">
+        <label class="text-lg font-bold text-center text-gray-700 block mb-4">
+            Track Students Response
+        </label>
+
+        <div class="flex items-center justify-between mb-4" *ngIf="teacherMac">
+            <div class="text-sm text-slate-700">
+                Teacher: <span class="font-mono text-xs">{{ teacherMac }}</span>
+            </div>
+            <button mat-icon-button (click)="openReassignTeacher()" matTooltip="Reassign teacher remote">
+                <mat-icon class="icon-size-4">edit</mat-icon>
+            </button>
+        </div>
+
+        <div *ngIf="numberBoxes.length > 0" class="flex flex-wrap gap-3">
+            <div *ngFor="let student of numberBoxes; let i = index" class="relative">
+                <div [matTooltip]="student.mac" matTooltipPosition="above" [ngClass]="{
+                                'bg-green-500 text-white': currentQuestionResponses.has(student.macKey),
+                                'bg-gray-300 text-gray-700': !currentQuestionResponses.has(student.macKey)
+                            }"
+                    class="w-10 h-10 flex items-center justify-center font-bold rounded-lg shadow text-sm transition duration-300 ease-in-out cursor-default">
+                    S{{ i + 1 }}
+                </div>
+
+                <button mat-icon-button class="absolute -top-3 -right-3"
+                    (click)="openReassignStudent(student); $event.stopPropagation();" matTooltip="Reassign remote">
+                    <mat-icon class="icon-size-4">edit</mat-icon>
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<!-- 📊 Live Results + Accuracy Grid Stacked Layout -->
+<div *ngIf="isRemoteInput &&hasSubmittedResults && questionWiseStats.length > 0" class="mt-6 space-y-10">
+
+    <!-- ✅ Top: Question-wise Accuracy Card -->
+    <div class="flex flex-col items-center w-full">
+        <mat-card class="rounded shadow-lg px-6 py-4 bg-white w-full max-w-6xl">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-bold mb-4 text-center">
+                    Question-wise Responses:
+                </h2>
+                <h2 class="text-lg font-bold mb-4 text-center">
+                    Student Response Accuracy – Correct Answers (Count / Percentage)
+                </h2>
+
+                <div class="flex items-center gap-2">
+                    <button mat-raised-button color="accent" class="mb-4" (click)="downloadQuestionAccuracyPdf()">
+                        Download Accuracy PDF
+                    </button>
+
+                    <button mat-raised-button color="primary" class="mb-4" (click)="exportToExcel()"
+                        [disabled]="!questionWiseStats?.length"
+                        matTooltip="Export the question-wise accuracy table to Excel">
+                        Export Accuracy Excel
+                    </button>
+                </div>
+            </div>
+
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+                <div *ngFor="let q of questionWiseStats"
+                    class="flex items-center gap-2 justify-start border border-gray-200 px-3 py-2 rounded-lg bg-gray-50">
+                    <span class="inline-block bg-blue-600 text-white text-xs font-bold py-1 px-2 rounded-full">
+                        {{ q.question }}
+                    </span>
+                    <span class="text-sm text-gray-700 font-semibold whitespace-nowrap">
+                        {{ q.correctCount }} / {{ q.percentage }}
+                    </span>
+                </div>
+            </div>
+        </mat-card>
+    </div>
+</div>

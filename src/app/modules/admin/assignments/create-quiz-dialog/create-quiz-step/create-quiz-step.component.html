@@ -1,0 +1,156 @@
+<form [formGroup]="quizInfoForm">
+    <div class="  h-[57vh] overflow-auto ">
+        <div class="pt-1 ">
+            <div class="bg-primary-50 rounded-xl">
+                <div class="p-4 grid grid-cols-2 gap-8">
+                    <!-- Left side of the form -->
+                    <div>
+                        <mat-form-field class="w-full text-accent-600">
+                            <mat-label class="text-[#282B66]">Title</mat-label>
+                            <input id="title" matInput formControlName="displayName" type="text"
+                                placeholder="Enter Quiz displayName">
+                            <mat-error *ngIf="quizInfoForm.get('displayName').invalid ">
+                                Quiz Title is required
+                            </mat-error>
+                        </mat-form-field>
+
+                        <mat-form-field class="w-full text-accent-600">
+                            <mat-label class="text-[#282B66]">Creator Name</mat-label>
+                            <input id="creator" matInput formControlName="creator" type="text"
+                                placeholder="Enter Creator Name">
+                            <mat-error *ngIf="quizInfoForm.get('creator').invalid ">
+                                Creator Name is required
+                            </mat-error>
+                        </mat-form-field>
+
+                        <mat-form-field class="w-full text-accent-600">
+                            <mat-label class="text-[#282B66]">Author Name</mat-label>
+                            <input id="author" matInput formControlName="author" type="text"
+                                placeholder="Enter Author Name">
+                            <mat-error *ngIf="quizInfoForm.get('author').invalid ">
+                                Author Name is required
+                            </mat-error>
+                        </mat-form-field>
+
+                        <mat-form-field class="w-full text-accent-600 ">
+                            <mat-label class="text-[#282B66]">Authentication Type</mat-label>
+                            <mat-select formControlName="authenticationType" placeholder="Select Authentication Type">
+                                <mat-option disabled selected>Select</mat-option>
+                                <mat-option value="login">Login</mat-option>
+                                <mat-option value="anonymous">Anonymous</mat-option>
+                            </mat-select>
+                            <mat-error
+                                *ngIf="quizInfoForm.get('authenticationType')?.invalid &&quizInfoForm.get('authenticationType')?.touched">
+                                Authentication Type is required
+                            </mat-error>
+                        </mat-form-field>
+
+                        <mat-form-field class="w-full text-accent-600">
+                            <mat-label class="text-[#282B66]">Status</mat-label>
+                            <mat-select formControlName="status" placeholder="Select the status">
+                                <mat-option disabled>Select</mat-option>
+                                <mat-option *ngFor="let status of statusList" [value]="status">{{status}}</mat-option>
+                            </mat-select>
+                            <mat-error *ngIf="quizInfoForm.get('status')?.invalid"></mat-error>
+                        </mat-form-field>
+                    </div>
+                    <!-- Right side of the form -->
+                    <div>
+                        <mat-form-field class="w-full text-accent-600">
+                            <mat-label class="text-[#282B66]">Number Of Allowed Submissions</mat-label>
+                            <input id="numberOfAllowedSubmissions" [min]="1" matInput
+                                formControlName="numberOfAllowedSubmissions" type="number"
+                                placeholder="Enter A Number">
+                            <mat-error *ngIf="quizInfoForm.get('numberOfAllowedSubmissions').invalid ">
+                                Number Of Allowed Submissions is required
+                            </mat-error>
+                        </mat-form-field>
+
+                        <!-- <mat-form-field class="w-full text-accent-600">
+                            <mat-label class="text-[#282B66]">Duration (In Seconds)</mat-label>
+                            <input id="duration" [min]="1" matInput formControlName="duration" type="number"
+                            placeholder="Enter Duration">
+                            <mat-error *ngIf="quizInfoForm.get('duration').invalid ">
+                                Duration is required
+                            </mat-error>
+                        </mat-form-field> -->
+
+                        <div class="grid grid-cols-12">
+                            <span class="text-[#282B66] font-semibold self-center col-span-2">Total Duration</span>
+
+                            <div class="col-span-10">
+                                <div class="grid grid-cols-4 gap-8">
+                                    <mat-form-field class="w-full text-accent-600">
+                                        <mat-label class="text-[#282B66]">Hours</mat-label>
+                                        <input matInput formControlName="totalDurationInHours" type="number" min="0" max="23"
+                                        placeholder="Enter hours" (focusout)="onFocusOutName('totalDurationInHours')">
+                                        <mat-error *ngIf="quizInfoForm.get('totalDurationInHours').invalid ">
+                                            Hours are required
+                                        </mat-error>
+                                    </mat-form-field>
+
+                                    <mat-form-field class="w-full text-accent-600">
+                                        <mat-label class="text-[#282B66]">Minutes</mat-label>
+                                        <input matInput formControlName="totalDurationInMinutes" type="number" min="0" max="59"
+                                        placeholder="Enter minutes" (focusout)="onFocusOutName('totalDurationInMinutes')">
+                                        <mat-error *ngIf="quizInfoForm.get('totalDurationInMinutes').invalid ">
+                                            Minutes are required
+                                        </mat-error>
+                                    </mat-form-field>
+
+                                    <mat-form-field class="w-full text-accent-600">
+                                        <mat-label class="text-[#282B66]">Seconds</mat-label>
+                                        <input matInput formControlName="totalDurationInSeconds" type="number" min="0" max="59"
+                                        placeholder="Enter seconds" (focusout)="onFocusOutName('totalDurationInSeconds')">
+                                        <mat-error *ngIf="quizInfoForm.get('totalDurationInSeconds').invalid ">
+                                            Seconds are required
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                        </div>
+
+                        <mat-form-field class="w-full text-accent-600 ">
+                            <mat-label class="text-[#282B66]">Allow Exit And ReEntry</mat-label>
+                            <mat-select formControlName="allowExitAndReEntry" placeholder="Select True Or False">
+                                <mat-option disabled>Select</mat-option>
+                                <mat-option [value]="false" selected>False</mat-option>
+                                <mat-option [value]="true">True</mat-option>
+
+                            </mat-select>
+                            <mat-error
+                                *ngIf="quizInfoForm.get('allowExitAndReEntry')?.invalid &&quizInfoForm.get('allowExitAndReEntry')?.touched">
+                                Allow Exit And ReEntry Field is required
+                            </mat-error>
+                        </mat-form-field>
+
+                        <mat-form-field class="w-full text-accent-600 ">
+                            <mat-label class="text-[#282B66]">Display Correct Answers</mat-label>
+                            <mat-select formControlName="displayCorrectAnswers" placeholder="Select True Or False">
+                                <mat-option disabled>Select</mat-option>
+                                <mat-option [value]="false" selected>False</mat-option>
+                                <mat-option [value]="true">True</mat-option>
+
+                            </mat-select>
+                            <mat-error
+                                *ngIf="quizInfoForm.get('displayCorrectAnswers')?.invalid &&quizInfoForm.get('displayCorrectAnswers')?.touched">
+                                Display Correct Answers is required
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="flex flex-row-reverse pt-3">
+        <button matStepperNext (click)="onClickNext()" [disabled]="!quizInfoForm.valid" mat-stroked-button type="button"
+            class="bg-primary text-white arrowBtn disabled:bg-primary-100">
+            Next
+            <mat-icon *ngIf="quizInfoForm.valid" class="ml-2 icon-size-5  text-white arrowIcon"
+                [svgIcon]="'heroicons_solid:arrow-sm-right'"></mat-icon>
+            <mat-icon *ngIf="!quizInfoForm.valid" class="ml-2 icon-size-5  text-white "
+                [svgIcon]="'heroicons_solid:arrow-sm-right'"></mat-icon>
+
+        </button>
+    </div>
+</form>

@@ -1,0 +1,34 @@
+::ng-deep .mat-tab-labels {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+::ng-deep .mat-tab-header-pagination-before,
+::ng-deep.mat-tab-header-pagination-after {
+    @media (max-width:600px) {
+        display: none !important;
+    }
+    background:rgba(255, 255, 255, 0) !important;
+    box-shadow: none !important;
+}
+
+.height{
+    height: calc(100vh - calc(4rem + 98px));
+}
+
+.white-icon {
+    color: white !important
+}
+
+.bg-primary {
+    background-color: #049BD8 !important;
+}
+
+::ng-deep.mat-tab-group.fuse-mat-no-header .mat-tab-header{
+    opacity: 0 !important;
+    visibility: hidden !important;
+}
+.pointer-events-none{
+    pointer-events: none !important;
+}
+

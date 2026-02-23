@@ -1,0 +1,27 @@
+<ng-container *ngIf="data?.type==='pdf'">
+    <button mat-dialog-close class=" absolute top-0 right-0 bg-red-400 h-6 w-6">
+        <mat-icon class=" hover:scale-110 transition duration-5000 transform" svgIcon="mat_outline:close">
+        </mat-icon>
+    </button>
+</ng-container>
+
+<div class="relative h-full ">
+    <ng-container *ngIf="data?.type==='image'">
+        <button mat-dialog-close class=" absolute top-0 right-0 bg-red-400 h-6 w-6">
+            <mat-icon class=" hover:scale-110 transition duration-5000 transform" svgIcon="mat_outline:close">
+            </mat-icon>
+        </button>
+    </ng-container>
+    <ng-container *ngIf="data?.type==='image'">
+        <img [src]="this.data.storagePath |getDownloadURL" alt="" class="sm:w-[60vw]">
+    </ng-container>
+
+    <ng-container *ngIf="data?.type==='pdf'">
+        <div class="h-[80vh] w-[70vw] ">
+            <app-pdf [pdfUrl]="this.data.storagePath |getDownloadURL" class=" h-full w-full">
+            </app-pdf>
+        </div>
+
+    </ng-container>l
+
+</div>

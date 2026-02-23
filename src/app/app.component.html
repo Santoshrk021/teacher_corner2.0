@@ -1,0 +1,20 @@
+<router-outlet></router-outlet>
+
+<!-- alert message service -->
+<ng-container *ngIf="alertMsg">
+    <div class="fixed z-9999 right-0 m-4">
+        <fuse-alert [type]="type" [dismissible]="dismissible" [name]="'alertBox1'" [appearance]="'outline'">
+            <span fuseAlertTitle>{{alertTitle}}</span>
+            {{alertMsg}}
+        </fuse-alert>
+    </div>
+</ng-container>
+<div *ngIf="user && !cookieStatus" class=" bottom-0 fixed z-9999 w-full bg-slate-700 sm:h-[9vh] xs:h-[15vh] xxs:h-[20vh] flex flex-row rounded-md">
+    <div class="w-full my-auto text-left ">
+    <p class="text-white ml-6 xs:text-md xxs:text-xs">This website uses cookies to ensure you get the best experience on our website.<a href="https://www.thinktac.com/policies/privacy-policy" target="_blank" class="underline text-slate-400 ml-1">Learn more</a></p>
+    </div>
+   <div class="xs:w-full xxs:w-4/5 md:my-auto text-right my-auto" (click)="addCookietouser()">
+          <span class="h-15 w-34 xs:mr-6 xxs:mr-2"><a  class=" p-2 bg-yellow-200 text-black border-black-500 cursor-pointer xs:text-md xxs:text-xs "><b>Got it!</b></a></span> 
+   </div>
+</div>
+

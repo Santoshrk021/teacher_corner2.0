@@ -1,0 +1,275 @@
+<!-- Navigation -->
+<fuse-vertical-navigation class="dark bg-gray-900 print:hidden" [mode]="isScreenSmall ? 'over' : 'side'"
+    [name]="'mainNavigation'" [navigation]="navigation?.default" [opened]="!isScreenSmall">
+    <!-- Navigation header hook -->
+    <ng-container fuseVerticalNavigationContentHeader>
+        <div class="flex items-center w-full p-4 justify-center">
+            <!-- Logo -->
+            <div class="flex items-center justify-center">
+                <ng-container *ngFor="let logo of environment.blueBackgroundLogos">
+                    <img [class]="logo.class" [src]="logo.src" [alt]="logo.alt" />
+                </ng-container>
+            </div>
+        </div>
+
+        <!-- User -->
+        <div class="flex flex-col items-center w-full p-4">
+            <div class="relative w-24 h-24">
+                <img class="w-full h-full rounded-full" *ngIf="!user?.avatar" src="https://ui-avatars.com/api/?bold=true&color=049BD8&format=svg&size=512&rounded=true&name={{
+                        user?.firstName + ' ' + user?.lastName
+                    }}" alt="User avatar" />
+                <mat-icon class="icon-size-24" *ngIf="user?.avatar" [svgIcon]="'heroicons_solid:user-circle'">
+                </mat-icon>
+            </div>
+            <div class="flex flex-col items-center justify-center w-full mt-6">
+                <div *ngIf="user?.firstName"
+                    class="w-full whitespace-nowrap text-ellipsis overflow-hidden text-center leading-normal font-medium">
+                    {{ user?.firstName + " " + user?.lastName }}
+                </div>
+                <div
+                    class="w-full mt-0.5 whitespace-nowrap text-ellipsis overflow-hidden text-center text-md leading-normal font-medium text-secondary">
+                    {{ user?.['countryCode'] }}{{user?.['phoneNumber']}}
+                </div>
+            </div>
+        </div>
+    </ng-container>
+</fuse-vertical-navigation>
+
+<!-- Wrapper -->
+<div class=" flex flex-col flex-auto w-full min-w-0">
+    <div *ngIf="buynowContainer">
+        <div *ngIf="!state" [@expandCollapse]
+            class="flex  animated-box w-full bg-[#29285F] py-2 px-4 md:hidden justify-center relative">
+            <div class="flex items-center ">
+                <span class="mr-4 text-white italic sm:text-md text-sm font-medium">
+                    Want access to more TACtivities™?
+                </span>
+                <div matRipple (click)="goToShopify()"
+                    class="w-20 cursor-pointer text-sm  italic rounded-2xl bg-primary outline outline-offset-2 outline-2 outline-primary text-white px-3 py-1 font-bold">
+                    Buy Now
+                </div>
+            </div>
+            <button (click)="bannerExpand()" class=" absolute top-0 right-0 z-10">
+                <mat-icon class="  text-white" svgIcon="mat_outline:close">
+                </mat-icon>
+            </button>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <div *ngIf="!isQuizActive"
+        class="relative flex flex-0 items-center w-full h-16 px-4 md:px-6 z-49 shadow dark:shadow-none dark:border-b bg-card dark:bg-transparent print:hidden">
+        <!-- Navigation toggle button -->
+        <button mat-icon-button (click)="toggleNavigation('mainNavigation')">
+            <mat-icon [svgIcon]="'heroicons_outline:menu'"></mat-icon>
+        </button>
+
+        <div class="text-secondary sm:text-sm text-xs" *ngIf="checkRoute(router.url)">
+            <!-- Institution -->
+            <span class="py-1 sm:px-3 rounded-full sm:bg-blue-50 transition-colors">
+                {{ institute || teacherInfo?.lastInstitutionName }}
+            </span>
+            <span class="text-black">&nbsp;>&nbsp;</span>
+
+            <!-- Classroom -->
+            <button type="button" class="py-1 sm:px-3 rounded-full sm:bg-blue-50 hover:bg-blue-100"
+                (click)="navigateToClassroom()">
+                {{ classroom || teacherInfo?.lastClassroomName }}
+            </button>
+            <span class="text-black">&nbsp;>&nbsp;</span>
+
+            <!-- Programme -->
+            <button type="button" class="py-1 sm:px-3 rounded-full sm:bg-blue-50 hover:bg-blue-100"
+                (click)="navigateToProgramme()">
+                {{ programme || teacherInfo?.lastProgrammeName }}
+            </button>
+
+            <!-- Learning Unit (only on LU / programme routes) -->
+            <ng-container *ngIf="checkSubmissionRoute(router.url)">
+                <span *ngIf="lu || teacherInfo?.lastLearningUnitName" class="text-black">&nbsp;>&nbsp;</span>
+                <button *ngIf="lu || teacherInfo?.lastLearningUnitName" type="button"
+                    class="py-1 sm:px-3 rounded-full sm:bg-blue-50 hover:bg-blue-100"
+                    (click)="navigateToLearningUnit()">
+                    {{ lu || teacherInfo?.lastLearningUnitName }}
+                </button>
+            </ng-container>
+        </div>
+
+
+        <div class="text-secondary sm:text-sm text-xs" *ngIf="checkSubmissionsRoute(router.url)">
+            <span class="py-1">
+                {{ institute || teacherInfo?.lastInstitutionName }}
+            </span>
+            <span class="text-black">&nbsp;>&nbsp;</span>
+
+            <button type="button" class="py-1 sm:px-3 rounded-full sm:bg-blue-50 hover:bg-blue-100"
+                (click)="navigateToClassroom()">
+                {{ classroom || teacherInfo?.lastClassroomName }}
+            </button>
+            <span class="text-black">&nbsp;>&nbsp;</span>
+
+            <button type="button" class="py-1 sm:px-3 rounded-full sm:bg-blue-50 hover:bg-blue-100"
+                (click)="navigateToProgramme()">
+                {{ programme || teacherInfo?.lastProgrammeName }}
+            </button>
+
+            <ng-container *ngIf="lu">
+                <span class="text-black">&nbsp;>&nbsp;</span>
+                <button type="button" class="py-1 sm:px-3 rounded-full sm:bg-blue-50 hover:bg-blue-100"
+                    (click)="navigateToLearningUnit()">
+                    {{ lu }}
+                </button>
+            </ng-container>
+
+            <span class="text-black">&nbsp;>&nbsp;</span>
+            <span class="py-1 sm:px-3 rounded-full sm:bg-blue-50 hover:bg-blue-100">
+                {{ router.url.includes('/quiz-submissions') ? 'Quiz Submissions' : 'Upload Submissions' }}
+            </span>
+        </div>
+
+        <!-- Contest breadcrumbs -->
+        <div class="text-secondary sm:text-sm text-xs" *ngIf="isContestRoute()">
+            <span class="py-1 sm:px-3 rounded-full sm:bg-blue-50 transition-colors">
+                Contests and Challenges
+            </span>
+
+            <span class="text-black">&nbsp;>&nbsp;</span>
+            <!-- Contest Title -->
+            <button type="button" class="py-1 sm:px-3 rounded-full sm:bg-blue-50 hover:bg-blue-100"
+                (click)="navigateToContest()">
+                {{ contestTitle }}
+            </button>
+
+            <!-- Stage Name -->
+            <ng-container *ngIf="stageName">
+                <span class="text-black">&nbsp;>&nbsp;</span>
+                <button type="button" class="py-1 sm:px-3 rounded-full sm:bg-blue-50 hover:bg-blue-100"
+                    (click)="navigateToContestStage()">
+                    {{ stageName }}
+                </button>
+            </ng-container>
+
+            <!-- Submission Name -->
+            <ng-container *ngIf="submissionName">
+                <span class="text-black">&nbsp;>&nbsp;</span>
+                <button type="button" class="py-1 sm:px-3 rounded-full sm:bg-blue-50 hover:bg-blue-100"
+                    (click)="navigateToContestSubmission()">
+                    {{ submissionName }}
+                </button>
+            </ng-container>
+        </div>
+
+        <!-- Nomination Dashboard breadcrumbs -->
+        <div class="text-secondary sm:text-sm text-xs" *ngIf="isNominationRoute()">
+
+            <span class="py-1 sm:px-3 rounded-full sm:bg-blue-50 transition-colors">
+                Nominations
+            </span>
+
+            <span class="text-black">&nbsp;>&nbsp;</span>
+
+            <!-- Contest Title -->
+            <button type="button" class="py-1 sm:px-3 rounded-full sm:bg-blue-50 hover:bg-blue-100"
+                (click)="navigateToNominationContest()">
+                {{ contestTitle }}
+            </button>
+
+            <!-- Stage Name -->
+            <ng-container *ngIf="stageName">
+                <span class="text-black">&nbsp;>&nbsp;</span>
+                <button type="button" class="py-1 sm:px-3 rounded-full sm:bg-blue-50 hover:bg-blue-100"
+                    (click)="navigateToNominationStage()">
+                    {{ stageName }}
+                </button>
+            </ng-container>
+        </div>
+
+        <!-- Nominations (View Nominations) breadcrumbs -->
+        <div class="text-secondary sm:text-sm text-xs" *ngIf="isNominationsRoute()">
+            <span class="py-1 sm:px-3 rounded-full sm:bg-blue-50 transition-colors">
+                Nominations
+            </span>
+
+            <span class="text-black">&nbsp;>&nbsp;</span>
+            <!-- Contest Title -->
+            <button type="button" class="py-1 sm:px-3 rounded-full sm:bg-blue-50 hover:bg-blue-100"
+                (click)="navigateToNominationsContest()">
+                {{ contestTitle }}
+            </button>
+
+            <!-- Stage Name -->
+            <ng-container *ngIf="stageName">
+                <span class="text-black">&nbsp;>&nbsp;</span>
+                <button type="button" class="py-1 sm:px-3 rounded-full sm:bg-blue-50 hover:bg-blue-100"
+                    (click)="navigateToNominationsStage()">
+                    {{ stageName }}
+                </button>
+            </ng-container>
+        </div>
+
+        <!-- Admin breadcrumbs -->
+        <div class="text-secondary sm:text-sm text-xs" *ngIf="isAdminRoute()">
+            <span class="py-1 sm:px-3 rounded-full sm:bg-blue-50">
+                Admin
+            </span>
+            <span class="text-black">&nbsp;>&nbsp;</span>
+            <button type="button" class="py-1 sm:px-3 rounded-full sm:bg-blue-50 hover:bg-blue-100"
+                (click)="navigateToAdminPage()">
+                {{ getAdminPageTitle() }}
+            </button>
+        </div>
+
+        <!-- Components -->
+        <div class="flex items-center pl-2 ml-auto space-x-0.5 sm:space-x-2">
+            <notifications></notifications>
+            <user [showAvatar]="false"></user>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <div class="flex flex-col flex-auto relative">
+        <router-outlet></router-outlet>
+
+        <!-- WhatsApp Chat Button -->
+        <div *ngIf="sharedService.isWhatsappBtnVisible && !isQuizActive" cdkDrag class="mr-2 hidden sm:block"
+            (cdkDragStarted)="onDragStarted()" (cdkDragEnded)="onDragEnded()"
+            [ngClass]="isWorkFlowView ? 'waChat--container' : 'otherView'">
+            <div id="header1" [ngClass]="isWorkFlowView ? 'removeCrossbutton' : 'showCrossbutton'">
+                <button id="waChat--close-button" matTooltip="Remove WhatsApp Icon" (click)="closeWhatsappChat()">
+                    <mat-icon class="icon-size-4 absolute rounded-full hover:bg-gray-300 top-4 -right-2 z-10"
+                        svgIcon="mat_outline:close"></mat-icon>
+                </button>
+            </div>
+            <a id="waChat--button" [disabled]="disableButtonClick"
+                [href]="disableButtonClick ? null : 'https://wa.me/' + environment.whatsAppSender + '?text=Greetings%21+I+have+a+question+regarding+Teacher+corner.'"
+                target="_blank" (click)="onLinkClick($event)">
+            </a>
+            <span id="waChat--text">Need Help? Chat with us</span>
+        </div>
+
+        <div *ngIf="buynowContainer">
+            <div *ngIf="buynowOpen" [@zoomOut] class="absolute left-5 bottom-5 z-10 md:block hidden">
+                <div class='flex'>
+                    <span class=" mr-4 buynowtext">
+                        Want access to more TACtivities™?
+                    </span>
+                    <div class="relative cursor-pointer" (click)="goToShopify()">
+                        <div matRipple
+                            class="w-30 buynowShadow italic rounded-2xl bg-primary outline outline-offset-2 outline-2 outline-primary text-white px-3 py-1 font-bold">
+                            Buy Now
+                        </div>
+                        <div matRipple
+                            class="h-11 w-11 bg-white border-2 border-primary-500 rounded-full absolute z-2 -right-1 -top-2 flex justify-center items-center shadow-xl">
+                            <mat-icon class="text-primary" svgIcon="heroicons_outline:shopping-cart"></mat-icon>
+                        </div>
+                        <button (click)="buyNowCloseBtn()" matTooltip="Close the 'Buy Now' button"
+                            class=" absolute -top-3 -right-1 z-10  hover:scale-125 transition duration-5000 transform">
+                            <mat-icon class="icon-size-4 " svgIcon="mat_outline:close">
+                            </mat-icon>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

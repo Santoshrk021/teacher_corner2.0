@@ -1,0 +1,47 @@
+.icon-display {
+    transform: scale(1.4);
+}
+
+.arrowBtn {
+    &:hover {
+        .arrowIcon {
+            animation: bounce 1s infinite;
+
+        }
+    }
+
+
+}
+
+.arrowAnime {
+    animation: bounce 1s infinite;
+}
+
+@keyframes bounce {
+
+    0% {
+        transform: translateX(0%);
+        animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+    }
+
+    100% {
+        transform: translateX(0%);
+        animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+    }
+
+    50% {
+        transform: translateX(35%);
+        animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+    }
+}
+
+::ng-deep .mat-form-field.mat-form-field-appearance-fill .mat-form-field-wrapper .mat-form-field-flex {
+    height: 10px !important;
+}
+
+.disableDiv {
+    filter: grayscale(100%);
+    // pointer-events: none;
+    opacity: 0.7;
+    /* Adjust the opacity to your preference */
+}

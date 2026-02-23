@@ -1,0 +1,138 @@
+<div class="h-[63vh] ">
+    <div class=" h-full overflow-auto bg-primary-50 rounded-xl p-6">
+        <div class="grid grid-cols-5 mb-6">
+            <div class="col-span-2 text-accent font-semibold">
+                <p class="mb-2  ">Program Title</p>
+                <p class="mb-2  ">Program Display Name</p>
+                <p class="mb-2  ">Program Code</p>
+                <p class="mb-2 ">Program Description</p>
+                <p class="mb-2 ">Program Type</p>
+                <p class="mb-2 ">Program Status</p>
+                <p class="mb-2 ">Program Image</p>
+                <p class="mb-2 ">Selected Institution</p>
+                <p class="mb-2 ">{{programData?.grades?.length?'Grades':'Age (In Years)'}}</p>
+            </div>
+            <div class="col-span-3 text-accent font-medium">
+                <p class="mb-2 ">{{programData?.programmeName}}</p>
+                <p class="mb-2 ">{{programData?.displayName}}</p>
+                <p class="mb-2 ">{{programData?.programmeCode}}</p>
+                <p class="mb-2 ">{{programData?.programmeDesc}}</p>
+                <p class="mb-2 ">{{programData?.type}}</p>
+                <p class="mb-2 ">{{programData?.programmeStatus}}</p>
+                <div class="mb-2 ">
+                    <div *ngIf="programData?.programmeImage" matRipple class=" mat-stroked-button right-2 bg-primary text-white
+                                        active:bg-primary-800 cursor-pointer text-center ">
+                        <a target="_blank" [href]="programData?.programmeImage | getDownloadURL"
+                            class="  h-full flex items-center justify-center">
+                            View
+                        </a>
+                    </div>
+                    <p *ngIf="!programData?.programmeImage">No Image</p>
+                </div>
+                <p class="mb-2 ">{{programData?.institutionName}}</p>
+                <p class="mb-2 ">
+                    {{ programData?.grades?.length ?
+                    programData?.grades?.join(', ') :
+                    programData?.age?.join(', ')}}
+                </p>
+            </div>
+        </div>
+        <p class="font-semibold text-accent">Selected learning unit list</p>
+        <div class="grid grid-cols-3 gap-4 mt-2">
+            <div *ngFor="let learningunit of programData?.selectedLearninglist;let i=index">
+                <div class="bg-primary-100 shadow border  rounded-xl p-4 mb-3 w-full ">
+                    <div class="grid grid-cols-2 mb-2 ">
+                        <div class=" text-accent font-semibold">
+                            Name
+                        </div>
+                        <div class=" text-accent font-medium">
+                            {{learningunit?.learningUnitName}}
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 mb-2 ">
+                        <div class=" text-accent font-semibold">
+                            DocId
+                        </div>
+                        <div class=" text-accent font-medium ">
+                            <span class="w-full break-words">
+                                {{learningunit?.docId}}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 mb-2 ">
+                        <div class=" text-accent font-semibold">
+                            Headline Image
+                        </div>
+                        <div class="relative flex flex-0   rounded overflow-hidden border">
+                            <img class="h-10 w-auto" *ngIf="learningunit?.learningUnitPreviewImage"
+                                [alt]="'learning unit thumbnail image'" [src]="learningunit?.learningUnitPreviewImage
+                                |getDownloadURL" loading="lazy">
+                            <div class="flex items-center justify-center w-full h-full text-xs font-semibold leading-none text-center uppercase"
+                                *ngIf="!learningunit?.learningUnitPreviewImage
+                                ">
+                                NO THUMB
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <p class="font-semibold mt-4 text-accent">Selected Assignments list</p>
+        <div class="grid grid-cols-3 gap-3 mt-2">
+            <div *ngFor="let assignment of programData?.selectedAssignments;let i=index">
+                <div class="bg-primary-100 shadow border  rounded-xl p-4 mb-3 w-full h-full">
+                    <div class="grid grid-cols-2 mb-2 w-full ">
+                        <div class=" text-accent font-semibold">
+                            Displayname
+                        </div>
+                        <div class=" text-accent font-medium w-full">
+                            <span class="w-full break-words">{{assignment?.displayName}}</span>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 mb-2 w-full">
+                        <div class="text-accent font-semibold">
+                            DocId
+                        </div>
+                        <div class=" text-accent font-medium w-full">
+                            <span class="w-full break-words"> {{assignment?.docId}}</span>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 mb-2 w-full">
+                        <div class=" text-accent font-semibold">
+                            Type
+                        </div>
+                        <div class=" text-accent font-medium">
+                            {{assignment?.type}}
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 mb-2 w-full ">
+                        <div class=" text-accent font-semibold">
+                            Headline Image
+                        </div>
+                        <div
+                            class="relative flex flex-0 items-right justify-right w-full mr-6 rounded overflow-hidden border">
+                            <!-- <img class="w-10 h-10" alt="'learning unit thumbnail image'"
+                                [src]="'https://firebasestorage.googleapis.com/v0/b/' + environment.firebase.projectId + '.appspot.com/o/learningUnits%2FBA02-EN-V10%2FChemistry-01.jpeg?alt=media&token=47c826ed-69ed-4b26-946e-49a9555949ef'"> -->
+                            <div
+                                class="flex items-center justify-center w-full h-full text-xs font-semibold leading-none text-center uppercase">
+                                NO THUMB
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="flex flex-row-reverse mt-2">
+    <button (click)="programSave()" mat-stroked-button type="button" [disabled]="loginSpinner"
+        class="bg-primary text-white  disabled:bg-primary-100">
+        <p *ngIf="!loginSpinner">Create</p>
+        <mat-spinner *ngIf="loginSpinner" [diameter]="20"></mat-spinner>
+    </button>
+    <!-- <button type="submit" color="primary" class="fuse-mat-stroked-button-large w-full mt-6 cursor-pointer"
+        mat-flat-button [disabled]="!schoolInfo.valid ||loginSpinner">
+        <p *ngIf="!loginSpinner">Submit</p>
+        <mat-spinner *ngIf="loginSpinner" [diameter]="20"></mat-spinner>
+    </button> -->
+</div>

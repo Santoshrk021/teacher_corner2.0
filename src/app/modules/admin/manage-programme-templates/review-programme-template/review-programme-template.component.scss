@@ -1,0 +1,16 @@
+.arrowBtn {
+    &:hover {
+        .arrowIcon {
+            animation: bounce 1s infinite;
+
+        }
+    }
+}
+
+.arrowBtnBack {
+    &:hover {
+        .arrowIconBack {
+            animation: bounceBack 1s infinite;
+        }
+    }
+}

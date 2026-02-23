@@ -1,0 +1,17 @@
+<div class="h-full flex flex-col">
+  <!-- Header -->
+  <div class="h-14 flex items-center justify-between px-5 border-b border-gray-200">
+    <div class="text-2xl font-bold text-gray-900 truncate">
+      {{ data?.title || 'Case Study' }}
+    </div>
+
+    <button mat-icon-button (click)="close()" aria-label="Close" class="text-gray-600 hover:text-gray-900">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Body -->
+  <div class="flex-1 overflow-hidden text-justify">
+    <app-quiz-case-study [html]="data.html"></app-quiz-case-study>
+  </div>
+</div>

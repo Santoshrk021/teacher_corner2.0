@@ -1,0 +1,154 @@
+<div class="md:p-6 p-2 w-full md:w-[35vw] md:h-[85vh] h-[60vh] relative overflow-auto">
+    <button mat-dialog-close class="m-4 sm:m-6 sm:mx-7 absolute -top-4 -right-4 z-40">
+        <mat-icon class=" hover:scale-110 transition duration-5000 transform" svgIcon="mat_outline:close">
+        </mat-icon>
+    </button>
+    <form [formGroup]="infoForm" (ngSubmit)="onSubmit(infoForm)">
+        <!-- phone no -->
+        <mat-form-field class="w-full text-accent-600" floatLabel="always">
+            <mat-label class="text-accent-600">Phone Number</mat-label>
+            <input
+                [matTooltip]="!data?.newStudent?'Phone number cannot be modified. Please delete the nomination and re-nominate in case you wish to change this nominee’s number.':''"
+                [readonly]="!data?.newStudent" id="phone" matInput [formControlName]="'phoneNumber'" type="text"
+                minLength="10" maxLength="10" placeholder="Enter the phone number of the nominee or their parent">
+            <span matPrefix class="text-gray-500">{{teacherCountryCode}}&nbsp;</span>
+            <mat-icon [svgIcon]="'heroicons_outline:information-circle'" matSuffix
+                *ngIf="selfNomination || isMoreThanTwo"
+                [matTooltip]="selfNomination?selfNominationError:isMoreThanTwo?moreThanTwoError:''"
+                class="text-warn-400"></mat-icon>
+            <mat-error
+                *ngIf="infoForm.get('phoneNumber').errors?.pattern || infoForm.get('phoneNumber').errors?.required">
+                Enter a valid 10 digit number
+            </mat-error>
+            <mat-error *ngIf="infoForm.get('phoneNumber').errors?.selfNomination">
+                {{selfNominationError}}
+            </mat-error>
+            <mat-error *ngIf="infoForm.get('phoneNumber').errors?.moreThanTwoError">
+                {{moreThanTwoError}}
+            </mat-error>
+            <!-- <mat-error *ngIf="selfNomination">
+                {{selfNominationError}}
+            </mat-error> -->
+        </mat-form-field>
+
+        <mat-form-field *ngIf="multipleStudents" class="w-full text-accent-600" floatLabel="always">
+            <mat-label matTooltipPosition="above" matTooltip="Type Custom Section"
+                class="text-accent-600">Select&nbsp;*</mat-label>
+            <mat-select formControlName="" placeholder="Select Student" (selectionChange)="fillForm($event)">
+                <mat-option value="Choose" placeholder="Select Student" disabled selected>Select</mat-option>
+                <mat-option [disabled]="st.registeredInRa"
+                    [matTooltip]="st.registeredInRa?'Student already nominated':''" *ngFor="let st of studentMetaArray"
+                    [value]="st">
+                    {{st?.studentMeta?.firstName+' '+st?.studentMeta?.lastName}}
+                </mat-option>
+                <mat-option (click)="addNewStudent()"><span class="bg-gray-200 rounded-full text-gray-500 py-2 px-4">Add
+                        a New Student&nbsp;
+                        <mat-icon class="m-0" svgIcon="feather:plus-circle"></mat-icon>
+                    </span>
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+
+        <!-- First Name -->
+        <mat-form-field class="w-full text-accent-600" floatLabel="always">
+            <mat-label class="text-accent-600">First Name</mat-label>
+            <input (focusout)="onFocusoutName()" id="name" matInput [formControlName]="'firstName'" type="text"
+                placeholder="Enter the nominee's first name">
+            <mat-icon [svgIcon]="'heroicons_outline:information-circle'" matSuffix *ngIf="isDuplicateName"
+                [matTooltip]="duplicateNameError" class="text-warn-400"></mat-icon>
+            <mat-error *ngIf=" infoForm.get('firstName').errors?.required">
+                First Name is required
+            </mat-error>
+            <mat-error *ngIf="infoForm.get('firstName').errors?.duplicateNameError ">
+                {{duplicateNameError}}
+            </mat-error>
+        </mat-form-field>
+
+        <!-- Last Name -->
+        <mat-form-field class="w-full text-accent-600" floatLabel="always">
+            <mat-label class="text-accent-600">Last Name</mat-label>
+            <input (focusout)="onFocusoutName()" id="name" matInput [formControlName]="'lastName'" type="text"
+                placeholder="Enter the nominee's last name">
+            <mat-icon [svgIcon]="'heroicons_outline:information-circle'" matSuffix *ngIf="isDuplicateName"
+                [matTooltip]="duplicateNameError" class="text-warn-400"></mat-icon>
+            <mat-error *ngIf="infoForm.get('lastName').errors?.required">
+                Last Name is required
+            </mat-error>
+            <mat-error *ngIf="infoForm.get('lastName').errors?.duplicateNameError ">
+                {{duplicateNameError}}
+            </mat-error>
+        </mat-form-field>
+
+        <div class="grid md:grid-cols-3 md:gap-4 grid-cols-1">
+            <div>
+                <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                    <mat-label class="text-accent-600">Age</mat-label>
+                    <input [min]="5" [max]="16" id="age" matInput [formControlName]="'age'" type="number"
+                        placeholder="Enter Age">
+                    <mat-error *ngIf="infoForm.get('age').invalid">
+                        Children should be between the ages of 5 and 16
+                    </mat-error>
+
+                </mat-form-field>
+            </div>
+            <div>
+                <mat-form-field class="w-full text-accent-600">
+                    <mat-label class="text-accent-600">Grade</mat-label>
+                    <input [readonly]="true" id="grade" matInput [formControlName]="'grade'" type="number">
+
+                    <!-- <mat-select formControlName="grade" placeholder="Select Grade">
+                        <mat-option value="" disabled selected>Select</mat-option>
+                        <mat-option *ngFor="let gr of gradeList" [value]="gr">
+                            Class {{ gr }}
+                        </mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="infoForm.get('grade')?.invalid &&infoForm.get('grade')?.touched">
+                        Grade is required
+                    </mat-error> -->
+                </mat-form-field>
+            </div>
+            <div>
+                <mat-form-field class="w-full text-accent-600">
+                    <mat-label class="text-accent-600">Gender</mat-label>
+                    <mat-select formControlName="gender" placeholder="Select gender">
+                        <mat-option value="" disabled selected>Select</mat-option>
+                        <mat-option *ngFor="let g of genderList" [value]="g">
+                            {{ g }}
+                        </mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="infoForm.get('gender')?.invalid &&infoForm.get('gender')?.touched">
+                        Gender is required
+                    </mat-error>
+
+                </mat-form-field>
+            </div>
+        </div>
+
+
+
+        <!-- email -->
+        <!-- <mat-form-field class="w-full text-accent-600"> -->
+        <mat-form-field class="w-full text-accent-600" floatLabel="always">
+            <!-- <mat-form-field class="w-full text-accent-600" [floatLabel]="getFloatLabelValue()"> -->
+            <mat-label class="text-accent-600">Email</mat-label>
+            <input id="email" matInput [formControlName]="'email'" type="email"
+                placeholder="Enter the email address of the nominee or their parent">
+            <mat-error *ngIf="infoForm.get('email').hasError('email')">
+                Email is invalid
+            </mat-error>
+        </mat-form-field>
+
+        <p class="text-primary text-[11px] italic font-semibold"><span class="font-bold text-accent">Note</span>:
+            <!-- You will have to nominate a minimum of one female child per grade</p> -->
+            In case you represent a co-ed school, you will have to nominate a minimum of one female child per grade
+        </p>
+        <div>
+            <button type="submit" color="primary" class="fuse-mat-stroked-button-large w-full mt-6 cursor-pointer "
+                mat-flat-button [disabled]="!infoForm.valid||loginSpinner||selfNomination">
+                {{loginSpinner?'':'Submit'}}
+                <mat-spinner *ngIf="loginSpinner" [diameter]="20"></mat-spinner>
+            </button>
+        </div>
+    </form>
+
+</div>

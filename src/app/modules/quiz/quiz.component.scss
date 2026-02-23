@@ -1,0 +1,287 @@
+// :host::ng-deep .mat-tab-label-container {
+//     @media (max-width:600px) {
+//         display: flex;
+//         flex-grow: 1;
+//         overflow: hidden;
+//         z-index: 1;
+//         overflow-x: scroll !important;
+//     }
+// }
+
+// :host::ng-deep .hide-stepper-header .mat-horizontal-stepper-header-container {
+//   display: none !important;
+// }
+
+:host::ng-deep.mat-tab-group .mat-tab-header .mat-tab-label-container .mat-tab-list .mat-tab-labels .mat-tab-label.mat-tab-label-active {
+    background-color: #049cd800 !important;
+}
+
+:host::ng-deep .mat-tab-group .mat-tab-body-content {
+    @media (max-width:600px) {
+        padding: 0;
+    }
+}
+
+:host::ng-deep.mat-tab-group .mat-tab-header .mat-tab-label-container .mat-tab-list .mat-tab-labels .mat-tab-label.mat-tab-label-active {
+    color: #049BD8 !important;
+    border-bottom: 2px solid #049BD8;
+    border-radius: 0px !important;
+}
+
+.white-icon {
+    color: white !important
+}
+
+.bg-primary {
+    background-color: #049BD8 !important;
+}
+
+.mainBtn {
+    &:hover {
+        .arrowIcon {
+            animation: bounce 1s infinite;
+
+            @keyframes bounce {
+
+                0% {
+                    transform: translateX(0%);
+                    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+                }
+
+                100% {
+                    transform: translateX(0%);
+                    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+                }
+
+                50% {
+                    transform: translateX(35%);
+                    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+                }
+            }
+        }
+    }
+
+
+}
+
+:host ::ng-deep.mat-step-label.mat-step-label-active {
+    border-top-color: #049cd8 !important;
+}
+
+:host ::ng-deep.mat-step-header {
+    color: #fff !important;
+}
+
+:host ::ng-deep.mat-step-header[aria-selected="true"] {
+    background-color: rgba(0, 168, 206, 0.105) !important;
+    border-radius: 32px;
+
+    & div.mat-step-label.mat-step-label-active.mat-step-label-selected {
+        color: #0080b3;
+    }
+}
+
+:host ::ng-deep.mat-step-header {
+    &:hover {
+        border-radius: 32px !important;
+    }
+}
+
+:host ::ng-deep.mat-horizontal-stepper-wrapper {
+    // background-color: #EFEFF2 !important;
+    background-color: var(--stepper-bg-color);
+}
+
+:host::ng-deep.ql-container .ql-editor {
+    background: none !important;
+}
+
+// :host ::ng-deep .ql-container {
+//     min-height: 0 !important;
+//     --tw-shadow: none !important;
+//     font-family: Inter var, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", Segoe UI Symbol, "Noto Color Emoji";
+// }
+
+// :host ::ng-deep .ql-container .ql-editor {
+//     font-size: 2rem !important;
+//     line-height: 1.6 !important;
+//     background: none !important;
+// }
+
+:host ::ng-deep .ql-editor img {
+    // max-width: 100%;
+    width: 200px;
+    height: auto;
+    display: block;
+    margin: 1rem auto;
+    /* Optional: add custom styling */
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+:host ::ng-deep .mat-radio-label-content,
+:host ::ng-deep .mat-checkbox-label {
+    font-size: 1.5rem !important;
+}
+:host ::ng-deep .flex.flex-row.items-center.flex-1 label,
+:host ::ng-deep .flex.items-center.flex-1 label {
+  font-size: 4rem !important;
+}
+
+:host ::ng-deep .flex.flex-row.items-center.flex-1 label,
+:host ::ng-deep .flex.items-center.flex-1 label {
+  font-size: 1.5rem !important; /* or 2rem */
+  line-height: 1.5 !important;
+}
+:host ::ng-deep div[formArrayName="options"] label {
+  font-size: 1.2rem !important; /* same as question */
+  line-height: 1.5 !important;
+}
+
+:host ::ng-deep .options-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 1.5rem !important;
+}
+// :host ::ng-deep .option-index-label {
+//   font-size: 2rem !important;
+//   font-weight: bold !important;
+//   line-height: 1.5 !important;
+//   min-width: 2.5rem;
+//   color: #111827 !important; // Use dark shade for clarity
+// }
+.option-image-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%; // take full width of option
+  overflow: visible;
+}
+
+.option-image {
+  transition: transform 0.3s ease;
+}
+
+
+/* Hidden: no space taken */
+:host ::ng-deep .step-labels-hidden .mat-horizontal-stepper-header-container {
+  max-height: 0 !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  transition: max-height 0.35s ease;
+}
+
+/* Visible: allow room for the header row */
+:host ::ng-deep .step-labels-visible .mat-horizontal-stepper-header-container {
+  max-height: 72px; /* adjust if your header is taller/shorter */
+  height: auto;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  transition: max-height 0.35s ease;
+}
+
+/* Fade the individual labels in/out (as you had) */
+:host ::ng-deep .step-labels-hidden .mat-step-label,
+:host ::ng-deep .step-labels-hidden .mat-step-text-label,
+:host ::ng-deep .step-labels-hidden .mat-horizontal-stepper-header {
+  opacity: 0;
+  transform: translateY(-12px);
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+:host ::ng-deep .step-labels-visible .mat-step-label,
+:host ::ng-deep .step-labels-visible .mat-step-text-label,
+:host ::ng-deep .step-labels-visible .mat-horizontal-stepper-header {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+
+:host ::ng-deep .step-labels-hidden .mat-horizontal-stepper-header-container {
+  pointer-events: none !important; /* you already hide space */
+}
+
+:host ::ng-deep .step-labels-visible .mat-horizontal-stepper-header-container {
+  pointer-events: auto;             /* ensure clicks work */
+}
+
+.zoom-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 1000; /* the zoomed item uses 1001 */
+}
+
+// ===================== SUB-PARTS STEPPER STYLING =====================
+.sub-parts-stepper-container {
+  padding: 8px 0;
+}
+
+.sub-part-active-bg {
+  background-color: rgba(0, 168, 206, 0.105) !important;
+  border-radius: 9999px;
+}
+
+// Remove extra whitespace from quill-view-html in question title display
+:host ::ng-deep .question-title-container quill-view-html {
+  .ql-container {
+    min-height: 0 !important;
+    height: auto !important;
+  }
+  .ql-editor {
+    padding: 0 !important;
+    min-height: 0 !important;
+    height: auto !important;
+    overflow: visible !important;
+
+    p {
+      margin-bottom: 0 !important;
+      &:last-child {
+        margin-bottom: 0 !important;
+      }
+    }
+
+    p:empty {
+      display: none !important;
+    }
+
+    p br:only-child {
+      display: none !important;
+    }
+  }
+}
+
+// ===================== TEXT ANSWER QUILL EDITOR STYLING =====================
+:host ::ng-deep .quiz-text-answer-editor {
+  .ql-container {
+    border: 1px solid #e5e7eb;
+    border-radius: 0.375rem;
+    min-height: 100px;
+    font-family: inherit;
+  }
+
+  .ql-editor {
+    min-height: 100px;
+    padding: 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+
+    &.ql-blank::before {
+      color: #9ca3af;
+      font-style: normal;
+    }
+  }
+
+  .ql-editor:focus {
+    outline: none;
+  }
+
+  &:focus-within .ql-container {
+    border-color: #049BD8;
+    box-shadow: 0 0 0 2px rgba(4, 155, 216, 0.1);
+  }
+}

@@ -1,0 +1,47 @@
+<div class="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
+    <div class="bg-white p-2 rounded-lg shadow-lg w-1/3">
+        <!-- <div class="bg-gray-200 p-4 py-2 flex justify-between items-center relative"> -->
+        <div class="bg-[#282B66] p-4 py-2 flex justify-between items-center relative">
+            <!-- <div class="bg-primary-600 p-4 py-2 flex justify-between items-center relative"> -->
+            <h2 class="text-white text-lg font-semibold">Rejection Reason</h2>
+
+            <div class="absolute top-2 right-2">
+                <button mat-dialog-close class="">
+                    <mat-icon class="hover:scale-110 transition duration-5000 transform text-white"
+                        svgIcon="mat_outline:close">
+                    </mat-icon>
+                </button>
+            </div>
+        </div>
+
+        <div class="p-6">
+            <form [formGroup]="rejectionForm" (ngSubmit)="onSubmit()">
+                <div class="mb-4">
+                    <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                        <mat-label class="text-[#282B66]">Select reason</mat-label>
+                        <mat-select formControlName="rejectionReason" placeholder="Select the reason for rejection">
+                            <mat-option disabled>Select</mat-option>
+                            <mat-option *ngFor="let reason of rejectionReasons" [value]="reason">
+                                {{reason?.reason}}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+
+                <div class="mb-4">
+                    <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                        <mat-label class="text-[#282B66]">Comment</mat-label>
+                        <input matInput formControlName="rejectionComment" placeholder="Enter your comment" />
+                    </mat-form-field>
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" mat-raised-button color="primary" [disabled]="rejectionForm.invalid || isRejectionSubmitted"
+                        mat-dialog-close class="fuse-mat-stroked-button-large mt-6 cursor-pointer">
+                        Submit
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

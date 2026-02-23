@@ -1,0 +1,84 @@
+<form [formGroup]="assignmentFormGroup" (ngSubmit)="onSubmit()">
+    <div class="rounded-xl bg-white p-5 m-5">
+        <h1 class="text-center text-primary-500">Instructions</h1>
+        <h2 class="text-center text-primary-500">{{assignmentFormGroup?.get('instructions')?.value}}</h2>
+
+        <div formArrayName="questions">
+            <div *ngFor="let question of questions?.controls; let i = index" [formGroupName]="i">
+                <div *ngIf="question?.get('isSubquestion')?.value === false; else subQuestion">
+                    Question {{question?.get('questionNumber')?.value}}: {{question?.get('question')?.value}}
+                </div>
+
+                <ng-template #subQuestion>
+                    {{question?.get('questionNumber')?.value}}: {{question?.get('question')?.value}}
+                </ng-template>
+
+                <div [ngSwitch]="question?.get('questionType')?.value">
+                    <div *ngSwitchCase="'text'">
+                        <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                            <input matInput type="text" formControlName="answer" placeholder="Enter the answer here">
+                        </mat-form-field>
+                    </div>
+
+                    <div *ngSwitchCase="'textBox'">
+                        <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                            <textarea matInput formControlName="answer"
+                                [placeholder]="question?.get('prompt')?.value"></textarea>
+                        </mat-form-field>
+                    </div>
+
+                    <div *ngSwitchCase="'dropDown'">
+                        <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                            <mat-select formControlName="answer" placeholder="Select the percentage">
+                                <mat-option disabled>Select</mat-option>
+                                <mat-option *ngFor="let option of question?.get('dropDownOptions')?.value"
+                                    [value]="option">{{option}}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+
+                    <div *ngSwitchCase="'dropDownDynamic'">
+                        <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                            <mat-select formControlName="answer" placeholder="Select the dropdown value"
+                                (selectionChange)="onSelectDynamicDropDown($event, i)">
+                                <mat-option disabled>Select</mat-option>
+                                <mat-option *ngFor="let option of question?.get('dropDownOptionsDynamic')?.value"
+                                    [value]="option">{{option}}</mat-option>
+                            </mat-select>
+                            <mat-icon class="icon-size-5" matPrefix
+                                [svgIcon]="question?.get('fieldIcon')?.value"></mat-icon>
+                        </mat-form-field>
+                    </div>
+
+                    <div *ngSwitchCase="'dropDownDependent'">
+                        <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                            <mat-select formControlName="answer" placeholder="Select the dropdown value"
+                                (selectionChange)="onSelectDependentDropDown($event, i)">
+                                <mat-option disabled>Select</mat-option>
+                                <mat-option
+                                    *ngFor="let option of question?.get('dropDownOptionsDependent')?.value?.[dependentDropdowns[i]]"
+                                    [value]="option">{{option}}</mat-option>
+                            </mat-select>
+                            <mat-icon class="icon-size-5" matPrefix
+                                [svgIcon]="question?.get('fieldIcon')?.value"></mat-icon>
+                        </mat-form-field>
+                    </div>
+
+                    <div *ngSwitchCase="'starRating'">
+                        <app-star-rating [question]="question.getRawValue()"
+                            (ratingInfo)="catchRatingEvent($event, i)"></app-star-rating>
+                    </div>
+
+                    <div *ngSwitchCase="'none'"></div>
+
+                    <div *ngSwitchDefault></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-center">
+            <button mat-raised-button class="w-50" color="primary"
+                [disabled]="!assignmentFormGroup.valid ||isSubmitBtnDisabled" type="submit">Submit</button>
+        </div>
+    </div>
+</form>

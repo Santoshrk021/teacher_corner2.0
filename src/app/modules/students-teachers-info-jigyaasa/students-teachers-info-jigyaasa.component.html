@@ -1,0 +1,174 @@
+<div class=" h-screen w-screen overflow-hidden relative">
+    <button (click)="drawerClose()" class="m-3  absolute top-0 right-0 z-40">
+        <mat-icon class=" hover:scale-110 transition duration-5000 transform" svgIcon="mat_outline:close">
+        </mat-icon>
+    </button>
+
+    <div class="pl-4 pr-22 h-10 flex justify-between my-4">
+        <div class="flex items-baseline">
+            <p Class=" font-bold text-lg text-accent-600">
+                {{
+                teacherInfoUi ?
+                'Teacher Information' :
+                'Students Information'
+                }}
+            </p>
+
+            <mat-form-field *ngIf="teacherInfoUi" class="fuse-mat-dense w-80 ml-5" [floatLabel]="'always'">
+                <mat-icon matPrefix class="icon-size-5" [svgIcon]="'heroicons_solid:search'"></mat-icon>
+                <input (input)="filterByQueryInTeacherDoc(query.value)"
+                    placeholder="Search by first name, last name, phone, email" matInput #query />
+            </mat-form-field>
+
+            <mat-form-field *ngIf="!teacherInfoUi" class="fuse-mat-dense w-80 ml-5" [floatLabel]="'always'">
+                <mat-icon matPrefix class="icon-size-5" [svgIcon]="'heroicons_solid:search'"></mat-icon>
+                <input (input)="filterByQueryInStudentDoc(query.value)" placeholder="Search by access code" matInput
+                    #query />
+            </mat-form-field>
+
+            <!-- <div *ngIf="!teacherInfoUi" class=" ml-10 mt-3">
+                <mat-slide-toggle [(ngModel)]="studentsAuthInfoUi" (change)="toggleAdmin($event)" [color]="'primary'">
+                    <p class="text-primary-600 pl-2 font-medium">View student credentials</p>
+                </mat-slide-toggle>
+            </div> -->
+        </div>
+
+        <div *ngIf="isAdmin" class=" ml-10 mt-3">
+            <mat-slide-toggle [(ngModel)]="teacherInfoUi" (change)="toggleList($event)" [color]="'primary'">
+                <p class="text-primary-600 pl-2 font-medium">View Teacher Info</p>
+            </mat-slide-toggle>
+        </div>
+
+        <div *ngIf="!isAdmin" class="">
+            <button *ngIf="!isAdmin" (click)="generateCredential()" type="button" class="fuse-mat-stroked-button-large "
+                mat-stroked-button color="primary">
+                Generate Credentials
+            </button>
+        </div>
+    </div>
+
+
+    <div class="overflow-auto h-[calc(100%-71px)]" *ngIf="!teacherInfoUi">
+        <table class="w-full border-collapse text-secondary bg-gray-50">
+            <!-- Table Header -->
+            <thead class="shadow sticky top-0 z-99 bg-gray-50">
+                <tr class="">
+                    <th class="py-4 px-2">Institution ID</th>
+                    <th class="text-left py-4 px-2">Student ID</th>
+                    <th class="text-left py-4 px-2">Passcode</th>
+                    <th class="text-left py-4 px-2">Last login</th>
+                    <th class="text-left py-4 px-2" *ngFor="let learningUnit of learningUnitArray">{{
+                        learningUnit.learningUnitDisplayName+" "+"("+learningUnit.language+')'}}</th>
+                </tr>
+            </thead>
+            <tbody *ngIf="studentInfo?.length === 0" class="text-red-500 bg-[#F1F5F9] ">
+                <tr>
+                    <td [attr.colspan]="learningUnitArray.length+4 " class="text-center pt-3">No students</td>
+                </tr>
+            </tbody>
+            <!-- Table Body -->
+            <tbody *ngIf="studentInfo?.length > 0" class=" bg-[#F1F5F9]">
+                <tr *ngFor="let st of studentInfo; let i = index" class="border-b  border-gray-300">
+                    <td class="py-4 px-2 text-left">{{ st?.authInfo?.accessCode?.substring(0, 7) }}</td>
+                    <td class="px-2 text-left">{{ st?.authInfo?.accessCode?.slice(-6) }}</td>
+                    <td class="truncate text-left">
+                        <!-- Display password or placeholder based on visibility and availability -->
+                        <ng-container *ngIf="isPasswordAvailable(st); else noPassword">
+                            <ng-container *ngIf="passwordVisibility[st.id]; else passwordHidden">
+                                {{ st?.authInfo?.password }}
+                            </ng-container>
+                            <ng-template #passwordHidden>
+                                <span class="text-gray-500">••••••</span> <!-- Default placeholder -->
+                            </ng-template>
+                        </ng-container>
+                        <ng-template #noPassword>
+                            <span class="text-red-500">Not available</span>
+                        </ng-template>
+
+                        <!-- Eye icon for toggling password visibility -->
+                        <mat-icon *ngIf="isPasswordAvailable(st)" (click)="togglePasswordVisibility(st.id)"
+                            class="ml-5 cursor-pointer"
+                            svgIcon="{{ passwordVisibility[st.id] ? 'heroicons_solid:eye-off' : 'heroicons_solid:eye' }}">
+                        </mat-icon>
+                    </td>
+                    <td class="px-2 text-left">
+                        <ng-container *ngIf="st?.lastLoginTimeStamp; else noLastLoginTimeStamp">
+                            {{ (st?.lastLoginTimeStamp?.seconds * 1000 | date:'MMM dd, h:mm a') }}
+                        </ng-container>
+                        <ng-template #noLastLoginTimeStamp>
+                            <span class="text-red-500">Not available</span>
+                        </ng-template>
+                    </td>
+
+                    <td class="px-2  " *ngFor="let completion of studentCompletionPercentage[i]">
+                        <div class="flex items-center justify-center">
+                            <span class="mr-1" [ngClass]="{'text-red-500':completion.workflowCompletion==='No Workflow'}"
+                                [matTooltip]="!completion?.workflowCompletion?.includes('%') ? noWorkflowTooltipMessage : ''">
+                                {{ completion?.workflowCompletion }}
+                            </span>
+                            <mat-icon *ngIf="completion?.workflowCompletion?.includes('%')"
+                                class="text-primary-600 cursor-pointer transition duration-500 transform hover:scale-[115%]"
+                                svgIcon="heroicons_outline:information-circle" matTooltip="View submission step"
+                                (click)="onViewLu(completion?.learningUnit, st,false,completion?.workflowId)">
+                            </mat-icon>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="overflow-auto h-[calc(100%-71px)]" *ngIf="teacherInfoUi">
+        <table class="w-full border-collapse text-secondary bg-gray-50">
+            <!-- Table Header -->
+            <thead class="shadow sticky top-0 z-99 bg-gray-50">
+                <tr class="">
+                    <th class="py-4 px-2">First Name</th>
+                    <th class="text-left py-4 px-2">Last Name</th>
+                    <th class="text-left py-4 px-2">Email ID</th>
+                    <th class="text-left py-4 px-2">Mobile No</th>
+                    <th class="text-left py-4 px-2">Edit</th>
+                    <th class="text-left py-4 px-2">Delete</th>
+                    <th class="text-left py-4 px-2" *ngFor="let learningUnit of learningUnitArray">{{
+                        learningUnit.learningUnitDisplayName+" "+"("+learningUnit.language+')'}}</th>
+                </tr>
+            </thead>
+
+            <!-- Table Body -->
+            <tbody class=" bg-[#F1F5F9]">
+                <tr *ngFor="let teacher of teacherInfo; let i = index" class="border-b  border-gray-300">
+                    <td class="py-4 px-2 text-left">{{ teacher?.teacherMeta?.firstName }}</td>
+                    <td class="px-2 text-left">{{ teacher?.teacherMeta?.lastName }}</td>
+                    <td class="truncate text-left">{{ teacher?.teacherMeta?.email }}</td>
+                    <td class="px-2 text-left">{{ teacher?.teacherMeta?.countryCode + teacher?.teacherMeta?.phoneNumber
+                        }}</td>
+                    <td class="px-2 text-left">
+                        <mat-icon (click)="editStudentOrTeacher(teacher, false)"
+                            class="text-primary icon-size-5 cursor-pointer transition duration-500 transform hover:scale-[115%]"
+                            svgIcon="feather:edit">
+                        </mat-icon>
+                    </td>
+                    <td class="px-2 text-left">
+                        <mat-icon (click)="onDelete(teacher, false)"
+                            class="text-red-500 cursor-pointer transition duration-500 transform hover:scale-[115%]"
+                            svgIcon="delete_outline">
+                        </mat-icon>
+                    </td>
+                    <td class="px-2  " *ngFor="let completion of teacherCompletionPercentage[i]">
+                        <div class="flex items-center justify-center">
+                            <span class="mr-1" [ngClass]="{'text-red-500':completion.workflowCompletion==='No Workflow'}"
+                                [matTooltip]="!completion?.workflowCompletion?.includes('%') ? noWorkflowTooltipMessage : ''">
+                                {{ completion?.workflowCompletion }}
+                            </span>
+                            <mat-icon *ngIf="completion?.workflowCompletion?.includes('%')"
+                                class="text-primary-600 cursor-pointer transition duration-500 transform hover:scale-[115%]"
+                                svgIcon="heroicons_outline:information-circle" matTooltip="View submission step"
+                                (click)="onViewLu(completion?.learningUnit, teacher,true,completion?.workflowId)">
+                            </mat-icon>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

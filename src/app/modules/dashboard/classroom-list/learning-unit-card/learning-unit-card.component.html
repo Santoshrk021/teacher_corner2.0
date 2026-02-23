@@ -1,0 +1,142 @@
+<div [appCustomTooltip]="(sequentiallyLocked && index > 0 && !stepsUnlocked && !privilege) ? 'Complete ' + allTactivities?.[index - 1]?.learningUnitDisplayName + ' to unlock this tactivity' : (dateLocked && !privilege) ? 'Learning unit will be unlocked from ' + (lockUnlockDate?.unlockAt * 1000 | date) + ' to ' + (lockUnlockDate?.lockAt * 1000 | date) :  (noWorkflow && !privilege) ? 'This learning unit has not been configured yet. Please contact us at +917483945803 or at info@thinktac.com for further assistance.' : tactivity?.longDescription ? tactivity?.longDescription : ''"
+    class="flex flex-col h-80 shadow rounded-2xl overflow-hidden bg-card relative" [ngClass]="{
+        'border-2 border-primary-300 border-spacing-2': tactivity.docId === teacherInfo?.lastUsedLearningUnit && !noWorkflow,
+        'border-spacing-2 disableDiv': (((sequentiallyLocked && index > 0 && !stepsUnlocked) || (dateLocked) || (noWorkflow)) && !privilege)
+    }">
+    <div class="flex flex-col p-6">
+        <div class="flex items-center justify-between">
+            <div class="py-0.5 px-3 rounded-full text-sm font-semibold" [ngClass]="{
+                'bg-green-100': tactivity?.type  === 'TACtivity',
+                'bg-orange-100': tactivity?.type  === 'Keep @ Home',
+                'bg-amber-100': tactivity?.type  === 'MuT',
+                'bg-yellow-100': tactivity?.type  === 'Multiuse TACtivity @ Home',
+                'bg-lime-100': tactivity?.type  === 'NISTA (FLN) TAC',
+                'bg-sky-100': tactivity?.type  === 'Group Activity',
+                'bg-emerald-100': tactivity?.type  === 'Online Games',
+                'bg-teal-100': tactivity?.type  === 'CBE Theme',
+                'bg-rose-300': tactivity?.type  === 'Toys and Tales',
+                'bg-purple-300': tactivity?.type  === 'FLN',
+                'bg-blue-300': tactivity?.type  === 'Micro Improvement Programme'
+                }">
+                {{tactivity?.type?.toUpperCase()}}
+            </div>
+
+            <div *ngIf="trackProgress" class="absolute right-[25px] top-[25px]">
+                <div class="spinner" *ngIf="completedSteps/totalSteps == 0">
+                    <div class="relative" matTooltip="You have not yet started this tactivity">
+                        <mat-progress-spinner diameter="30" strokeWidth="4" mode="determinate" color="primary"
+                            [value]="(completedSteps/totalSteps)*100 | number: '1.0-0'">
+                        </mat-progress-spinner>
+                        <div class="absolute left-[8px] top-[6px] text-sm font-semibold text-primary-500">
+                            {{(completedSteps/totalSteps)*100 | number: '1.0-0'}}%</div>
+                    </div>
+                </div>
+
+                <div class="spinner" *ngIf="completedSteps/totalSteps > 0 && completedSteps/totalSteps < 1">
+                    <div class="relative" [matTooltip]="getTooltipContent((this.completedSteps)/this.totalSteps)">
+                        <mat-progress-spinner diameter="30" strokeWidth="4" mode="determinate" color="primary"
+                            [value]="(completedSteps/totalSteps)*100 | number: '1.0-0'">
+                        </mat-progress-spinner>
+                        <div class="absolute left-[8px] top-[6px] text-sm font-semibold text-primary-500">
+                            {{(completedSteps/totalSteps)*100 | number: '1.0-0'}}</div>
+                    </div>
+                </div>
+
+                <div *ngIf="completedSteps/totalSteps == 1">
+                    <div class="flex items-center">
+                        <mat-icon class="icon-size-5 text-green-600" [svgIcon]="'heroicons_solid:badge-check'"
+                            [matTooltip]="'You completed this tactivity at least once'">
+                        </mat-icon>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-8">
+            <div class="h-8 mb-4">
+                <p class="text-lg font-medium text-primary-500">
+                    {{tactivity?.displayName}}
+                    {{tactivity?.learningUnitDisplayName}}
+                </p>
+                <p class="text-sm font-medium text-primary-500">
+                    {{tactivity?.language}}
+                </p>
+            </div>
+
+            <div class="pt-6 text-secondary flex">
+                <mat-icon svgIcon="mat_outline:watch_later"></mat-icon>&nbsp;&nbsp;
+                <span class="mt-[1px]">
+                    {{tactivity?.totalTime}}&nbsp;minutes
+                </span>
+            </div>
+        </div>
+
+        <!-- separator -->
+        <!-- <div class="w-12 h-1 my-6 border-t-2"></div> -->
+
+        <div class="mt-3 flex justify-between items-center">
+            <div class="w-10 h-10" *ngIf="tactivity?.learningUnitPreviewImage; else noThumb">
+                <img [src]="tactivity?.learningUnitPreviewImage |getDownloadURL" alt="Learing unit image icon"
+                    class="w-10">
+            </div>
+
+            <ng-template #noThumb class="w-10 h-10">
+                <!-- <div class="w-10 text-center tracking-tighter"> -->
+                <div
+                    class="flex items-center justify-start w-12 h-12 text-xs font-semibold leading-none text-center uppercase rounded overflow-hidden border">
+                    NO THUMB
+                </div>
+            </ng-template>
+
+            <div class="ml-1 flex flex-row-reverse">
+                <div *ngFor="let tag of tactivity?.tags">
+                    <div *ngIf="tag.tag==='Hands on Activity'" class="scale_on_hover">
+                        <mat-icon style="stroke-width:5; stroke: #179AD7" [svgIcon]="'feather:hands'"
+                            class="icon-display ml-3 text-[#179AD7] "></mat-icon>
+                    </div>
+                    <div *ngIf="tag.tag==='Quiz'" class="scale_on_hover" matTooltipPosition="above" matTooltip="'Quiz'">
+                        <mat-icon style="stroke-width:5; stroke: #179AD7" [svgIcon]="'feather:quiz'"
+                            class="icon-display ml-3 text-[#179AD7]"></mat-icon>
+                    </div>
+                    <div *ngIf="tag.tag==='Adult Support Needed'" class="scale_on_hover" matTooltipPosition="above"
+                        matTooltip="'Adult Support Needed'">
+                        <mat-icon style="stroke-width:5; stroke: #179AD7" [svgIcon]="'feather:parent'"
+                            class="icon-display ml-3 text-[#179AD7]"></mat-icon>
+                    </div>
+                    <div *ngIf="tag.tag==='Assignment'" class="scale_on_hover" matTooltipPosition="above"
+                        matTooltip="'Assignment'">
+                        <mat-icon style="stroke-width:5; stroke: #179AD7" [svgIcon]="'feather:cloud-download'"
+                            class="icon-display ml-3 text-[#179AD7]"></mat-icon>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="flex flex-col w-full mt-auto">
+        <!-- tactivity progress -->
+        <div class="relative h-0.5">
+            <div class="h-0.5 bg-primary-100 w-full">
+            </div>
+        </div>
+
+        <!-- tactivity launch button -->
+        <div class="px-6 py-2 text-right bg-gray-50 dark:bg-transparent">
+            <!-- class="arrowBtn" -->
+            <a mat-stroked-button
+                (click)="!(((sequentiallyLocked && index > 0 && !stepsUnlocked) || (dateLocked) || (noWorkflow)) && !privilege) ? onClickContinue(tactivity) : null"
+                [disabled]="(((sequentiallyLocked && index > 0 && !stepsUnlocked) || (dateLocked) || (noWorkflow)) && !privilege)"
+                [ngClass]="{'bg-primary-600 text-white arrowBtn': tactivity?.docId == teacherInfo?.lastUsedLearningUnit && !noWorkflow}">
+                <!-- [matTooltip]="(sequentiallyLocked && index > 0 && !stepsUnlocked && !privilege) ? 'Complete ' + allTactivities?.[index - 1]?.learningUnitDisplayName + ' to unlock this tactivity' : (dateLocked && !privilege) ? 'Learning unit will be unlocked from ' + (lockUnlockDate?.unlockAt * 1000 | date) + ' to ' + (lockUnlockDate?.lockAt * 1000 | date) :  (noWorkflow && !privilege) ? 'This learning unit has not been configured yet. Please contact us at +917483945803 or at info@thinktac.com for further assistance.' : ''" -->
+                <span class="inline-flex items-center">
+                    <span>Continue</span>
+
+                    <mat-icon class="ml-1.5 icon-size-5 arrowIcon" [svgIcon]="'heroicons_solid:arrow-sm-right'"
+                        [ngClass]="{'text-white arrowAnime': tactivity?.docId == teacherInfo?.lastUsedLearningUnit && !noWorkflow}">
+                    </mat-icon>
+                </span>
+            </a>
+        </div>
+    </div>
+</div>

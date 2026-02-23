@@ -1,0 +1,182 @@
+<div class="w-full relative">
+
+    <div class="flex flex-wrap">
+        <div *ngFor="let cls of allClassrooms;let i=index">
+            <div (click)="checkCheckBoxvalue(cls)" matRipple matRippleColor="#049cd836" matTooltipPosition="above"
+                matTooltip="Click  to Select Classroom"
+                class="mr-4 mb-4 cursor-pointer p-4 flex flex-col rounded-xl bg-card shadow w-40 h-20 "
+                [ngClass]="{'border-2  border-primary-300 border-spacing-2':cls.classroomId==indexObj[cls.classroomId]}">
+                <div class="">
+                    <div class="flex justify-between">
+                        <p class="text-gray-600 mb-2 font-medium line-clamp-1">{{cls.classroomName}}</p>
+                        <mat-icon *ngIf="cls.classroomId==indexObj[cls.classroomId]" class="icon-size-5 text-green-600"
+                            [svgIcon]="'heroicons_solid:badge-check'">
+                        </mat-icon>
+                    </div>
+                    <p class="text-lg text-primary-600">{{cls.subject}}</p>
+
+                    <!-- <mat-checkbox [(ngModel)]="indexObj[i]" color="primary" class="example-margin mt-1 "
+                    (change)="checkCheckBoxvalue($event,cls)"></mat-checkbox> -->
+                </div>
+            </div>
+        </div>
+<!--
+        <div (click)="addNewClass=!addNewClass" matRipple matTooltipPosition="above"
+            matTooltip="{{addNewClass?'Hide Classroom Create Layout':'Show Classroom Create Layout'}}"
+            class=" w-40 h-20 bg-primary-100 hover:bg-primary-200 font-semibold cursor-pointer text-sm text-primary-600 rounded-xl border-2 border-dashed border-primary-400 flex justify-center items-center">
+            <p>{{addNewClass?'Remove Classroom':'Add Classroom'}}</p>
+            <mat-icon *ngIf="!addNewClass" class="text-primary-600 ml-2"
+                svgIcon="heroicons_outline:plus-circle"></mat-icon>
+            <mat-icon *ngIf="addNewClass" class="text-primary-600 ml-2"
+                svgIcon="heroicons_outline:minus-circle"></mat-icon>
+        </div> -->
+    </div>
+
+
+    <div class="block mt-4" *ngIf="addNewClass">
+        <form [formGroup]="classCreate" (ngSubmit)="onclassCreateSubmit(classCreate)">
+            <div class="grid  grid-flow-row ">
+                <div formArrayName="classInfo">
+                    <div *ngFor="let cls of classInfo().controls; let i=index">
+                        <div class="grid grid-cols-1 md:grid-cols-3 md:gap-6 items-start" [formGroupName]="i">
+                            <div>
+                                <div class="grid grid-cols-3 gap-4">
+
+                                    <mat-form-field class="w-full text-accent-600">
+                                        <mat-label class="text-accent-600">Subject</mat-label>
+                                        <mat-select formControlName="subject" placeholder="Select subject">
+                                            <mat-option value="" disabled selected>Select</mat-option>
+                                            <mat-option *ngFor="let sub of subjectList?.subjectsNames " [value]="sub">
+                                                {{ sub }}
+                                            </mat-option>
+                                        </mat-select>
+                                        <mat-error
+                                            *ngIf="classCreate.get('subject')?.invalid &&classCreate.get('subject')?.touched">
+                                            subject is required
+                                        </mat-error>
+                                    </mat-form-field>
+
+                                    <mat-form-field class="w-full text-accent-600">
+                                        <mat-label class="text-accent-600">Grade</mat-label>
+                                        <mat-select formControlName="grade" placeholder="Select Grade">
+                                            <mat-option value="" disabled selected>Select</mat-option>
+                                            <mat-option *ngFor="let gr of gradeList" [value]="gr">
+                                                Class {{ gr }}
+                                            </mat-option>
+                                        </mat-select>
+                                        <mat-error
+                                            *ngIf="classCreate.get('grade')?.invalid &&classCreate.get('grade')?.touched">
+                                            Grade is required
+                                        </mat-error>
+                                    </mat-form-field>
+
+                                    <mat-form-field *ngIf="!customSection[i]" class="w-full text-accent-600">
+                                        <mat-label matTooltipPosition="above" matTooltip="Type Custom Section"
+                                            class="text-accent-600">Section</mat-label>
+                                        <mat-select formControlName="section" placeholder="Select Section">
+                                            <mat-option value="" disabled selected>Select</mat-option>
+                                            <mat-option *ngFor="let sec of section" [value]="sec">
+                                                {{ sec }}
+                                            </mat-option>
+                                            <mat-option (click)="customSection[i]=true">Custom
+                                                Section</mat-option>
+                                        </mat-select>
+
+                                        <mat-error
+                                            *ngIf="classCreate.get('section')?.invalid &&classCreate.get('section')?.touched">
+                                            Section is required
+                                        </mat-error>
+                                    </mat-form-field>
+
+                                    <mat-form-field *ngIf="customSection[i]" class="w-full text-accent-600">
+                                        <mat-label matTooltipPosition="above" matTooltip="Type Custom Section"
+                                            class="text-accent-600">Type
+                                            Custom
+                                            Section</mat-label>
+
+                                        <input matTooltipPosition="above" matTooltip="Enter Custom Section" id="section"
+                                            matInput [formControlName]="'section'" type="text"
+                                            placeholder="Enter Custom Section">
+                                        <mat-error
+                                            *ngIf="classCreate.get('section')?.invalid &&classCreate.get('section')?.touched">
+                                            Section is required
+                                        </mat-error>
+                                    </mat-form-field>
+
+
+                                </div>
+                            </div>
+
+                            <div>
+                                <mat-form-field class="w-full text-accent-600">
+                                    <mat-label class="text-accent-600">Programme</mat-label>
+                                    <mat-select formControlName="programme" multiple="" placeholder="Select Programmes">
+                                        <mat-option disabled>Select</mat-option>
+                                        <div *ngFor="let pr of allProgrammes">
+                                            <mat-option *ngIf=" pr.programmeName" [value]="pr">
+                                                {{ pr.programmeName }}
+                                            </mat-option>
+                                        </div>
+                                        <div (click)="openProgramme()" class="mb-4 ml-2"><span
+                                                class="bg-gray-200 rounded-full text-gray-500 py-2 px-4">Create
+                                                Programme &nbsp;&nbsp;
+                                                <mat-icon class="m-0 pt-2" svgIcon="feather:plus-circle"></mat-icon>
+                                            </span>
+                                        </div>
+                                    </mat-select>
+                                    <mat-error
+                                        *ngIf="classCreate.get('programme')?.invalid &&classCreate.get('programme')?.touched">
+                                        Programmes is required
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+
+                            <div class="mt-8" *ngIf="this.classInfo().length>1">
+                                <button type="button" matTooltipPosition="above" matTooltip="Delete Classroom"
+                                    (click)="removeClassInfo(i)">
+                                    <mat-icon class="text-red-500 icon-size-6 scale_on_hover125 active:text-red-200"
+                                        svgIcon="mat_solid:delete"></mat-icon>
+                                </button>
+
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="grid grid-cols-3 ">
+                    <div class="col-span-2 flex flex-row-reverse">
+                        <button type="button" (click)="addClassInfo()">
+                            <mat-icon matTooltipPosition="above" matTooltip="Add New Classroom"
+                                class="icon-size-8 text-primary-600 cursor-pointer plusIcon active:text-primary-500"
+                                [svgIcon]="'heroicons_solid:plus-circle'"></mat-icon>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 ">
+                    <div class="col-start-2 text-center ">
+                        <button type="submit" [disabled]="classCreate.invalid"
+                            class="disabled:bg-primary-100 fuse-mat-stroked-button-large bg-primary-600 text-white hover:bg-primary-500"
+                            mat-stroked-button>
+                            Submit
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </form>
+    </div>
+
+   <div class="flex justify-between mt-3">
+    <button matStepperPrevious type="button" class="  text-primary-600 fuse-mat-stroked-button-large " mat-stroked-button>
+        Previous Step
+    </button>
+
+    <button *ngIf="nextBtnIsActive" matStepperNext type="button" class="text-primary-600 fuse-mat-stroked-button-large " mat-stroked-button>
+        Next Step
+    </button>
+   </div>
+</div>

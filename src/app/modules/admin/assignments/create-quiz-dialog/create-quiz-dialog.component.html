@@ -1,0 +1,91 @@
+<!-- <div class="w-[60vw] h-[79vh] relative ">
+    <button mat-dialog-close class=" absolute -top-4 -right-4 z-40">
+        <mat-icon class=" hover:scale-110 transition duration-5000 transform" svgIcon="mat_outline:close">
+        </mat-icon>
+    </button>
+
+
+    <mat-stepper [linear]="true" #stepper class="bg-transparent h-full w-full ">
+        <mat-step>
+            <ng-template matStepLabel>Create Quiz</ng-template>
+            <ng-template matStepContent>
+                <app-create-quiz-step [quizInfo]="this.data?.assignmentInfo" (quizBasicInfo)="catchBasicInfoEvent($event)"></app-create-quiz-step>
+            </ng-template>
+        </mat-step>
+        <mat-step>
+            <ng-template matStepLabel>Fill Out Questions</ng-template>
+            <ng-template matStepContent>
+                <app-create-question-step [quizInfo]="this.data?.assignmentInfo" [quizBasicInfo]="quizBasicInfo" (quizQusInfo)="catchQusInfoEvent($event)" (optionFiles)="catchOptionFiles($event)" ></app-create-question-step>
+            </ng-template>
+        </mat-step>
+        <mat-step>
+            <ng-template matStepLabel>Review</ng-template>
+            <ng-template matStepContent>
+                <app-review-quiz [quizInfo]="this.data?.assignmentInfo" [quizQusInfo]="quizQusInfo"  [quizBasicInfo]="quizBasicInfo" [optionFiles]="uploadedOptionFiles"></app-review-quiz>
+            </ng-template>
+        </mat-step>
+    </mat-stepper>
+
+
+</div> -->
+
+
+<div class="w-[60vw] h-[79vh] relative">
+  <button mat-dialog-close class="absolute -top-4 -right-4 z-40">
+    <mat-icon class="hover:scale-110 transition duration-5000 transform" svgIcon="mat_outline:close"></mat-icon>
+  </button>
+
+  <mat-stepper [linear]="true" #stepper class="bg-transparent h-full w-full">
+    
+    <!-- Step 1: Basic Quiz Info -->
+    <mat-step>
+      <ng-template matStepLabel>Create Quiz</ng-template>
+      <ng-template matStepContent>
+        <app-create-quiz-step
+          [quizInfo]="data?.assignmentInfo"
+          (quizBasicInfo)="catchBasicInfoEvent($event)">
+        </app-create-quiz-step>
+      </ng-template>
+    </mat-step>
+
+    <!-- Step 2: Case Study / Background Info (Optional) -->
+    <mat-step [optional]="true">
+      <ng-template matStepLabel>Create Case Study</ng-template>
+      <ng-template matStepContent>
+        <app-background-info-step
+          [quizInfo]="data?.assignmentInfo"
+          (backgroundInfo)="catchBackgroundInfoEvent($event)"
+          (pdfFiles)="catchPdfFilesEvent($event)">
+        </app-background-info-step>
+      </ng-template>
+    </mat-step>
+
+    <!-- Step 3: Question Entry -->
+    <mat-step>
+      <ng-template matStepLabel>Fill Out Questions</ng-template>
+      <ng-template matStepContent>
+        <app-create-question-step
+          [quizInfo]="data?.assignmentInfo"
+          [quizBasicInfo]="quizBasicInfo"
+          (quizQusInfo)="catchQusInfoEvent($event)"
+          (optionFiles)="catchOptionFiles($event)">
+        </app-create-question-step>
+      </ng-template>
+    </mat-step>
+
+    <!-- Step 4: Review & Submit -->
+    <mat-step>
+      <ng-template matStepLabel>Review</ng-template>
+      <ng-template matStepContent>
+        <app-review-quiz
+          [quizInfo]="data?.assignmentInfo"
+          [quizQusInfo]="quizQusInfo"
+          [quizBasicInfo]="quizBasicInfo"
+          [backgroundInfo]="backgroundInfo"
+          [backgroundPdfFiles]="backgroundPdfFiles"
+          [optionFiles]="optionFiles">
+        </app-review-quiz>
+      </ng-template>
+    </mat-step>
+  </mat-stepper>
+</div>

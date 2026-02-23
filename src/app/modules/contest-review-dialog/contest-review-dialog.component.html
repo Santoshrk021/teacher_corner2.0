@@ -1,0 +1,177 @@
+<div class="h-[85vh] w-full sm:w-140 flex flex-col items-center justify-center">
+    <div class="card h-full rounded-xl bg-white relative">
+        <div class="absolute -top-4 -right-2">
+            <button mat-dialog-close class="">
+                <mat-icon class="hover:scale-110 transition duration-5000 transform" svgIcon="mat_outline:close">
+                </mat-icon>
+            </button>
+        </div>
+
+        <!-- Header Section -->
+        <div class="text-3xl font-bold text-center my-1">
+            Review Section
+        </div>
+
+        <!-- Contest Details -->
+        <mat-tab-group (selectedIndexChange)="onTabChange($event)">
+            <mat-tab *ngFor="let submissionDetail of contestDetails?.submissionDetails"
+                [label]="submissionDetail?.title.length > 13 ? submissionDetail?.title.substring(0, 10) + '...' : submissionDetail?.title"> 
+                <ng-template matTabContent>
+                    <div class="flex flex-row justify-center my-1">
+                        <div class="card p-4 grid grid-cols-7 gap-2 border rounded-xl bg-gray-100 shadow-md">
+                            <div class="col-span-2">
+                                <div class="font-semibold">Contest Name</div>
+                                <div class="font-semibold">Stage Name</div>
+                                <div class="font-semibold">Assignment Name</div>
+                                <div class="font-semibold">Date of Submission</div>
+                            </div>
+
+                            <div class="col-span-5">
+                                <div>{{contestDetails?.contestTitle}}</div>
+                                <div>{{contestDetails?.selectedStageData?.stageName}}</div>
+                                <div>{{submissionDetail?.title}}</div>
+                                <div>{{
+                                    contestDetails?.submissionMeta?.submissionTime?.seconds * 1000 |
+                                    date: 'd MMMM, y h:mma'
+                                    }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="my-3">
+                        <!-- Supporting Files -->
+                        <div class="card p-4 bg-gray-100 shadow-md rounded-xl">
+                            <div class="font-semibold">Supporting Files</div>
+
+                            <div class="flex flex-row gap-2 items-center">
+                                <ng-container
+                                    *ngFor="let submission of data?.eachSubmissionData[submissionDetail.submissionId]">
+                                    <ng-container [ngSwitch]="submission?.type">
+                                        <ng-container *ngSwitchCase="'MEDIA'">
+                                            <ng-container *ngFor="let selectedSubmission of submission?.submission">
+                                                <ng-container [ngSwitch]="selectedSubmission?.type">
+                                                    <ng-container *ngSwitchCase="'IMAGE'">
+                                                        <a [href]="selectedSubmission?.submissionPath | getDownloadURL"
+                                                            target="_blank" [matTooltip]="submission?.contestStepName">
+                                                            <img [src]="selectedSubmission?.submissionPath | getDownloadURL"
+                                                                alt="Image" class="h-20 w-auto">
+                                                        </a>
+                                                    </ng-container>
+
+                                                    <ng-container *ngSwitchCase="'PDF'">
+                                                        <a [href]="selectedSubmission?.submissionPath | getDownloadURL"
+                                                            target="_blank"
+                                                            [matTooltip]="submission?.contestStepName"><img
+                                                                src="assets/images/logo/pdf-icon.png"
+                                                                alt="PDF Submission" class="h-20 w-auto">
+                                                        </a>
+                                                    </ng-container>
+
+                                                    <ng-container *ngSwitchCase="'VIDEO'">
+                                                        <a [href]="selectedSubmission?.submissionPath | getDownloadURL"
+                                                            target="_blank"
+                                                            [matTooltip]="submission?.contestStepName"><img
+                                                                src="assets/images/logo/video-icon.png"
+                                                                alt="Video Submission" class="h-20 w-auto">
+                                                        </a>
+                                                    </ng-container>
+                                                </ng-container>
+                                            </ng-container>
+                                        </ng-container>
+
+                                        <ng-container *ngSwitchCase="'VIDEO'">
+                                            <a [href]="submission?.submission?.innovationVideoLink" target="_blank"
+                                                [matTooltip]="submission?.contestStepName">
+                                                <img src="assets/images/logo/video-icon.png" alt="Video Submission"
+                                                    class="h-20 w-auto">
+                                            </a>
+                                        </ng-container>
+
+                                        <ng-container *ngSwitchCase="'QUIZ'">
+                                            <button><img src="assets/images/logo/quiz-icon.png" class="h-[70px] w-auto"
+                                                    alt="Quiz Submission" (click)="onClickQuiz(submission?.submission)"
+                                                    [matTooltip]="submission?.contestStepName"></button>
+                                        </ng-container>
+
+                                        <ng-container *ngSwitchCase="'FORM'">
+                                            <button><img src="assets/images/logo/form-icon.png" class="h-20 w-auto"
+                                                    alt="Form Submission" (click)="onClickForm(submission?.submission)"
+                                                    [matTooltip]="submission?.contestStepName"></button>
+                                        </ng-container>
+                                    </ng-container>
+
+                                    <ng-template class="w-auto h-20" #noImage>
+                                        <div
+                                            class="flex items-center justify-center w-full h-full text-xs font-semibold leading-none text-center uppercase">
+                                            NO THUMB
+                                        </div>
+                                    </ng-template>
+                                </ng-container>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Row with Buttons -->
+                    <div class="flex justify-center gap-4 ">
+                        <button mat-raised-button color="primary"
+                            class="fuse-mat-stroked-button-large mt-6 cursor-pointer"
+                            (click)="rateSubmission(submissionDetail)" [disabled]="!canRateSubmission">
+                            <span *ngIf="!isFeedbackSubmitted">
+                                Rate Submission
+                            </span>
+                            <span *ngIf="isFeedbackSubmitted">
+                                View Rating
+                            </span>
+                        </button>
+
+                        <button mat-raised-button color="primary"
+                            class="fuse-mat-stroked-button-large mt-6 cursor-pointer"
+                            (click)="rejectSubmission(submissionDetail)"
+                            [disabled]="isFeedbackSubmitted && !isRejected">
+                            <span *ngIf="!isFeedbackSubmitted">
+                                Reject Submission
+                            </span>
+                            <span *ngIf="isFeedbackSubmitted">
+                                View Rejection
+                            </span>
+                        </button>
+
+                    </div>
+                </ng-template>
+
+
+            </mat-tab>
+        </mat-tab-group>
+
+
+
+        <!-- Comment Section -->
+        <div class="py-6 w-full">
+            <div class="card p-4 bg-gray-100 shadow-md rounded-xl">
+                <div class="font-semibold text-primary-600 text-lg">Comments</div>
+
+                <!-- List of Comments -->
+                <div class="my-4">
+                    <ng-container *ngFor="let comment of comments">
+                        <div class="p-2 bg-gray-50 border-b mb-2 border border-gray-200 shadow rounded-md">
+                            <div class="font-medium text-primary-600">{{comment?.authorName}} <span class="text-sm text-gray-400">{{'('+comment.role.charAt(0).toUpperCase() + comment.role.slice(1)+')'}}</span></div>
+                            <div class="text-sm text-gray-600">{{comment?.time?.seconds*1000 | date: 'd MMMM, y h:mma'}}
+                            </div>
+                            <div class="mt-1">{{comment?.text}}</div>
+                        </div>
+                    </ng-container>
+                </div>
+
+                <!-- Add a New Comment -->
+                <div class="mt-6 text-center">
+                    <textarea class="" [(ngModel)]="newComment" placeholder="Add a comment..."
+                        class="w-full p-2 border border-gray-300 rounded-md"></textarea>
+                    <button mat-raised-button color="primary" class="mt-2" (click)="addComment()"
+                        [disabled]="!newComment">
+                        Submit Comment
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

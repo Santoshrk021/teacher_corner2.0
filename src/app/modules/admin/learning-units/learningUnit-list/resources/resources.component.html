@@ -1,0 +1,322 @@
+<mat-form-field appearance="fill" floatLabel="always">
+    <mat-label>Maturity Type</mat-label>
+    <mat-select [(ngModel)]="selectedMaturity" placeholder="Select the Maturity type"
+        (selectionChange)="changeMaturity($event)">
+        <mat-option value="" disabled selected>Select</mat-option>
+        <mat-option *ngFor="let lu of maturitiesdropdown" [value]="lu.value" [disabled]="!lu.status">
+            <span class="flex items-center w-full">
+    <span >{{ lu.value }}</span>
+    <mat-icon *ngIf="!lu.status"
+              matTooltip="Maturity at learning unit level is currently {{selectedMaturity}}. Upgrade to upload resources for {{lu.value}}"
+              matTooltipPosition="left"
+              class="ml-auto text-blue-500 ">
+      info
+    </mat-icon>
+  </span>
+        </mat-option>
+    </mat-select>
+</mat-form-field>
+
+
+<div class=" w-full -mt-4">
+    <div *ngIf="resArr.length > 0" class="inventory-grid" [ngStyle]="gridStyle">
+        <div *ngFor="let res of resArr; let i = index">
+            <div class="mr-0" *ngIf="res?.length > 0"
+                [ngClass]="{'border-r border-primary-300':luConfig.length>3,'':luConfig.length<3}">
+                <div *ngFor="let resource of res; let j = index" class="ml-10 mb-1">
+
+                    <!-- Non Board Grade Dependent Resources -->
+                    <div class="" *ngIf="resource?.isGradeDependent===false">
+                        <div [ngSwitch]="resource?.type">
+                            <!-- Single File Type -->
+                            <div *ngSwitchCase="'file'">
+                                <!-- Video File Types -->
+                                <div *ngIf="['video','mp4'].includes(resource?.allowedExtensions)">
+                                    <mat-label class="text-accent-600 text-sm font-medium relative right-2">
+                                        {{resource.display}}
+                                    </mat-label>
+
+                                    <div class="grid grid-cols-2 gap-27 mt-1">
+                                        <div class="flex flex-col bg-grey-lighter"
+                                            [title]="trashUINotEditable?matTooltipMsg:''">
+                                            <label matRipple
+                                                class="border border-primary relative w-full right-2 flex flex-col items-center  rounded-lg p-2 cursor-pointer rounded-r-none bg-slate-100 text-primary-600"
+                                                [ngClass]="trashUINotEditable?'':' hover:bg-slate-200'">
+                                                <span class="flex items-center">
+                                                    <mat-icon class="text-primary mr-2"
+                                                        svgIcon="heroicons_outline:arrow-circle-down"></mat-icon>
+                                                    {{
+                                                    externalResourcePath?.[mValue]?.[this.key]?.[resource.key] ?
+                                                    'Re-upload' :
+                                                    'Upload'
+                                                    }}
+                                                </span>
+
+                                                <input [readonly]="trashUINotEditable === true ? true : false"
+                                                    class="w-full" type="file" class="hidden"
+                                                    (change)="onInputFile($event, resource.key, resource,gradeDependentSources[resource.key])">
+                                            </label>
+                                        </div>
+
+                                        <div matRipple
+                                            class="w-3/5 md:ml-1 sm:mr-1 p-2 border border-primary-600 rounded-lg rounded-l-none bg-primary-600 text-white cursor-pointer relative md:left-1 sm:left-0 md:text-base sm:text-[10px]"
+                                            [ngClass]="{
+                                                'hover:bg-primary active:bg-primary-800': externalResourcePath?.[mValue]?.[this.key]?.[resource.key],
+                                                'disableDiv': !externalResourcePath?.[mValue]?.[this.key]?.[resource.key]
+                                            }">
+
+                                            <a *ngIf="externalResourcePath?.[mValue]?.[this.key]?.[resource.key]; else viewDisabled"
+                                                [ariaDisabled]="true" target="_blank"
+                                                [href]="externalResourcePath?.[mValue]?.[this.key]?.[resource.key] | getDownloadURL"
+                                                class="w-full h-full flex items-center justify-center">
+                                                <p>View</p>
+                                            </a>
+                                        </div>
+                                    </div>
+
+                                    <ng-container
+                                        *ngTemplateOutlet="uploadProgress; context: {$implicit: bytesTransferred?.[resource.key]}"></ng-container>
+                                </div>
+
+                                <!-- Other File Types -->
+                                <div
+                                    *ngIf="['pdf', 'img', 'xlsx', 'ppt', 'jpg', 'png'].includes(resource?.allowedExtensions)">
+                                    <mat-label class="text-accent-600 text-sm font-medium relative right-2">
+                                        {{resource?.display}}
+                                    </mat-label>
+
+                                    <div class="grid grid-cols-2 gap-2 mt-1">
+                                        <div class="flex flex-col bg-grey-lighter">
+                                            <label matRipple
+                                                class="border border-primary relative w-full right-2 flex flex-col items-center rounded-lg p-2 cursor-pointer rounded-r-none bg-slate-100 text-primary-600"
+                                                [ngClass]="trashUINotEditable ? '' : 'hover:bg-slate-200'">
+
+                                                <span class="md:mx-2 absolute left-0 sm:mr-2 mt-[-2px]">
+                                                    <mat-icon class="text-primary"
+                                                        svgIcon="heroicons_outline:arrow-circle-up"></mat-icon>
+                                                </span>
+
+                                                <div class="flex items-center">
+                                                    <span class="md:mr-2 md:text-base relative sm:text-[10px] sm:ml-6">
+                                                        {{
+                                                        externalResourcePath?.[mValue]?.[key]?.[resource?.key] ?
+                                                        'Re-Upload' :
+                                                        'Upload'
+                                                        }}
+                                                    </span>
+                                                </div>
+
+                                                <input [disabled]="trashUINotEditable == true ? true : false"
+                                                    type="file" class="hidden"
+                                                    (change)="selectFile($event, resource?.key, resource,gradeDependentSources[resource.key])" #guideRef />
+                                            </label>
+                                        </div>
+
+                                        <div class="flex">
+                                            <div matRipple
+                                                class="w-3/5 md:ml-1 sm:mr-1 p-2 border border-primary-600 rounded-lg rounded-l-none
+                                                bg-primary-600 text-white cursor-pointer relative md:left-1 sm:left-0 md:text-base sm:text-[10px]"
+                                                [ngClass]="{'hover:bg-primary active:bg-primary-800': externalResourcePath?.[mValue]?.[key]?.[resource?.key],
+                                                    'disableDiv': !externalResourcePath?.[mValue]?.[key]?.[resource?.key]}">
+
+                                                <a *ngIf="externalResourcePath?.[mValue]?.[key]?.[resource?.key]; else viewDisabled"
+                                                    [ariaDisabled]="true" target="_blank"
+                                                    [href]="externalResourcePath?.[mValue]?.[key]?.[resource?.key] | getDownloadURL"
+                                                    class="w-full h-full flex items-center justify-center">
+                                                    <p>View</p>
+                                                </a>
+                                            </div>
+
+                                            <mat-icon color="primary" class="mt-2 ml-1"
+                                                (click)="copyFileName(resource,gradeDependentSources[resource.key])"
+                                                svgIcon="mat_solid:content_copy" matTooltip="Copy file name">
+                                            </mat-icon>
+                                        </div>
+                                    </div>
+
+                                    <ng-container
+                                        *ngTemplateOutlet="uploadProgress; context: {$implicit: bytesTransferred?.[resource.key]}"></ng-container>
+                                </div>
+                            </div>
+
+                            <!-- Multiple File Type -->
+                            <div *ngSwitchCase="'files'">
+                                <!-- Video File Types -->
+                                <div *ngIf="['video','mp4'].includes(resource.allowedExtensions)">
+                                    <mat-label class="text-accent-600 text-sm font-medium relative right-2">
+                                        {{resource.display}}
+                                    </mat-label>
+
+                                    <div class="grid grid-cols-2 gap-27 mt-1">
+                                        <div class="flex flex-col bg-grey-lighter"
+                                            [title]="trashUINotEditable?matTooltipMsg:''">
+                                            <label matRipple
+                                                class="border border-primary relative w-full right-2 flex flex-col items-center rounded-lg p-2 cursor-pointer rounded-r-none bg-slate-100 text-primary-600"
+                                                [ngClass]="trashUINotEditable ? '' : 'hover:bg-slate-200'">
+                                                <span class="flex items-center">
+                                                    <mat-icon class="text-primary mr-2"
+                                                        svgIcon="heroicons_outline:arrow-circle-down"></mat-icon>
+                                                    <mat-spinner *ngIf="loading?.[resource.key]; else showupload"
+                                                        [diameter]="20" class="mt-[2px]"></mat-spinner>
+                                                    <ng-template #showupload>
+                                                        {{
+                                                        externalResourcePath?.[mValue]?.[this.key]?.[resource.key]?.length
+                                                        > 0 ?
+                                                        'Re-upload' :
+                                                        'Upload'
+                                                        }}
+                                                    </ng-template>
+                                                </span>
+
+                                                <input [readonly]="trashUINotEditable==true ? true : false"
+                                                    class="w-full" multiple type="file" accept=".mp4" class="hidden"
+                                                    (change)="onMultipleInputFile($event, resource.key)">
+                                            </label>
+                                        </div>
+
+                                        <div matRipple
+                                            class="w-3/5 md:ml-1 sm:mr-1 p-2 border border-primary-600 rounded-lg rounded-l-none bg-primary-600 text-white cursor-pointer relative md:left-1 sm:left-0 md:text-base sm:text-[10px]"
+                                            [ngClass]="{
+                                                    'hover:bg-primary active:bg-primary-800': externalResourcePath?.[mValue]?.[this.key]?.[resource.key]?.length>0,
+                                                    'disableDiv': !externalResourcePath?.[mValue]?.[this.key]?.[resource.key]?.length>0
+                                                }">
+
+                                            <a *ngIf="externalResourcePath?.[mValue]?.[this.key]?.[resource.key].length>0; else viewDisabled"
+                                                [ariaDisabled]="true" target="_blank" (click)="showFiles(resource.key)"
+                                                class="w-full h-full flex items-center justify-center">
+                                                <p>View</p>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Video Link Type -->
+                            <div *ngSwitchCase="'video'">
+                                <!-- Video Link Type -->
+                                <div *ngIf="['video'].includes(resource.allowedExtensions)">
+                                    <mat-label class="text-accent-600 text-sm font-medium relative right-2">
+                                        {{resource?.display}}
+                                    </mat-label>
+
+                                    <div class="grid grid-cols-2 gap-27 mt-1">
+                                        <div class="flex flex-col bg-grey-lighter"
+                                            [title]="trashUINotEditable?matTooltipMsg:''">
+                                            <label matRipple
+                                                class="border border-primary relative w-full right-2 flex flex-col items-center rounded-lg p-2 cursor-pointer rounded-r-none bg-slate-100 text-primary-600"
+                                                [ngClass]="trashUINotEditable?'':' hover:bg-slate-200'">
+
+                                                <input [readonly]="trashUINotEditable==true?true:false" class="w-full"
+                                                    (keyup)="onInputModify($event, resource?.key)"
+                                                    [value]="externalResourcePath?.[mValue]?.[key]?.[resource.key]"
+                                                    placeholder="Paste video URL">
+                                            </label>
+                                        </div>
+
+                                        <div matRipple
+                                            class="w-3/5 md:ml-1 sm:mr-1 p-2 border border-primary-600 rounded-lg rounded-l-none bg-primary-600 text-white cursor-pointer relative md:left-1 sm:left-0 md:text-base sm:text-[10px]"
+                                            [ngClass]="{
+                                                'hover:bg-primary active:bg-primary-800': this.urlValid?.[resource?.key],
+                                                'disableDiv': !this.urlValid?.[resource?.key]
+                                            }">
+
+                                            <!-- <a *ngIf="!this.urlValid[resource?.key]  ; else enablehref2" target="_blank"
+                                                class="w-full h-full flex items-center justify-center"
+                                                matTooltip="This resource has not been added. Please add a resource to continue">
+                                                <p>View</p>
+                                            </a> -->
+
+                                            <!-- <ng-template #enablehref2> -->
+                                            <a *ngIf="this.urlValid?.[resource?.key]; else viewDisabled"
+                                                [ariaDisabled]="true" target="_blank"
+                                                [href]="externalResourcePath?.[mValue]?.[key]?.[resource?.key]"
+                                                class="w-full h-full flex items-center justify-center">
+                                                <p>View</p>
+                                            </a>
+                                            <!-- </ng-template> -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Board Grade Dependent Resources -->
+                    <div *ngIf="resource.isGradeDependent===true">
+                        <mat-label class="text-accent-600 text-sm font-medium relative right-2">
+                            {{resource?.display}}
+                        </mat-label>
+
+                        <div class="grid grid-cols-2 gap-2 mt-1">
+                            <div (click)="editView(resource?.key, resource,gradeDependentSources[resource.key])" class="flex flex-col bg-grey-lighter">
+                                <label matRipple
+                                    class=" border border-primary relative w-full right-2 flex flex-col items-center rounded-lg p-2 cursor-pointer rounded-r-none bg-slate-100 text-primary-600"
+                                    [ngClass]="trashUINotEditable?'':' hover:bg-slate-200'">
+
+                                    <span class=" md:mx-2 absolute left-0 sm:mr-2 mt-[-2px] ">
+                                        <mat-icon class="text-primary"
+                                            svgIcon="heroicons_outline:arrow-circle-up"></mat-icon>
+                                    </span>
+
+                                    <div class="flex items-center ">
+                                        <span class=" md:mr-2 md:text-base relative sm:text-[10px] sm:ml-6">
+                                            <!-- {{!disableView(resource?.key) ? 'Re-Upload' : 'Upload'}} -->
+                                            {{gradeDependentSources?.[resource.key] === true ? 'Re-Upload' : 'Upload'}}
+                                        </span>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div matRipple
+                                class="w-3/5 md:ml-1 sm:mr-1 p-2 border border-primary-600 rounded-lg rounded-l-none bg-primary-600 text-white cursor-pointer relative md:left-1 sm:left-0 md:text-base sm:text-[10px]"
+                                [ngClass]="{
+                                    'hover:bg-primary active:bg-primary-800': gradeDependentSources?.[resource.key] !== true,
+                                    'disableDiv': gradeDependentSources?.[resource.key] !== true
+                                }">
+                                <ng-container *ngIf="gradeDependentSources?.[resource.key] === true; else viewDisabled">
+                                    <div class="flex justify-center" (click)="resourceView(resource?.key, resource,gradeDependentSources[resource.key])">
+                                        View
+                                    </div>
+                                </ng-container>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div [ngClass]="trashUINotEditable==true?'hidden':''" class="sm:px-6 w-full text-center mt-[200px] ">
+            <button type="button" (click)="updateInputs()" mat-raised-button color="primary"
+                class="absolute px-2 leading-6 top-1/2 left-1/2 mt-[130px] transform -translate-x-1/2 -translate-y-1/2  "
+                [disabled]="!enableForm">
+                Save
+            </button>
+        </div>
+    </div>
+    <div class="mr-0 mt-4 d-flex text-center" *ngIf="resArr?.length == 0">
+        <p>There is no resource available for the {{selectedTab}} team for learning units of the {{selectedMaturity}}
+            maturity</p>
+    </div>
+</div>
+
+<ng-template #viewDisabled>
+    <a [ariaDisabled]="true" target="_blank" class="w-full h-full flex items-center justify-center"
+        matTooltip="This resource has not been added. Please add a resource to continue">
+        <p>View</p>
+    </a>
+</ng-template>
+
+<ng-template #uploadProgress let-bytesTransferred>
+    <div *ngIf="bytesTransferred !== 0 && bytesTransferred < 100"
+        class="mt-2 pl-2 grid grid-cols-1 gap-1 justify-center">
+        <mat-progress-bar mode="buffer" [value]="bytesTransferred">
+        </mat-progress-bar>
+        <p class="mb-3" class="text-yellow-500">
+            {{bytesTransferred}}% uploaded
+        </p>
+    </div>
+    <p *ngIf="bytesTransferred == 100" class="mb-3" class="text-green-500">
+        Successfully Uploaded
+    </p>
+</ng-template>

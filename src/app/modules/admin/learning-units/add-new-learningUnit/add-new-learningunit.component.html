@@ -1,0 +1,194 @@
+<div class="h-[70vh] sm:w-[40vw] p-3 relative">
+
+    <div class="flex flex-row mt-4 mb-2 w-full">
+        <h1 class="text-2xl text-left">Add a New Learning Unit or Version</h1>
+        <button mat-dialog-close class="m-4 sm:m-6 sm:mx-7 absolute -top-4 -right-4 z-40" type="button"
+            (click)="close()">
+            <mat-icon class=" hover:scale-110 transition duration-5000 transform" svgIcon="mat_outline:close">
+            </mat-icon>
+        </button>
+    </div>
+
+    <div class=" h-[calc(89vh_-_207px)] overflow-auto ">
+        <form [formGroup]="tacForm" (ngSubmit)="submitForm()">
+            <div class="flex flex-col w-full  rounded-xl p-3 mt-4">
+
+                <mat-form-field appearance="fill" floatLabel="always">
+                    <mat-label>Learning Unit Name</mat-label>
+                    <input type="text" matInput formControlName='learningUnitName' [matAutocomplete]="auto1"
+                        (keyup)="tactivitySearchInput($event)" placeholder="Enter the learning unit name">
+                    <mat-autocomplete #auto1="matAutocomplete" (optionSelected)="selectedLU($event.option.value)">
+                        <mat-option *ngFor="let option of allTacts" [value]="option"
+                            (mouseover)="getoptionLength(option)">
+                            <span [matTooltip]="showFulllength ? tacOnOption : ''">
+                                {{option.learningUnitCode}} - {{option.learningUnitName}} - ({{ option.typeCode }}) -
+                                ({{ option.isoCode }}) - ({{ option.version }}) - ({{ option.Maturity }})
+                            </span>
+                        </mat-option>
+                    </mat-autocomplete>
+                </mat-form-field>
+
+                <div>
+                    <p class="text-red-500 -mt-4 mb-2"
+                        *ngIf="tacForm.controls['learningUnitName'].hasError('maxlength')">
+                        Lerning unit name cannot exceed 60 characters.
+                    </p>
+                </div>
+
+                <mat-form-field appearance="fill" floatLabel="always" class="customDivLUdisplay">
+                    <mat-label>Learning Unit Display Name</mat-label>
+                    <div class="w-full">
+                        <input type="text" matInput formControlName='learningUnitDisplayName' [matAutocomplete]="auto2"
+                            placeholder="Enter the learning unit display name">
+                    </div>
+
+                    <mat-autocomplete #auto2="matAutocomplete"
+                        (optionSelected)="selectedDisplayname($event.option.value)">
+                        <mat-option *ngFor="let option of allTacsFordisplay" [value]="option">
+                            {{option.learningUnitCode}} - {{option.learningUnitDisplayName}} - ({{ option.isoCode }}) -
+                            ({{ option.type }})
+                        </mat-option>
+                    </mat-autocomplete>
+
+                    <mat-icon *ngIf="isLUautoSelected" class="icon-size-5 "
+                        [ngClass]="enableEditnewTag?'text-blue-500':''" matSuffix [svgIcon]="'heroicons_solid:pencil'"
+                        (click)="EnableDisplayEdit()"
+                        [matTooltip]="isLUautoSelected?'':'You do not have the required permissions to edit this field'">
+                    </mat-icon>
+                </mat-form-field>
+
+                <mat-form-field appearance="fill" floatLabel="always">
+                    <mat-label>Learning Unit Type</mat-label>
+                    <mat-select formControlName='type' placeholder="Select the learning unit type"
+                        (selectionChange)="changeTacType($event)">
+                        <mat-option value="" disabled selected>Select</mat-option>
+
+                        <mat-option *ngFor="let lu of luType" [value]="lu.name">
+                            {{ lu.name }}
+                        </mat-option>
+
+                        <mat-option *ngIf="userAccessLevel > 10" class="">
+                            <div class="">
+                                <span class="bg-gray-200 rounded-full text-gray-500 py-2 px-4"
+                                    (click)="addnewLUtype()">Add a New Learning Unit Type &nbsp;&nbsp;
+                                    <mat-icon class="m-0" svgIcon="feather:plus-circle"></mat-icon>
+                                </span>
+                            </div>
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="fill" floatLabel="always">
+                    <mat-label>Select Language</mat-label>
+                    <mat-select formControlName='language' (selectionChange)="languageSelected($event)"
+                        placeholder="Select a language">
+                        <mat-option *ngFor="let elem of languages" [value]="elem.code">
+                            {{elem.name}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="fill" floatLabel="always">
+                    <mat-label>Learning Unit Code</mat-label>
+                    <input type="text" matInput formControlName='learningunitCode' (keyup)="updateValue($event)"
+                        placeholder="Enter the learning unit code" pattern="[A-Z]{2}[0-9]{2}$" maxlength="4">
+                    <mat-icon [svgIcon]="'heroicons_outline:information-circle'" matSuffix
+                        *ngIf="tacForm.get('learningunitCode').hasError('pattern')|| tacForm.get('learningunitCode').hasError('maxlength') || this.codeValid==false"
+                        matTooltip="Please enter a valid learning unit code, in the format CLXY" class="text-warn-400">
+                    </mat-icon>
+                </mat-form-field>
+
+                <mat-form-field appearance="fill" floatLabel="always">
+                    <mat-label>Version Number</mat-label>
+                    <input type="text" matInput formControlName='versionName' [value]="latestVersion"
+                        placeholder="Enter the version number">
+                    <mat-icon class="icon-size-5 " [ngClass]="enableEditnewVesion?'text-blue-500':''" matSuffix
+                        [svgIcon]="'heroicons_solid:pencil'" (click)="EnableVersionEdit()"
+                        [matTooltip]="enableEditnewVesion?'':'You do not have the required permissions to edit this field'">
+                    </mat-icon>
+                </mat-form-field>
+
+                <mat-form-field appearance="fill" floatLabel="always">
+                    <mat-label>Learning Unit Maturity</mat-label>
+                    <mat-select formControlName='Maturity' placeholder="Learning Unit Maturity">
+                        <mat-option *ngFor="let val of defaultMaturities" [value]="val">
+                            {{val}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="fill" floatLabel="always">
+                    <mat-label>Subject Code</mat-label>
+                    <mat-select formControlName='subjectCode' placeholder="Subject Code" name="subjectCode">
+                        <mat-option *ngFor="let val of subjectCodes" [value]="val">
+                            {{val}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="fill" floatLabel="always">
+                    <mat-label>Subject Name</mat-label>
+                    <mat-select formControlName='subjectName' placeholder="Subject Name">
+                        <mat-option *ngFor="let val of subjects" [value]="val">
+                            {{val}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="fill" floatLabel="always">
+                    <mat-label>Domain Code</mat-label>
+                    <mat-select formControlName='domainCode' placeholder="Domain Code">
+                        <mat-option *ngFor="let val of domainCodes" [value]="val">
+                            {{val}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="fill" floatLabel="always">
+                    <mat-label>Domain Name</mat-label>
+                    <mat-select formControlName='domainName' placeholder="Domain Name">
+                        <mat-option *ngFor="let val of domainNames" [value]="val.name">
+                            {{val.name}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="fill" floatLabel="always">
+                    <mat-label>Sub-Domain Code</mat-label>
+                    <mat-select formControlName='subDomainCode' placeholder="Sub-Domain Code">
+                        <mat-option *ngFor="let val of subdomainNames" [value]="val.code">
+                            {{val.code}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="fill" floatLabel="always">
+                    <mat-label>Sub-Domain Name</mat-label>
+                    <mat-select formControlName='subDomainName' placeholder="Sub-Domain Name">
+                        <mat-option *ngFor="let val of filteredSubdomains" [value]="val">
+                            {{val}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="fill" floatLabel="always">
+                    <mat-label>Composite Code</mat-label>
+                    <input type="text" matInput formControlName='compositeCode' placeholder="Composite Code">
+                    <mat-icon class="icon-size-5 " matSuffix [svgIcon]="'heroicons_solid:pencil'">
+                    </mat-icon>
+                </mat-form-field>
+
+                <button type="submit" class="w-1/2 m-auto"
+                    [disabled]="!(tacForm?.valid==true) || !(this.codeValid==true)" mat-raised-button color="primary">
+                    <div *ngIf="startLoading; else saveButton">
+                        <mat-spinner [diameter]="30"></mat-spinner>
+                    </div>
+
+                    <ng-template #saveButton>
+                        Save
+                    </ng-template>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

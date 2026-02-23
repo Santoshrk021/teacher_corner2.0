@@ -1,0 +1,18 @@
+<div class="h-full">
+    <mat-tab-group class="tab-body ">
+        <mat-tab label="Quick Guide">
+            <div class="tac-container-height " *ngIf="tacData?.mainGuidePath">
+                <app-pdf [pdfUrl]="tacData?.mainGuidePath | getDownloadURL" class=" w-full  h-full"></app-pdf>
+            </div>
+        </mat-tab>
+
+        <mat-tab label="Video">
+            <div class="tac-container">
+                <app-video [videoUrl]="tacData?.videoUrl">
+                </app-video>
+            </div>
+        </mat-tab>
+    </mat-tab-group>
+
+ 
+</div>

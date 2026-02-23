@@ -1,0 +1,7 @@
+a.disabled {
+    pointer-events: none;
+    cursor: default;
+  }
+  ::ng-deep .mat-progress-bar-buffer {
+    background: #E4E8EB;
+}

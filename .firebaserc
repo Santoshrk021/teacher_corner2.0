@@ -1,0 +1,31 @@
+{
+    "projects": {
+        "default": "thinktac-staging",
+        "backup": "backup-collection",
+        "jigyaasa": "jigyasa-e3fbb"
+    },
+    "targets": {
+        "thinktac-staging": {
+            "hosting": {
+                "review-teachercorner": [
+                    "review-teachercorner"
+                ]
+            }
+        },
+        "backup-collection": {
+            "hosting": {
+                "sandbox-teachercorner": [
+                    "sandbox-teachercorner"
+                ]
+            }
+        },
+        "jigyasa-e3fbb": {
+            "hosting": {
+                "jigyasa-teachercorner": [
+                    "jigyasa-teachercorner"
+                ]
+            }
+        }
+    },
+    "etags": {}
+}

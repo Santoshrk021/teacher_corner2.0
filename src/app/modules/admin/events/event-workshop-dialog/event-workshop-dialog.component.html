@@ -1,0 +1,30 @@
+<div class="w-[60vw] h-[80vh] relative ">
+    <button mat-dialog-close class=" absolute -top-4 -right-4 z-40">
+        <mat-icon class=" hover:scale-110 transition duration-1000 transform" svgIcon="mat_outline:close">
+        </mat-icon>
+    </button>
+
+
+    <mat-stepper [linear]="true" #stepper class="bg-transparent h-full w-full ">
+        <mat-step >
+            <ng-template matStepLabel>Basic</ng-template>
+            <ng-template matStepContent>
+                <app-basic [eventInfo]="this.data?.eventInfo" (basicInfoEmitter)="catchBasicInfoEvent($event)"></app-basic>
+            </ng-template>
+        </mat-step>
+        <mat-step>
+                <ng-template matStepLabel>Define Batches</ng-template>
+                <ng-template matStepContent>
+                    <app-define-batches [eventInfo]="this.data?.eventInfo" (batchInfoEmitter)="catchBatchInfoEvent($event)"></app-define-batches>
+                </ng-template>
+        </mat-step>
+        <mat-step>
+            <ng-template matStepLabel>Review</ng-template>
+            <ng-template matStepContent>
+                <app-review [eventInfo]="this.data?.eventInfo" [eventBasicInfo]="eventBasicInfo"[eventBatchInfo]="eventBatchInfo"></app-review>
+            </ng-template>
+        </mat-step>
+    </mat-stepper>
+
+
+</div>

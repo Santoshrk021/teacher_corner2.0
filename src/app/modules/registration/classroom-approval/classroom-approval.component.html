@@ -1,0 +1,27 @@
+<!-- <div class="m-5 mb-4 sm:mb-10 sm:m-auto"> -->
+<div class="m-5 mb-4 sm:m-auto">
+    <!-- Logo -->
+    <div class="w-50 my-4 m-auto flex items-center justify-center">
+        <ng-container *ngFor="let logo of environment.whiteBackgroundLogos">
+            <img [class]="logo.class" [src]="logo.src" [alt]="logo.alt" />
+        </ng-container>
+    </div>
+
+    <div class="w-full sm:w-[40vw] py-4 px-4 sm:p-8 sm:rounded-2xl sm:shadow sm:bg-card">
+        <!-- <p class="mb-2 text-center font-semibold text-xl text-accent-600">Registration</p> -->
+        <p class="mb-10 text-center text-accent-600">
+            Your request to join the {{selfRegCls?.classroomName}} classroom in the {{selfRegCls?.institutionName}}
+            institution on {{environment.projectName}}'s Teacher Corner platform has been sent for approval.
+        </p>
+        <p class="text-center text-accent-600">
+            You will receive a notification and a WhatsApp message within 24 hours on successful approval, to login.
+        </p>
+    </div>
+</div>
+
+<div class="absolute bottom-0 right-0 m-6">
+    <button type="button" (click)="logout()" class="fuse-mat-stroked-button-large w-full mt-6" mat-stroked-button
+        [color]="'primary'">
+        Logout
+    </button>
+</div>

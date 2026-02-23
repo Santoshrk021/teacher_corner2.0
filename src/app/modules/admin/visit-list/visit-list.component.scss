@@ -1,0 +1,69 @@
+.inventory-grid {
+    // grid-template-columns: 9% 8% 9% 9% 9% 6% 8% 8% 8% 6% 7% 2% ;
+    // grid-template-columns: 9% 8% 9% 9% 10% 6% 8% 8% 8% 6% 7% ;
+    // grid-template-columns: 5% 5% 7% 7% 8% 10% 7% 5% 6% 5% 6% 4% 3%;
+    grid-template-columns: 9% 10% 11% 9% 9% 6% 8% 8% 8% 8%;
+    // grid-template-columns: repeat(9,6fr);
+}
+
+:host ::ng-deep .mat-tab-group .mat-tab-header .mat-tab-label-container .mat-tab-list .mat-tab-labels .mat-tab-label.mat-tab-label-active {
+    background-color: #F1F5F9 !important;
+    color: #179AD7 !important;
+    border-radius: 20px !important;
+    border: 1px solid #179AD7;
+    scale: 90%
+}
+
+:host::ng-deep.mat-tab-group .mat-tab-header .mat-tab-label-container {
+    padding: 5px 24px;
+    background-color: transparent;
+    height: 50px;
+}
+
+:host::ng-deep.mat-tab-group .mat-tab-header .mat-tab-label-container .mat-tab-list .mat-tab-labels .mat-tab-label {
+    color: #179AD7;
+    scale: 90%
+}
+
+.search-results {
+    height: calc(100vh - 243px) !important;
+    overflow: scroll;
+}
+
+
+.dynamicwidth {
+    width: 100%;
+}
+
+
+@media only screen and (max-width:800px) {
+    .dynamicwidth {
+
+        width: 1000px;
+    }
+}
+
+
+@media only screen and (max-width:300px) {
+    .inventory-grid {
+        //grid-template-columns: repeat(3,2fr) 2fr 1fr 2fr 1fr 100px 100px 50px;
+        grid-template-columns: 5% 5% 7% 7% 8% 10% 7% 5% 6% 5% 6% 4% 3%;
+    }
+}
+
+@media only screen and (min-width: 300px) and (max-width: 500px) {
+    .inventory-grid {
+
+        grid-template-columns: 5% 5% 7% 7% 8% 10% 7% 5% 6% 5% 6% 4% 3%;
+        // grid-template-columns: repeat(7,200px);
+
+    }
+}
+
+.not-available {
+    color: red;
+}
+
+.imported {
+    color: green;
+}

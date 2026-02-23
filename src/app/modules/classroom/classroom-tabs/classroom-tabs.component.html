@@ -1,0 +1,55 @@
+<mat-tab-group class="tab-body">
+
+    <!-- Assignment Tab -->
+    <mat-tab label="Assignments">
+        <div class="tac-container-height">
+            <app-assignments></app-assignments>
+        </div>
+
+    </mat-tab>
+    <!-- "Additional Resources -->
+
+    <mat-tab label="Additional Resources">
+        <div class="tac-container-height w-full bg-accent-50 shadow">
+            Additional Resources
+        </div>
+    </mat-tab>
+
+    <!-- TAC Video -->
+    <mat-tab label="Video">
+        <div class="tac-container-height  w-full bg-accent-50 shadow ">
+            <app-video [videoUrl]="'https://www.youtube.com/watch?v=zziSt1naQmQ'" class="max-h-100"></app-video>
+        </div>
+    </mat-tab>
+
+    <!-- TAC Quide -->
+    <mat-tab label="Quick Guide">
+        <div class="tac-container-height  w-full bg-accent-50 shadow ">
+            Additional Resources
+        </div>
+    </mat-tab>
+
+    <!-- Material Required  -->
+    <mat-tab label="Material Required">
+        <div class="tac-container-height  w-full bg-accent-50 shadow">
+            Material Required
+        </div>
+    </mat-tab>
+
+    <!-- Observation Sheet -->
+    <mat-tab label="Observation Sheet">
+        <div class="tac-container-height  w-full bg-accent-50 shadow ">
+            <div class='flex justify-center items-center pb-2 height'>
+                <app-pdf [pdfUrl]="pdfLink" class=" w-full  h-full"></app-pdf>
+            </div>
+        </div>
+    </mat-tab>
+
+    <!-- Associated TACs -->
+    <mat-tab label="Associated TACs">
+        <div class="tac-container-height  w-full bg-accent-50 shadow ">
+            Associated TACs
+        </div>
+    </mat-tab>
+
+</mat-tab-group>

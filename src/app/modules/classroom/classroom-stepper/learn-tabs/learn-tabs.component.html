@@ -1,0 +1,287 @@
+<div class="h-full">
+    <mat-tab-group class="tab-body " #tabGroup (selectedTabChange)="onTabChanged($event)"
+        [(selectedIndex)]="selectedTabIndex">
+        <div *ngFor="let content of workflow?.contents; let i = index">
+            <mat-tab *ngIf="content?.resourcePath || content?.contentCategory==='assignment'; else showEmpty">
+                <ng-template mat-tab-label>
+                    <div class=" py-2  rounded-full" (click)="onTabChange(i)">
+                        {{content?.contentName}}
+                    </div>
+                </ng-template>
+                <div [ngSwitch]="content?.contentCategory">
+
+                    <div *ngSwitchCase="'assignment'">
+                        <div *ngIf="content.assignmentType==='UPLOAD'" class="border-b border-primary-200">
+                            <app-assignments [contentInfo]="content" [workflowId]="workflowId"
+                                [assignmentId]="workflow?.contents[i].assignmentId" [currentWorkflow]="workflow"
+                                [currentData]="currentSubmdataofstep"
+                                [assignmentIdwithtabchange]="assignmentID"></app-assignments>
+                        </div>
+                        <div *ngIf="content.assignmentType==='GAME'" class="border-b border-primary-200">
+                            <app-game [gameUrl]="content.resourcePath" [currentWorkflow]="workflow"
+                                [content]="workflow?.contents[i]" [assignmentId]="workflow?.contents[i].assignmentId"
+                                [index]="i" [workflowContents]="workflow.contents" [gameIndex]="gameNo"></app-game>
+                        </div>
+                        <div *ngIf="content.assignmentType==='QUIZ'" class="">
+                            <app-quiz [contentInfo]="content" [quizId]="content.assignmentId" [workflowId]="workflowId"
+                                [currentWorkflow]="workflow"></app-quiz>
+                        </div>
+                        <div *ngIf="content.assignmentType==='FORM'" class="">
+                            <app-form-workflow [contentInfo]="content" [formId]="content.assignmentId"
+                                [workflowId]="workflowId" [currentWorkflow]="workflow"
+                                [currentData]="currentSubmdataofstep" [assignmentIdwithtabchange]="assignmentID"
+                                [currentStep]="currentStep"></app-form-workflow>
+                        </div>
+                        <div *ngIf="content.assignmentType==='TEXTBLOCK'" class="">
+                            <app-textblock-view [contentInfo]="content" [formId]="content.assignmentId"
+                                [currentData]="currentSubmdataofstep" [assignmentIdwithtabchange]="assignmentID"
+                                [workflowId]="workflowId"></app-textblock-view>
+                        </div>
+                    </div>
+
+                    <div *ngSwitchCase="'games'">
+                        <app-game [gameUrl]="content.resourcePath"></app-game>
+                    </div>
+
+                    <div *ngSwitchCase="'additional resources'">
+                        <div *ngIf="content.additionalResourceType==='PDF' && content?.resourcePath ">
+                            <div *ngIf="content?.isDownloadable ==undefined ||content?.isDownloadable ==true"
+                                class="text-right mr-16">
+                                <a [href]="content?.resourcePath|getDownloadURL" appDownloadDirective
+                                    [download]="content?.resourcePath" #dwld="appDownloadDirective" title="Download"
+                                    target="_blank">
+                                    <mat-icon class="download-pdf  icon-size-8"
+                                        svgIcon="mat_solid:cloud_download"></mat-icon>
+                                </a>
+                            </div>
+
+                            <div class="tac-container-height">
+                                <app-pdf [pdfUrl]="content?.resourcePath | getDownloadURL"
+                                    class=" w-full  h-full"></app-pdf>
+                            </div>
+
+                        </div>
+                        <div *ngIf="content.additionalResourceType==='LINK'  && content?.resourcePath" class="">
+                            <app-video [videoUrl]="content?.resourcePath">
+                            </app-video>
+                        </div>
+                        <div *ngIf="content.additionalResourceType==='PPT' && content?.resourcePath "
+                            class="tac-container">
+                            <a [href]="content?.resourcePath| getDownloadURL" target="_blank"
+                                class="fuse-mat-stroked-button-large disabled:bg-primary-200 text-center mt-6 bg-primary-600 text-white hover:bg-primary-500"
+                                mat-stroked-button>Download PPT</a>
+                        </div>
+                    </div>
+
+                    <div *ngSwitchCase="'externalResources'">
+                        <div *ngIf="externalResources?.[content?.contentSubCategory]?.type==='video' ;else noVideoTemp1"
+                            class="tac-container">
+                            <app-video [videoUrl]="content?.resourcePath">
+                            </app-video>
+                        </div>
+                        <ng-template #noVideoTemp1>
+                            <div class="tac-container-height">
+                                <app-pdf [pdfUrl]="content?.resourcePath | getDownloadURL"
+                                    class=" w-full  h-full"></app-pdf>
+                            </div>
+                        </ng-template>
+                    </div>
+
+                    <div *ngSwitchDefault>
+                        <div
+                            *ngIf="getFileExtension(content?.resourcePath?.universalGradeBoardResourcePath || content?.resourcePath)">
+                            <div
+                                [ngSwitch]="content?.resourcePath?.universalGradeBoardResourcePath?content?.resourcePath?.universalGradeBoardResourcePath.substring(content?.resourcePath?.universalGradeBoardResourcePath?.lastIndexOf('.') + 1):content?.resourcePath?.substring(content?.resourcePath?.lastIndexOf('.') + 1)">
+                                <div
+                                    *ngSwitchCase="['mp4'].includes((content?.resourcePath?.universalGradeBoardResourcePath?content?.resourcePath?.universalGradeBoardResourcePath:content?.resourcePath)?.substring(content?.resourcePath?.universalGradeBoardResourcePath?content?.resourcePath?.universalGradeBoardResourcePath:content?.resourcePath?.lastIndexOf('.') + 1)) ?
+                                     (content?.resourcePath?.universalGradeBoardResourcePath?content?.resourcePath?.universalGradeBoardResourcePath:content?.resourcePath).substring((content?.resourcePath?.universalGradeBoardResourcePath?content?.resourcePath?.universalGradeBoardResourcePath:content?.resourcePath).lastIndexOf('.') + 1) : ''">
+                                    <app-video
+                                        [videoUrl]="(content?.resourcePath?.universalGradeBoardResourcePath?content?.resourcePath?.universalGradeBoardResourcePath:content?.resourcePath) | getDownloadURL">
+                                    </app-video>
+                                </div>
+
+                                <div *ngSwitchCase="'pdf'" class="tac-container-height">
+                                    <app-pdf
+                                        [pdfUrl]="(content?.resourcePath?.universalGradeBoardResourcePath?content?.resourcePath?.universalGradeBoardResourcePath:content?.resourcePath) | getDownloadURL"
+                                        class=" w-full h-full">
+                                    </app-pdf>
+                                </div>
+
+                                <div
+                                    *ngSwitchCase="['jpg', 'jpeg', 'png', 'webp'].includes((content?.resourcePath?.universalGradeBoardResourcePath?content?.resourcePath?.universalGradeBoardResourcePath:content?.resourcePath).substring((content?.resourcePath?.universalGradeBoardResourcePath?content?.resourcePath?.universalGradeBoardResourcePath:content?.resourcePath).lastIndexOf('.') + 1)) ?
+                                    (content?.resourcePath?.universalGradeBoardResourcePath?content?.resourcePath?.universalGradeBoardResourcePath:content?.resourcePath).substring((content?.resourcePath?.universalGradeBoardResourcePath?content?.resourcePath?.universalGradeBoardResourcePath:content?.resourcePath).lastIndexOf('.') + 1) : ''">
+                                    <img class="w-full h-full object-cover"
+                                        [src]="(content?.resourcePath?.universalGradeBoardResourcePath?content?.resourcePath?.universalGradeBoardResourcePath:content?.resourcePath) | getDownloadURL"
+                                        alt="image" />
+                                </div>
+
+                                <div
+                                    *ngSwitchCase="['docx', 'doc', 'ppt', 'pptx', 'xls', 'xlsx'].includes((content?.resourcePath?.universalGradeBoardResourcePath?content?.resourcePath?.universalGradeBoardResourcePath:content?.resourcePath).substring((content?.resourcePath?.universalGradeBoardResourcePath?content?.resourcePath?.universalGradeBoardResourcePath:content?.resourcePath).lastIndexOf('.') + 1)) ?
+                                    (content?.resourcePath?.universalGradeBoardResourcePath?content?.resourcePath?.universalGradeBoardResourcePath:content?.resourcePath).substring((content?.resourcePath?.universalGradeBoardResourcePath?content?.resourcePath?.universalGradeBoardResourcePath:content?.resourcePath).lastIndexOf('.') + 1) : ''">
+                                    <a [href]="(content?.resourcePath?.universalGradeBoardResourcePath?content?.resourcePath?.universalGradeBoardResourcePath:content?.resourcePath) | getDownloadURL"
+                                        target="_blank"
+                                        class="fuse-mat-stroked-button-large disabled:bg-primary-200 text-center mt-6 bg-primary-600 text-white hover:bg-primary-500"
+                                        mat-stroked-button>
+                                        Download PPT
+                                    </a>
+                                </div>
+
+                                <div *ngSwitchDefault>
+                                    <div
+                                        *ngIf="checkIfUrl((content?.resourcePath?.universalGradeBoardResourcePath?content?.resourcePath?.universalGradeBoardResourcePath:content?.resourcePath))">
+                                        <app-video
+                                            [videoUrl]="(content?.resourcePath?.universalGradeBoardResourcePath?content?.resourcePath?.universalGradeBoardResourcePath:content?.resourcePath)">
+                                        </app-video>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- <div
+                            *ngSwitchCase="['mp4'].includes(content?.resourcePath?.universalGradeBoardResourcePath?.substring(content?.resourcePath?.universalGradeBoardResourcePath?.lastIndexOf('.') + 1)) ? content?.resourcePath?.universalGradeBoardResourcePath?.substring(content?.resourcePath?.universalGradeBoardResourcePath?.lastIndexOf('.') + 1) : ''">
+                            <app-video [videoUrl]="content?.resourcePath?.universalGradeBoardResourcePath | getDownloadURL">
+                            </app-video>
+                        </div>
+
+                        <div *ngSwitchCase="'pdf'" class="tac-container-height">
+                            <app-pdf [pdfUrl]="content?.resourcePath?.universalGradeBoardResourcePath | getDownloadURL" class=" w-full h-full">
+                            </app-pdf>
+                        </div>
+
+                        <div
+                            *ngSwitchCase="['jpg', 'jpeg', 'png', 'webp'].includes(content?.resourcePath?.universalGradeBoardResourcePath?.substring(content?.resourcePath?.universalGradeBoardResourcePath?.lastIndexOf('.') + 1)) ? content?.resourcePath?.universalGradeBoardResourcePath?.substring(content?.resourcePath?.universalGradeBoardResourcePath?.lastIndexOf('.') + 1) : ''">
+                            <img class="w-full h-full object-cover"
+                                [src]="content?.resourcePath?.universalGradeBoardResourcePath | getDownloadURL" alt="image" />
+                        </div>
+
+                        <div
+                            *ngSwitchCase="['docx', 'doc', 'ppt', 'pptx', 'xls', 'xlsx'].includes(content?.resourcePath?.universalGradeBoardResourcePath?.substring(content?.resourcePath?.universalGradeBoardResourcePath?.lastIndexOf('.') + 1)) ? content?.resourcePath?.universalGradeBoardResourcePath?.substring(content?.resourcePath?.universalGradeBoardResourcePath?.lastIndexOf('.') + 1) : ''">
+                            <a [href]="content?.resourcePath?.universalGradeBoardResourcePath | getDownloadURL" target="_blank"
+                                class="fuse-mat-stroked-button-large disabled:bg-primary-200 text-center mt-6 bg-primary-600 text-white hover:bg-primary-500"
+                                mat-stroked-button>
+                                Download PPT
+                            </a>
+                        </div> -->
+                        <!--
+                        <div *ngIf="resourceKeys.includes(content?.contentCategory)">
+                            <div
+                                [ngSwitch]="luResources?.[content?.contentCategory]?.[content?.contentSubCategory]?.contentType">
+                                <div *ngSwitchCase="'video'">
+                                    <app-video [videoUrl]="content?.resourcePath">
+                                    </app-video>
+                                </div>
+
+                                <div class="tac-container-height" *ngSwitchCase="'pdf'">
+                                    <app-pdf [pdfUrl]="content?.resourcePath | getDownloadURL" class=" w-full h-full">
+                                    </app-pdf>
+                                </div>
+
+                                <div *ngSwitchCase="'image'">
+                                    <img class="w-full h-full object-cover"
+                                        [src]="content?.resourcePath | getDownloadURL" alt="image" />
+                                </div>
+
+                                <div *ngSwitchCase="'document'">
+                                    <a [href]="content?.resourcePath | getDownloadURL" target="_blank"
+                                        class="fuse-mat-stroked-button-large disabled:bg-primary-200 text-center mt-6 bg-primary-600 text-white hover:bg-primary-500"
+                                        mat-stroked-button>
+                                        Download PPT
+                                    </a>
+                                </div>
+
+                                <div *ngSwitchDefault>
+                                </div>
+                            </div>
+                        </div>
+                        -->
+
+                        <!-- old code -->
+                        <!--
+                                <div *ngIf="luResources?.[content?.contentCategory]?.[content?.contentSubCategory]?.type=='video'
+                                    && luResources?.[content?.contentCategory]?.[content?.contentSubCategory]?.allowedExtensions=='video' ;else noVideoTemp2"
+                                    class="tac-container">
+                                    <app-video [videoUrl]="content?.resourcePath">
+                                    </app-video>
+                                </div>
+                                <ng-template #noVideoTemp2>
+                                    <div *ngIf="content?.resourcePath && luResources?.[content?.contentCategory]?.[content?.contentSubCategory]?.type=='file'
+                                            && (luResources?.[content?.contentCategory]?.[content?.contentSubCategory]?.allowedExtensions=='video' || luResources?.[content?.contentCategory]?.[content?.contentSubCategory]?.allowedExtensions=='mp4') ;else noVideoTemp4"
+                                        class="tac-container">
+                                        <app-video [videoUrl]="content?.resourcePath | getDownloadURL">
+                                        </app-video>
+                                    </div>
+                                    <ng-template #noVideoTemp4>
+                                        <div class="tac-container-height" *ngIf="luResources?.[content?.contentCategory]?.[content?.contentSubCategory]?.type=='file'
+                                                && luResources?.[content?.contentCategory]?.[content?.contentSubCategory]?.allowedExtensions!='img'
+                                                && luResources?.[content?.contentCategory]?.[content?.contentSubCategory]?.allowedExtensions!='jpg'
+                                                && luResources?.[content?.contentCategory]?.[content?.contentSubCategory]?.allowedExtensions!='png'
+                                                 && luResources?.[content?.contentCategory]?.[content?.contentSubCategory]?.allowedExtensions!='xlsx'
+                                                  && luResources?.[content?.contentCategory]?.[content?.contentSubCategory]?.allowedExtensions!='ppt'
+                                                ;else noVideoTemp5">
+                                            <app-pdf [pdfUrl]="content?.resourcePath | getDownloadURL"
+                                                class=" w-full  h-full"></app-pdf>
+                                        </div>
+                                    </ng-template>
+                                    <ng-template #noVideoTemp5>
+                                        <img *ngIf="luResources?.[content?.contentCategory]?.[content?.contentSubCategory]?.type=='file'
+                                                && (luResources?.[content?.contentCategory]?.[content?.contentSubCategory]?.allowedExtensions=='img' ||
+                                                luResources?.[content?.contentCategory]?.[content?.contentSubCategory]?.allowedExtensions=='jpg'||
+                                                luResources?.[content?.contentCategory]?.[content?.contentSubCategory]?.allowedExtensions=='png') ;else noVideoTemp6"
+                                            class="w-full h-full object-cover"
+                                            [src]="content?.resourcePath | getDownloadURL" alt="image" />
+                                    </ng-template>
+                                    <ng-template #noVideoTemp6>
+                                        <div *ngIf="luResources?.[content?.contentCategory]?.[content?.contentSubCategory]?.type=='file'
+                                                    && (
+                                                    luResources?.[content?.contentCategory]?.[content?.contentSubCategory]?.allowedExtensions=='ppt'||
+                                                    luResources?.[content?.contentCategory]?.[content?.contentSubCategory]?.allowedExtensions=='xlsx')"
+                                            class="tac-container">
+                                            <a [href]="content?.resourcePath| getDownloadURL" target="_blank"
+                                                class="fuse-mat-stroked-button-large disabled:bg-primary-200 text-center mt-6 bg-primary-600 text-white hover:bg-primary-500"
+                                                mat-stroked-button>Download PPT</a>
+                                        </div>
+                                    </ng-template>
+                                </ng-template>
+                            -->
+                    </div>
+                </div>
+            </mat-tab>
+
+            <ng-template #showEmpty>
+                <!-- <mat-tab [label]="content?.contentName"> -->
+                <!-- <p>ffffffffff</p> -->
+
+                <!-- No Content Found -->
+                <!-- </mat-tab> -->
+            </ng-template>
+        </div>
+    </mat-tab-group>
+</div>
+
+<ng-template #lockAnimation>
+    <div class="sm:h-[90%] h-[70%] bg-primary-200 rounded-lg shadow-md border ">
+        <div class="scale-[35%] -mt-24 -ml-4">
+            <div class="wrapper">
+                <div class="base">
+                    <div class="base-bottom">
+                    </div>
+                    <div class="lock-inside-top">
+                    </div>
+                    <div class="lock-inside-bottom">
+                    </div>
+                </div>
+                <div class="lock-cirlce">
+                    <div class="lock-circle-inside">
+                    </div>
+                </div>
+                <div class="lock-box">
+                </div>
+            </div>
+
+        </div>
+        <div class="text-center flex justify-center ">
+            <div class="scale-100  -mt-30 text-lg font-bold border-slate-500 border w-max h-max px-4 py-2 rounded-full">
+                The
+                Content Is Locked</div>
+        </div>
+    </div>
+</ng-template>

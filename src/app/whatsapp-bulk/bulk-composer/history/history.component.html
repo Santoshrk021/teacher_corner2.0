@@ -1,0 +1,219 @@
+<div class="py-6 h-screen w-screen overflow-hidden relative bg-gray-50">
+  <!-- Close button -->
+  <button (click)="drawerClose()" class="m-3 absolute top-0 right-0 z-40">
+    <mat-icon class="hover:scale-110 transition duration-500 transform" svgIcon="mat_outline:close">
+    </mat-icon>
+  </button>
+
+  <!-- Header -->
+  <div class="text-3xl font-bold pt-2 pl-4">WhatsApp Messages History</div>
+
+  <!-- Loading spinner -->
+  <div *ngIf="isLoading" class="flex items-center justify-center h-64">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+
+  <!-- Content -->
+  <div class="w-full mt-4" *ngIf="!isLoading">
+    <!-- Grid Header -->
+    <div class="history-grid z-10 sticky top-0 grid gap-4 py-3 px-4 shadow text-sm font-semibold text-gray-600 bg-white rounded-t-lg">
+      <div>Date</div>
+      <div>Template</div>
+      <div>Recipients</div>
+      <div>Success</div>
+      <div>Failed</div>
+      <div>Status</div>
+      <div class="text-center">View More</div>
+    </div>
+
+    <!-- History Items -->
+    <div class="overflow-y-auto h-[calc(100vh_-_180px)]">
+      <ng-container *ngIf="historyItems.length > 0">
+        <ng-container *ngFor="let item of historyItems">
+          <!-- Row -->
+          <div class="history-grid grid items-center gap-4 py-3 px-4 border-b border-gray-200 bg-white hover:bg-gray-50">
+            <div class="text-sm text-gray-700">{{ item.createdAt | date: 'dd/MM/yyyy HH:mm' }}</div>
+            <div class="text-sm text-gray-900 font-medium truncate" [matTooltip]="item.templateName">{{ item.templateName }}</div>
+            <div class="text-sm text-gray-700">{{ item.totalRecipients }}</div>
+            <div class="text-sm text-green-600 font-medium">{{ item.successCount }}</div>
+            <div class="text-sm text-red-600 font-medium">{{ item.failedCount }}</div>
+            <div>
+              <span class="px-2 py-1 text-xs rounded-full"
+                    [ngClass]="{
+                      'bg-green-100 text-green-700': item.status === 'completed',
+                      'bg-yellow-100 text-yellow-700': item.status === 'pending',
+                      'bg-red-100 text-red-700': item.status === 'failed'
+                    }">
+                {{ item.status }}
+              </span>
+            </div>
+            <!-- Toggle Button -->
+            <div class="text-center">
+              <button class="min-w-10 min-h-7 h-7 px-2 leading-6" mat-stroked-button
+                      (click)="toggleDetails(item)"
+                      [ngClass]="{'bg-slate-200': selectedBatch?.batchId === item.batchId}">
+                <mat-icon class="icon-size-5"
+                          [svgIcon]="selectedBatch?.batchId === item.batchId ? 'heroicons_solid:chevron-up' : 'heroicons_solid:chevron-down'">
+                </mat-icon>
+              </button>
+            </div>
+          </div>
+
+          <!-- Expanded Details -->
+          <div *ngIf="selectedBatch?.batchId === item.batchId" class="border-b border-slate-300 bg-blue-50 p-4">
+            <!-- Loading details -->
+            <div *ngIf="isLoadingDetails" class="flex items-center justify-center py-8">
+              <mat-spinner diameter="30"></mat-spinner>
+              <span class="ml-3 text-gray-600">Loading details...</span>
+            </div>
+
+            <!-- Tabs -->
+            <mat-tab-group *ngIf="!isLoadingDetails" class="bg-white rounded-lg shadow-sm">
+              <!-- Tab 1: Original Send List -->
+              <mat-tab>
+                <ng-template matTabLabel>
+                  <span class="flex items-center gap-2">
+                    <mat-icon class="icon-size-4" svgIcon="heroicons_outline:document-text"></mat-icon>
+                    Original List
+                  </span>
+                </ng-template>
+                <ng-template matTabContent>
+                  <div class="p-4">
+                    <div class="flex justify-between items-center mb-4">
+                      <h4 class="font-semibold text-gray-800 m-0">Original Recipients ({{ originalData.length }})</h4>
+                      <button mat-stroked-button color="primary" (click)="downloadOriginalData()">
+                        <mat-icon class="icon-size-4 mr-1" svgIcon="heroicons_outline:download"></mat-icon>
+                        Download
+                      </button>
+                    </div>
+                    <div class="max-h-64 overflow-y-auto border rounded-lg">
+                      <table class="w-full text-sm">
+                        <thead class="bg-gray-100 sticky top-0">
+                          <tr>
+                            <th class="px-3 py-2 text-left font-medium text-gray-600">Phone Number</th>
+                            <th *ngFor="let field of selectedBatch?.paramFields" class="px-3 py-2 text-left font-medium text-gray-600">
+                              {{ field }}
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr *ngFor="let entry of originalData" class="border-t hover:bg-gray-50">
+                            <td class="px-3 py-2 text-gray-700">{{ entry.phone }}</td>
+                            <td *ngFor="let param of entry.params" class="px-3 py-2 text-gray-700">{{ param }}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </ng-template>
+              </mat-tab>
+
+              <!-- Tab 2: Status Report -->
+              <mat-tab>
+                <ng-template matTabLabel>
+                  <span class="flex items-center gap-2">
+                    <mat-icon class="icon-size-4" svgIcon="heroicons_outline:clipboard-check"></mat-icon>
+                    Status Report
+                  </span>
+                </ng-template>
+                <ng-template matTabContent>
+                  <div class="p-4">
+                    <div class="flex justify-between items-center mb-4">
+                      <h4 class="font-semibold text-gray-800 m-0">Status Results ({{ statusResults.length }})</h4>
+                      <button mat-stroked-button color="primary" (click)="downloadStatusReport()">
+                        <mat-icon class="icon-size-4 mr-1" svgIcon="heroicons_outline:download"></mat-icon>
+                        Download
+                      </button>
+                    </div>
+                    <div class="max-h-64 overflow-y-auto border rounded-lg">
+                      <table class="w-full text-sm">
+                        <thead class="bg-gray-100 sticky top-0">
+                          <tr>
+                            <th class="px-3 py-2 text-left font-medium text-gray-600">Phone Number</th>
+                            <th *ngFor="let field of selectedBatch?.paramFields" class="px-3 py-2 text-left font-medium text-gray-600">
+                              {{ field }}
+                            </th>
+                            <th class="px-3 py-2 text-left font-medium text-gray-600">Status</th>
+                            <th class="px-3 py-2 text-left font-medium text-gray-600">Failure Reason</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr *ngFor="let entry of statusResults" class="border-t hover:bg-gray-50">
+                            <td class="px-3 py-2 text-gray-700">{{ entry.phone }}</td>
+                            <td *ngFor="let param of entry.params" class="px-3 py-2 text-gray-700">{{ param }}</td>
+                            <td class="px-3 py-2">
+                              <span class="px-2 py-1 text-xs rounded-full" [ngClass]="getStatusClass(entry.status)">
+                                {{ entry.status }}
+                              </span>
+                            </td>
+                            <td class="px-3 py-2 text-red-600 text-xs">{{ entry.failure_reason }}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </ng-template>
+              </mat-tab>
+
+              <!-- Tab 3: Failed Entries -->
+              <mat-tab>
+                <ng-template matTabLabel>
+                  <span class="flex items-center gap-2">
+                    <mat-icon class="icon-size-4 text-red-500" svgIcon="heroicons_outline:exclamation-circle"></mat-icon>
+                    Failed ({{ failedEntries.length }})
+                  </span>
+                </ng-template>
+                <ng-template matTabContent>
+                  <div class="p-4">
+                    <div class="flex justify-between items-center mb-4">
+                      <h4 class="font-semibold text-gray-800 m-0">Failed Entries ({{ failedEntries.length }})</h4>
+                      <button mat-stroked-button color="warn" (click)="downloadFailedEntries()" [disabled]="failedEntries.length === 0">
+                        <mat-icon class="icon-size-4 mr-1" svgIcon="heroicons_outline:download"></mat-icon>
+                        Download for Retry
+                      </button>
+                    </div>
+
+                    <!-- No failed entries -->
+                    <div *ngIf="failedEntries.length === 0" class="text-center py-8 text-gray-500">
+                      <mat-icon class="text-green-400 mb-2" style="transform: scale(2);" svgIcon="heroicons_outline:check-circle"></mat-icon>
+                      <p class="mt-4">All messages were sent successfully!</p>
+                    </div>
+
+                    <!-- Failed entries table -->
+                    <div *ngIf="failedEntries.length > 0" class="max-h-64 overflow-y-auto border rounded-lg">
+                      <table class="w-full text-sm">
+                        <thead class="bg-red-50 sticky top-0">
+                          <tr>
+                            <th class="px-3 py-2 text-left font-medium text-red-700">Phone Number</th>
+                            <th *ngFor="let field of selectedBatch?.paramFields" class="px-3 py-2 text-left font-medium text-red-700">
+                              {{ field }}
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr *ngFor="let entry of failedEntries" class="border-t hover:bg-red-50">
+                            <td class="px-3 py-2 text-gray-700">{{ entry.phone }}</td>
+                            <td *ngFor="let param of entry.params" class="px-3 py-2 text-gray-700">{{ param }}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </ng-template>
+              </mat-tab>
+            </mat-tab-group>
+          </div>
+        </ng-container>
+      </ng-container>
+
+      <!-- Empty State -->
+      <div *ngIf="historyItems.length === 0"
+           class="flex flex-col items-center justify-center h-64 bg-white rounded-b-lg">
+        <mat-icon class="text-gray-300 mb-4" style="transform: scale(3);"
+                  svgIcon="heroicons_outline:clock"></mat-icon>
+        <p class="text-gray-500 text-lg font-medium">No message history yet</p>
+        <p class="text-gray-400 text-sm">Your sent messages will appear here</p>
+      </div>
+    </div>
+  </div>
+</div>

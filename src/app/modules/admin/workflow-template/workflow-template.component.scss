@@ -1,0 +1,126 @@
+::ng-deep .mat-tab-labels {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+::ng-deep .mat-tab-header-pagination-before,
+::ng-deep.mat-tab-header-pagination-after {
+    @media (max-width:600px) {
+        display: none !important;
+    }
+
+    background:rgba(255, 255, 255, 0) !important;
+    box-shadow: none !important;
+}
+
+.height {
+    height: calc(100vh - calc(4rem + 98px));
+}
+
+.white-icon {
+    color: white !important
+}
+
+.bg-primary {
+    background-color: #049BD8 !important;
+}
+
+::ng-deep.mat-tab-group.fuse-mat-no-header .mat-tab-header {
+    opacity: 0 !important;
+    visibility: hidden !important;
+}
+
+.pointer-events-none {
+    pointer-events: none !important;
+}
+
+// .cursor-grab {
+//     cursor: grab;
+// }
+
+
+::ng-deep.mat-tab-group .mat-tab-header .mat-tab-label-container .mat-tab-list .mat-tab-labels .mat-tab-label.mat-tab-label-active {
+    background-color: #049BD8 !important;
+    color: aliceblue !important;
+}
+
+::ng-deep .mat-tab-body-wrapper {
+    height: 600px;
+}
+
+
+
+
+
+
+// ::ng-deep .mat-button-toggle-checked {
+//   background-color: #2563eb;
+//   color: #ffffff;
+//   box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+// }
+
+
+::ng-deep .mat-button-toggle-group {
+    background-color: #f4f6fa;
+    border-radius: 8px;
+    padding: 4px;
+    display: flex;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+::ng-deep .mat-button-toggle {
+    font-weight: 500;
+    font-size: 13px;
+    //   padding: 8px 18px;
+    padding: 4px 24px;
+    color: #4b5563;
+    border-radius: 6px;
+    transition: all 0.2s ease-in-out;
+}
+
+::ng-deep .mat-button-toggle-checked {
+    background-color: #049BD8 !important;
+    color: #ffffff !important;
+}
+
+::ng-deep .mat-button-toggle:not(.mat-button-toggle-checked):hover {
+    //   background-color: #e0f4fb;
+    background-color: #DBEAFE;
+}
+
+::ng-deep .mat-button-toggle-group .mat-button-toggle.mat-button-toggle-checked .mat-button-toggle-label-content {
+    color: #ffffff !important;
+}
+
+
+
+::ng-deep .mat-button-toggle-checked:not(.mat-button-toggle-disabled) {
+  background-color: #049BD8 !important;
+  color: #ffffff !important;
+}
+
+/* ✅ Hover effect only if not disabled and not selected */
+// ::ng-deep .mat-button-toggle:not(.mat-button-toggle-disabled):not(.mat-button-toggle-checked):hover {
+//   background-color: #e0f4fb;
+// }
+
+/* ✅ Selected + Disabled toggle — gray muted style */
+::ng-deep .mat-button-toggle-checked.mat-button-toggle-disabled {
+  background-color: #cbd5e1 !important; 
+  color: #ffffff !important;
+}
+
+/* ✅ Unselected + Disabled toggle — gray text, no hover */
+::ng-deep .mat-button-toggle.mat-button-toggle-disabled {
+  color: #9ca3af !important;
+  pointer-events: none;
+}
+
+::ng-deep .mat-button-toggle.mat-button-toggle-disabled:not(.mat-button-toggle-checked) {
+  background-color: transparent !important;
+  color: #9ca3af !important;  // muted gray
+  pointer-events: none;
+}

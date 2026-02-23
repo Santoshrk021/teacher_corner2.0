@@ -1,0 +1,175 @@
+<div class="py-6 h-screen w-screen overflow-hidden relative">
+    <button (click)="drawerClose()" class="m-3  absolute top-0 right-0 z-40">
+        <mat-icon class=" hover:scale-110 transition duration-5000 transform" svgIcon="mat_outline:close">
+        </mat-icon>
+    </button>
+
+
+    <button [ngClass]="trashLUList.length ==0?'hidden':''" mat-stroked-button color="warn" (click)="deleteAllTrash()"
+        class=" m-3 text-center absolute top-1 right-10 z-40">
+        <mat-icon class="text-red-500  cursor-pointer transition duration-500 transform  hover:scale-[115%]"
+            svgIcon="delete_outline">
+        </mat-icon>Empty Trash
+    </button>
+    <div class="pl-4 pr-22 h-10 flex justify-between">
+        <p Class=" font-bold text-lg text-accent-600">View Deleted Learning Units or Versions
+        </p>
+    </div>
+
+    <div class="grid">
+        <div class="">
+            <div class="inventory-grid grid gap-4 py-4 px-10 md:px-8 shadow text-md font-semibold text-secondary bg-gray-50 dark:bg-black dark:bg-opacity-5 w-full"
+                matSort matSortDisableClear (matSortChange)="sortData($event)">
+                <div>Image </div>
+                <div [mat-sort-header]="'learningUnitCode'">Code</div>
+                <div [mat-sort-header]="'learningUnitName'">Name</div>
+                <div [mat-sort-header]="'version'">Version</div>
+                <div [mat-sort-header]="'status'">Status</div>
+                <div [mat-sort-header]="'creationDate'">Creation Date</div>
+                <div [mat-sort-header]="'tacOwner'">Owner</div>
+                <div >Deleted On</div>
+                <div [mat-sort-header]="'totalViews'">Total Views</div>
+                <div >View Details</div>
+                <div class="hidden sm:block">Restore</div>
+                <div class="hidden sm:block">Delete</div>
+            </div>
+        </div>
+        <div *ngIf="!loader;else spinnerTemplate">
+            <div class=" h-[calc(100vh_-_207px)] overflow-auto">
+                <ng-container *ngFor="let tac of trashLUList; let i = index; trackBy: trackByFn">
+
+                    <div class="inventory-grid grid items-center text-secondary gap-4 py-3 px-10 md:px-8 border-b border-gray-300 overflow-x-auto"
+                        matSort matSortDisableClear>
+                        <div class="flex items-center">
+                            <div
+                                class="relative flex flex-0 items-center justify-center w-12 h-12 mr-6 rounded overflow-hidden border">
+                                <img class="w-12" *ngIf="tac?.learningUnitImage"
+                                    [alt]="'learning unit thumbnail image'"
+                                    [src]="tac?.learningUnitImage|getDownloadURL" loading="lazy">
+                                <div class="flex items-center justify-center w-full h-full text-xs font-semibold leading-none text-center uppercase"
+                                    *ngIf="!tac.learningUnitImage">
+                                    NO THUMB
+                                </div>
+                            </div>
+                        </div>
+                        <div class="truncate">
+                            {{tac.learningUnitCode}}
+                        </div>
+                        <div class="truncate" [title]="tac.displayName">
+                            {{tac.learningUnitName}}
+                        </div>
+                        <div class="truncate">
+                            {{tac.version}}
+                        </div>
+
+                        <div class="truncate">
+                            {{tac.status}}
+                        </div>
+                        <div class="truncate pl-1.5">
+                            {{tac.creationDate.seconds*1000| date: 'shortDate'}}
+                        </div>
+                        <div class="truncate pl-1">
+                            {{tac.tacOwnerName}}
+                        </div>
+                        <div class="truncate pl-2">
+                            {{tac.trashAt?.seconds*1000| date: 'shortDate'}}
+                        </div>
+                        <div class="truncate" class="truncate pl-4" >
+                            {{tac?.totalViews||0}}
+                        </div>
+                        <div class="hidden sm:block pl-2">
+                            <button class="min-w-10 min-h-7 h-7 px-2 leading-6" mat-stroked-button
+                                (click)="toggleDetails(tac)"
+                                [ngClass]="{'bg-slate-200':selectedLearningUnit?.docId==tac?.docId}">
+                                <mat-icon class="icon-size-5"
+                                    [svgIcon]="selectedLearningUnit?.docId==tac?.docId ? 'heroicons_solid:chevron-up' : 'heroicons_solid:chevron-down'">
+                                </mat-icon>
+                            </button>
+                        </div>
+                        <!-- Restore -->
+                        <div class="ml-2">
+                            <mat-icon (click)="restoreVersion(tac,i)"
+                                class="text-primary icon-size-5 cursor-pointer transition duration-500 transform  hover:scale-[115%]">
+
+                                <span class="material-icons">
+                                    restore_from_trash
+                                </span>
+                            </mat-icon>
+                        </div>
+                        <!-- Delete  -->
+                        <div class="ml-2">
+                            <mat-icon (click)="deleteConfirmDialog(tac,i)"
+                                class="text-red-500  cursor-pointer transition duration-500 transform  hover:scale-[115%]"
+                                svgIcon="delete_outline"></mat-icon>
+                        </div>
+
+                    </div>
+                    <div class="grid">
+                        <ng-container *ngIf="selectedLearningUnit?.docId === tac?.docId">
+                            <ng-container *ngTemplateOutlet="rowDetailsTemplate;context: {$implicit: tac}">
+                            </ng-container>
+                        </ng-container>
+                    </div>
+                </ng-container>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!--------------------------------mattabgroup------------------------------------------------------->
+<ng-template #rowDetailsTemplate let-learningunit>
+    <div class=" border-b border-slate-300 overflow-scroll bg-blue-100 p-4 pt-10">
+        <mat-tab-group disablePagination="false">
+
+            <!-- info tab -->
+            <mat-tab label="Basic Info">
+                <app-basic-info [trashUINotEditableInput]="true" [luDetailsInput]="selectedLuDetails"
+                    [allLUList]="allLearningunits"></app-basic-info>
+            </mat-tab>
+
+            <!-- Description tab -->
+            <mat-tab label="Descriptions">
+                <app-description [trashUINotEditableInput]="true"
+                    [luDetailsInput]="selectedLuDetails"></app-description>
+            </mat-tab>
+
+            <!-- External Resoirces Tab -->
+            <mat-tab label="External Resources">
+                <app-external-resource [trashUINotEditableInput]="true"
+                    [luDetailsInput]="selectedLuDetails"></app-external-resource>
+
+            </mat-tab>
+
+            <!-- Associated LU Tab -->
+            <mat-tab label="Associated LU">
+                <app-associated-lu [trashUINotEditableInput]="true" [allLUList]="allLearningunits"
+                    [luDetailsInput]="selectedLuDetails"></app-associated-lu>
+            </mat-tab>
+
+            <!-- Images tab -->
+            <mat-tab label="Images">
+                <app-images [trashUINotEditableInput]="true" (updatedHeadlineImgPathEvent)="updatedHeadlineImg($event)"
+                    [luDetailsInput]="selectedLuDetails" [allLUList]="allLearningunits"></app-images>
+            </mat-tab>
+
+            <!-- Additional resources Tab -->
+            <mat-tab label="Additional resources">
+                <app-additional-resources [trashUINotEditableInput]="true"
+                    [luDetailsInput]="selectedLuDetails"></app-additional-resources>
+            </mat-tab>
+            <mat-tab label="Version Changes">
+                <app-version-changes [trashUINotEditableInput]="true" [luDetailsInput]="selectedLuDetails"
+                    [allLUList]="allLearningunits"></app-version-changes>
+            </mat-tab>
+
+        </mat-tab-group>
+    </div>
+</ng-template>
+
+<ng-template #spinnerTemplate>
+    <div
+        class="flex text-accent-500 font-medium text-2xl w-[90vw] h-full flex-auto flex-col items-center justify-center dark:bg-transparent scale-50">
+        <mat-spinner></mat-spinner>
+    </div>
+</ng-template>

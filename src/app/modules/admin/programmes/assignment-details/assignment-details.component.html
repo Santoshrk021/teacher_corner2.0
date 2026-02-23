@@ -1,0 +1,46 @@
+<div class="m-auto md:w-[30vw] xs:w-[45vw] md:px-8 xs:px-0 relative ">
+    <div class="">
+        <div class="absolute -top-4 -right-2">
+            <button mat-dialog-close class="">
+                <mat-icon class=" hover:scale-110 transition duration-5000 transform" svgIcon="mat_outline:close">
+                </mat-icon>
+            </button>
+        </div>
+        <form class="rounded-2xl overflow-hidden" [formGroup]="assignmentForm" (ngSubmit)="onSubmit()">
+            <div class="flex flex-row items-center justify-center w-full ">
+                <div class="flex flex-row justify-center w-full">
+                    <p class="text-2xl font-semibold mb-2 text-center text-accent">{{data.title}}
+                    </p>
+                </div>
+            </div>
+            <div class="h-[57vh] overflow-auto">
+                <div class="pt-1">
+                    <div class="bg-primary-50 rounded-xl">
+                        <div class="p-4">
+                            <div class="w-full">
+                                <mat-form-field floatLabel="always" class="w-full text-accent-600">
+                                    <mat-label class="text-[#282B66]">Assignment Due Date</mat-label>
+                                    <input #ref required matInput [ngxMatDatetimePicker]="picker"
+                                        placeholder="Choose date and time" formControlName="assignmentDueDate"
+                                        [min]="currentDate">
+                                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                                    <ngx-mat-datetime-picker #picker [stepHour]="1" [stepMinute]="1" [stepSecond]="1"
+                                        [showSeconds]="false" [enableMeridian]="true"
+                                        [defaultTime]="[currentDate.getHours(), currentDate.getMinutes(), currentDate.getSeconds()]">
+                                    </ngx-mat-datetime-picker>
+                                </mat-form-field>
+                            </div>
+
+                            <div class="w-full text-center">
+                                <button type="submit" class="fuse-mat-stroked-button-large  mt-6" mat-flat-button
+                                    [color]="'primary'" [disabled]="assignmentForm.invalid" [mat-dialog-close]="onSubmit()">
+                                    Save
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

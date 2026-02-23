@@ -1,0 +1,153 @@
+<div
+    class="bg-gray-100 h-[90vh] max-w-[120vw] flex flex-col lg:flex-row justify-center items-center relative space-y-6 lg:space-y-0 lg:space-x-6 p-4 mx-auto"
+>
+    <button
+        mat-dialog-close
+        (click)="closeDialog()"
+        class="absolute top-2 -mt-8 -mr-8 right-2 z-50 p-1"
+    >
+        <mat-icon
+            class="hover:scale-110 transition duration-1000 transform"
+            svgIcon="mat_outline:close"
+        >
+        </mat-icon>
+    </button>
+    <!-- Left Side: Form -->
+    <div
+        class="bg-white shadow-lg rounded-xl p-6 w-full max-w-md h-[80vh] overflow-auto"
+    >
+        <h2 class="text-3xl font-bold text-center mb-4">
+            Generate Certificate
+        </h2>
+
+        <!-- Student Name -->
+        <div class="mb-4">
+            <label class="block font-semibold text-[#282B66] text-lg pb-2"
+                >Enter Student Name:</label
+            >
+            <input
+                type="text"
+                [(ngModel)]="studentName"
+                (ngModelChange)="generatePdf()"
+                placeholder="Student Name"
+                class="w-full p-2 border border-primary rounded-lg"
+            />
+        </div>
+
+        <!-- Student X Position -->
+        <div class="mb-4">
+            <label class="block font-semibold text-[#282B66] text-lg pb-2"
+                >Student Name X Position:</label
+            >
+            <input
+                type="number"
+                [(ngModel)]="namePositionX"
+                (ngModelChange)="generatePdf()"
+                placeholder="X Position"
+                class="w-full p-2 border border-primary rounded-lg"
+            />
+        </div>
+
+        <!-- Student Y Position -->
+        <div class="mb-4">
+            <label class="block font-semibold text-[#282B66] text-lg pb-2"
+                >Student Name Y Position:</label
+            >
+            <input
+                type="number"
+                [(ngModel)]="namePositionY"
+                (ngModelChange)="generatePdf()"
+                placeholder="Y Position"
+                class="w-full p-2 border border-primary rounded-lg"
+            />
+        </div>
+
+        <!-- Add School Name -->
+        <div class="text-right mb-4">
+            <mat-icon
+                matTooltip="Add School Name"
+                class="text-primary cursor-pointer"
+                (click)="showSchoolFields = !showSchoolFields"
+            >
+                add_circle
+            </mat-icon>
+        </div>
+
+        <!-- School Fields -->
+        <div *ngIf="showSchoolFields">
+            <div class="mb-4">
+                <label class="block font-semibold text-gray-700 text-lg pb-2"
+                    >Enter School Name:</label
+                >
+                <input
+                    type="text"
+                    [(ngModel)]="schoolName"
+                    (ngModelChange)="generatePdf()"
+                    placeholder="School Name"
+                    class="w-full p-2 border border-primary rounded-lg"
+                />
+            </div>
+
+            <div class="mb-4">
+                <label class="block font-semibold text-gray-700 text-lg pb-2"
+                    >School Name X Position:</label
+                >
+                <input
+                    type="number"
+                    [(ngModel)]="schoolNamePositionX"
+                    (ngModelChange)="generatePdf()"
+                    placeholder="X Position"
+                    class="w-full p-2 border border-primary rounded-lg"
+                />
+            </div>
+
+            <div class="mb-4">
+                <label class="block font-semibold text-gray-700 text-lg pb-2"
+                    >School Name Y Position:</label
+                >
+                <input
+                    type="number"
+                    [(ngModel)]="schoolNamePositionY"
+                    (ngModelChange)="generatePdf()"
+                    placeholder="Y Position"
+                    class="w-full p-2 border border-primary rounded-lg"
+                />
+            </div>
+        </div>
+
+        <div class="text-center">
+            <button
+                (click)="finalizeAndStorePdf()"
+                class="bg-primary disabled:bg-primary-100 text-white px-4 py-2 rounded-2xl"
+                [disabled]="isLoading"
+            >
+                <span *ngIf="!isLoading">Generate Certificate</span>
+                <mat-progress-spinner
+                    *ngIf="isLoading"
+                    [diameter]="24"
+                    [mode]="'indeterminate'"
+                    color="accent"
+                >
+                </mat-progress-spinner>
+            </button>
+        </div>
+    </div>
+
+    <!-- Right Side: PDF Preview -->
+    <div
+        class="bg-white shadow-lg rounded-xl p-4 w-full max-w-2xl h-[80vh] flex justify-center items-center"
+    >
+        <div *ngIf="isLoading" class="flex flex-col items-center">
+            <div
+                class="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"
+            ></div>
+            <p class="text-gray-700 mt-2">Generating PDF...</p>
+        </div>
+
+        <iframe
+            *ngIf="!isLoading && firebasePdfUrl"
+            [src]="firebasePdfUrl"
+            class="w-full h-[90%] border"
+        ></iframe>
+    </div>
+</div>

@@ -1,0 +1,32 @@
+
+::ng-deep .mat-tab-header {
+    @media (max-width:600px) {
+        overflow-x: scroll !important;
+    }
+}
+
+::ng-deep .mat-tab-label-container {
+    @media (max-width:600px) {
+        overflow: visible !important;
+    }
+}
+
+
+::ng-deep .mat-tab-group .mat-tab-body-content {
+    @media (max-width:600px) {
+        padding: 0;
+    }
+}
+
+.white-icon {
+    color: white !important
+}
+
+.bg-primary {
+    background-color: #049BD8 !important;
+}
+
+
+// .main-card{
+//     height: calc(100vh - calc(9rem + 98px));
+// }

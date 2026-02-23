@@ -1,0 +1,49 @@
+<div class="flex flex-col flex-auto min-w-0">
+    <div class="flex-auto  sm:p-10">
+        <div class="max-w-3xl">
+            <!-- <form [formGroup]="videoForm" (ngSubmit)="confirmationDialog(videoForm)" -->
+            <form [formGroup]="videoForm" class="flex flex-col px-8 pt-10 bg-card shadow rounded-2xl overflow-hidden">
+                <p class="text-accent font-medium mb-2">Innovation Video (YouTube Only) <span
+                        class="text-sm">(Maxlength:&nbsp;4&nbsp;minutes)</span>
+                </p>
+
+                <div class="flex flex-col">
+                    <!-- <mat-form-field class="flex-auto">
+                        <input (change)="youtubeInputChange()" formControlName="innovationVideoLink" matInput
+                            [placeholder]="'Paste Innovation Video Youtube Link '">
+                        <p matPrefix>URL</p>
+                    </mat-form-field> -->
+
+                    <mat-form-field class="flex-auto">
+                        <!-- <input
+                          (change)="youtubeInputChange()"
+                          formControlName="innovationVideoLink"
+                          matInput
+                          [placeholder]="'Paste Innovation Video Youtube Link'"
+                          matTooltip="{{ !inBetweenContest ? (isContestStarted ? 'Contest has not started yet.' : 'Contest has ended.') : '' }}"
+                          matTooltipPosition="above"
+                        /> -->
+                        <input (change)="youtubeInputChange()" formControlName="innovationVideoLink" matInput
+                            [placeholder]="'Paste Innovation Video Youtube Link'" [matTooltip]="
+                        inBetweenContest ? '' :
+                        (isContestStarted
+                            ? 'The Stage ' + (currentStage?.submissions?.[0]?.displayName || '') +
+                              ' of the ' + (contestInfo?.contestTitle || '') +
+                              ' starts on the date of ' + (currentStage?.startDate?.seconds * 1000 | date:'dd/MM/yyyy')
+                            : 'The Stage ' + (currentStage?.submissions?.[0]?.displayName || '') +
+                              ' of the ' + (contestInfo?.contestTitle || '') +
+                              ' ended on the date of ' + (currentStage?.endDate?.seconds * 1000 | date:'dd/MM/yyyy')
+                        )" matTooltipPosition="above" />
+                        <p matPrefix>URL</p>
+                    </mat-form-field>
+
+                    <button (click)="onSave(videoForm)"
+                        [disabled]="isFinalSubmission || !videoForm.get('innovationVideoLink').value.length || !videoForm.get('innovationVideoLink').value.length || this.currentWorkflow.isAttempted"
+                        type="submit" class="mb-4 m-auto" mat-flat-button [color]="'primary'">
+                        Save
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

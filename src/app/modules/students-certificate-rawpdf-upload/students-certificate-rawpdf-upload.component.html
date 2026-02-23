@@ -1,0 +1,90 @@
+<div class="bg-gray-100 rounded-xl relative">
+    <!-- Close Button -->
+    <button
+        mat-dialog-close
+        (click)="closeDialog()"
+        class="absolute top-2 -mt-8 -mr-8 right-2 z-50 p-1"
+    >
+        <mat-icon
+            class="hover:scale-110 transition duration-1000 transform"
+            svgIcon="mat_outline:close"
+        ></mat-icon>
+    </button>
+
+    <div class="rounded-xl p-6">
+        <h2 class="text-2xl font-semibold text-center mb-4">
+            Upload PDF Certificate
+        </h2>
+
+        <!-- File Upload Section -->
+        <div class="flex flex-col bg-grey-lighter w-72 mx-auto">
+            <label
+                matRipple
+                class="border border-primary flex flex-col items-center rounded-lg p-2 h-12 cursor-pointer bg-white text-primary-600 hover:bg-slate-200"
+            >
+                <span class="absolute mt-1 -ml-40">
+                    <mat-icon
+                        class="text-primary"
+                        svgIcon="heroicons_outline:arrow-circle-down"
+                    ></mat-icon>
+                </span>
+                <div class="flex items-center mt-1">
+                    <span class="md:text-base relative sm:text-[10px]">
+                        {{ selectedFile ? "Re-Upload Pdf" : "Upload Pdf" }}
+                    </span>
+                </div>
+                <input
+                    type="file"
+                    class="hidden"
+                    #logoFileInputRef
+                    accept="application/pdf"
+                    (change)="onFileSelected($event)"
+                />
+            </label>
+
+            <span
+                *ngIf="selectedFile"
+                class="text-xs text-secondary line-clamp-1 ml-1"
+            >
+                {{ selectedFile.name }}
+            </span>
+        </div>
+
+        <!-- Upload Button with Spinner -->
+        <div class="text-center mt-4">
+            <button
+                (click)="uploadPdfFile()"
+                class="bg-primary disabled:bg-primary-100 text-white px-4 py-2 rounded-2xl"
+                [disabled]="!selectedFile || uploading"
+            >
+                <span *ngIf="!uploading">Upload Certificate</span>
+                <mat-progress-spinner
+                    *ngIf="uploading"
+                    [diameter]="24"
+                    [mode]="'indeterminate'"
+                    color="accent"
+                ></mat-progress-spinner>
+            </button>
+        </div>
+
+        <!-- View Certificate Button -->
+        <div class="text-center mt-4" *ngIf="firebasePdfUrl">
+            <button
+                (click)="openPdfInNewTab()"
+                class="bg-green-600 text-white px-4 py-2 rounded-2xl hover:bg-green-700 transition duration-200"
+            >
+                View Certificate
+            </button>
+        </div>
+
+        <!-- Add Custom Certificate Button -->
+        <div class="text-center mt-4" *ngIf="firebasePdfUrl">
+            <button
+                (click)="openCustomCertificateDialog()"
+                class="bg-primary text-white px-4 py-2 rounded-2xl"
+            >
+                Add Custom Certificate
+            </button>
+        </div>
+    </div>
+</div>

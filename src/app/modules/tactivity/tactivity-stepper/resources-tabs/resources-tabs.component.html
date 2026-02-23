@@ -1,0 +1,28 @@
+<div class="h-full ">
+    <mat-tab-group class="tab-body ">
+        <mat-tab label="Material Required">
+            <div class="tac-container-height">
+                <app-pdf [pdfUrl]="this.tacData?.materialPath |getDownloadURL" class=" w-full  h-full"></app-pdf>
+            </div>
+        </mat-tab>
+
+        <mat-tab label="Observation Sheet">
+            <div class="tac-container-height  ">
+                <app-pdf [pdfUrl]="this.tacData?.observationSheetPath|getDownloadURL" class=" w-full  h-full"></app-pdf>
+            </div>
+        </mat-tab>
+
+        <!-- <mat-tab label="Additional Resources">
+            <div class="tac-container-height ">
+                <div *ngFor="let res of tacData.Resource">
+                    <div class="w-full h-40 bg-white rounded-2xl py-4 px-6 mb-4">
+                        <p class="text-secondary my-3 font-semibold text-2xl">{{res.Title}}</p>
+                        <a [href]="res['URL']" class="mat-flat-button bg-primary my-3 text-white hover:bg-primary-700"
+                            matRipple target="_blank"> {{res.Type=="ppt"?"Download":"Watch Video"}}</a>
+                    </div>
+                </div>
+            </div>
+        </mat-tab> -->
+    </mat-tab-group>
+
+</div>

@@ -1,0 +1,259 @@
+<div class="bg-slate-100 h-screen w-screen overflow-auto relative">
+  <button (click)="drawerClose()" class="m-3 absolute top-0 right-0 z-40">
+    <mat-icon class="hover:scale-110 transition duration-5000 transform" svgIcon="mat_outline:close"></mat-icon>
+  </button>
+
+  <div class="px-4 py-3 flex border-red-700">
+    <div class="font-bold text-lg text-accent-600 w-max flex items-center py-3">
+      <p>{{ assignmentName ? assignmentName + ' - Report Download (Remote Submission)' : 'Assignment Report Download (Remote Submission)' }}</p>
+    </div>
+
+    <div class="flex pt-1 -mb-2 justify-between w-[85vw] mr-6 items-end">
+      <!-- Institution -->
+      <mat-form-field appearance="fill" class="w-full mx-4 fuse-mat-dense">
+        <mat-label>Select Institution</mat-label>
+        <mat-select
+          [(value)]="selectedInstitutionId"
+          (selectionChange)="onSelectInstitution($event.value)">
+          <mat-option *ngFor="let i of institutions" [value]="i.institutionId" [matTooltip]="i.institutionName">
+            {{ i.institutionName || i.institutionId }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <!-- Classroom -->
+      <mat-form-field appearance="fill" class="w-full mx-4 fuse-mat-dense">
+        <mat-label>Select Classroom</mat-label>
+        <mat-select
+          [disabled]="!selectedInstitutionId || classrooms.length === 0"
+          [(value)]="selectedClassroomId"
+          (selectionChange)="onSelectClassroom($event.value)">
+          <mat-option *ngFor="let c of classrooms" [value]="c.classroomId" [matTooltip]="c.classroomName">
+            {{ c.classroomName || c.classroomId }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <!-- Programme -->
+      <mat-form-field appearance="fill" class="w-full mx-4 fuse-mat-dense">
+        <mat-label>Select Programme</mat-label>
+        <mat-select
+          [disabled]="!selectedClassroomId || programmes.length === 0"
+          [(value)]="selectedProgrammeId"
+          (selectionChange)="onSelectProgramme($event.value)">
+          <mat-option *ngFor="let p of programmes" [value]="p.programmeId" [matTooltip]="p.programmeName">
+            {{ p.programmeName || p.programmeId }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <!-- Learning Unit -->
+      <mat-form-field
+        appearance="fill"
+        class="w-full mx-4 fuse-mat-dense"
+        [matTooltip]="learningUnits.length === 0 ? 'No learning units present for the selected Programme' : ''"
+        [matTooltipDisabled]="learningUnits.length > 0"
+        matTooltipShowDelay="300"
+      >
+        <mat-label>Select Learning Unit</mat-label>
+
+        <!-- Show spinner at the right inside the field while fetching -->
+        <mat-progress-spinner
+          *ngIf="isLuLoading"
+          matSuffix
+          mode="indeterminate"
+          diameter="20">
+        </mat-progress-spinner>
+
+        <mat-select
+          [disabled]="isLuLoading || learningUnits.length === 0"
+          [(value)]="selectedLearningUnitId"
+          (selectionChange)="onSelectLearningUnit($event.value)"
+        >
+          <mat-option *ngFor="let lu of learningUnits"
+                      [value]="lu.learningUnitId"
+                      [matTooltip]="lu.learningUnitName">
+            {{ lu.learningUnitName || lu.learningUnitId }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+    </div>
+  </div>
+
+<div class="h-[calc(100%-109px)] flex flex-col -mt-8 items-center justify-center">
+  <!-- Centered Row -->
+  <div
+    class="w-[85vw] max-w-5xl mx-auto mt-2 rounded-2xl bg-white shadow-lg border border-gray-200 p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-6"
+    *ngIf="selectedInstitutionId && selectedClassroomId && selectedProgrammeId && selectedLearningUnitId"
+  >
+    <!-- Text Section -->
+    <div class="text-lg flex-1 leading-relaxed">
+      <div class="w-full flex justify-center">
+        <h1 class="mb-3 text-primary text-2xl font-semibold text-center">
+          Download Snappy Report (Excel Format)
+        </h1>
+      </div>
+
+      <div class="ml-3" *ngIf="matchedStudentCount === 0">
+        <mat-progress-spinner mode="indeterminate" diameter="48"></mat-progress-spinner>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-3">
+        <div><span class="font-bold text-gray-700">Institution:</span> {{ selectedInstitutionName }}</div>
+        <div><span class="font-bold text-gray-700">Classroom:</span> {{ selectedClassroomName }}</div>
+        <div><span class="font-bold text-gray-700">Programme:</span> {{ selectedProgrammeName }}</div>
+        <div><span class="font-bold text-gray-700">Learning Unit:</span> {{ selectedLearningUnitName }}</div>
+        <div class="sm:col-span-2">            <span class="font-semibold text-slate-600">Students Attended:</span>
+            <span class="ml-2 inline-flex items-center rounded-full px-3 py-1 text-sm lg:text-base font-semibold
+                         bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-200">
+              {{ matchedStudentCount }}
+            </span></div>
+      </div>
+    </div>
+
+    <!-- Button Section -->
+    <div class="flex flex-col gap-3 w-full max-w-xs">
+      <!-- Question-wise -->
+      <button
+        mat-flat-button
+        color="primary"
+        class="text-base font-semibold px-6 py-3 rounded-xl shadow-md hover:shadow-lg transition-all w-full"
+        [disabled]="!canDownload || isExporting"
+        (click)="onClickDownloadExcel()"
+      >
+        <mat-icon svgIcon="mat_solid:download" class="mr-2"></mat-icon>
+        {{ isExporting ? 'Preparing…' : 'Download Question-wise' }}
+      </button>
+
+      <!-- Student-wise (download) -->
+      <button
+        mat-flat-button
+        color="accent"
+        class="text-base font-semibold px-6 py-3 rounded-xl shadow-md hover:shadow-lg transition-all w-full"
+        [disabled]="!canDownload || isExporting"
+        (click)="onClickDownloadStudentWise()"
+      >
+        <mat-icon svgIcon="mat_solid:download" class="mr-2"></mat-icon>
+        {{ isExporting ? 'Preparing…' : 'Download Student-wise' }}
+      </button>
+
+      <!-- Show Charts -->
+      <button
+        mat-flat-button
+        color="warn"
+        class="text-base font-semibold px-6 py-3 rounded-xl shadow-md hover:shadow-lg transition-all w-full"
+        [disabled]="!canDownload || isExporting"
+        (click)="onClickShowCharts()"
+      >
+        <mat-icon svgIcon="mat_outline:insights" class="mr-2"></mat-icon>
+        {{ isExporting ? 'Preparing…' : 'Show Charts' }}
+      </button>
+    </div>
+
+  </div>
+</div>
+
+  <div class="border-gray-200 bg-primary-100 rounded-xl m-4 p-2"
+     *ngIf="showCharts"
+     #chartsContainer>
+    <div class="flex justify-end gap-3 mb-3">
+      <!-- PNG Button -->
+      <button
+        mat-stroked-button
+        color="primary"
+        (click)="downloadChartsAsPNG()"
+        [disabled]="isExporting"
+        class="relative flex items-center justify-center gap-2 px-4"
+      >
+        <!-- Spinner shown while exporting -->
+        <mat-progress-spinner
+          *ngIf="isExporting && currentExport === 'png'"
+          mode="indeterminate"
+          diameter="18"
+          strokeWidth="3"
+          class="absolute left-3"
+        ></mat-progress-spinner>
+
+        <!-- Normal icon/text -->
+        <mat-icon *ngIf="!(isExporting && currentExport === 'png')">image</mat-icon>
+        <span>{{ isExporting && currentExport === 'png' ? 'Generating…' : 'Download as PNG' }}</span>
+      </button>
+
+      <!-- PDF Button -->
+      <button
+        mat-stroked-button
+        color="accent"
+        (click)="downloadChartsAsPDF()"
+        [disabled]="isExporting"
+        class="relative flex items-center justify-center gap-2 px-4"
+      >
+        <mat-progress-spinner
+          *ngIf="isExporting && currentExport === 'pdf'"
+          mode="indeterminate"
+          diameter="18"
+          strokeWidth="3"
+          class="absolute left-3"
+        ></mat-progress-spinner>
+
+        <mat-icon *ngIf="!(isExporting && currentExport === 'pdf')">picture_as_pdf</mat-icon>
+        <span>{{ isExporting && currentExport === 'pdf' ? 'Generating…' : 'Download as PDF' }}</span>
+      </button>
+    </div>
+
+    <h1 class=" text-primary text-2xl font-semibold text-center">Snappy Report charts (Visual Representation)</h1>
+    <div class="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6 w-[90vw] max-w-6xl mx-auto">
+
+      <!-- Pie Chart -->
+      <div class="bg-white shadow rounded-xl p-4 border border-gray-200">
+        <apx-chart
+          *ngIf="pieChartOptions"
+          [series]="pieChartOptions.series"
+          [chart]="pieChartOptions.chart"
+          [labels]="pieChartOptions.labels"
+          [legend]="pieChartOptions.legend"
+          [title]="pieChartOptions.title">
+        </apx-chart>
+      </div>
+
+      <!-- Radar Chart -->
+      <div class=" bg-white shadow rounded-xl p-4 border border-gray-200">
+        <apx-chart
+          *ngIf="radarChartOptions"
+          [series]="radarChartOptions.series"
+          [chart]="radarChartOptions.chart"
+          [xaxis]="radarChartOptions.xaxis"
+          [yaxis]="radarChartOptions.yaxis"
+          [title]="radarChartOptions.title">
+        </apx-chart>
+      </div>
+
+      <!-- Bar Chart -->
+      <div class="md:col-span-2 bg-white shadow rounded-xl p-4 border border-gray-200">
+        <apx-chart
+          *ngIf="barChartOptions"
+          [series]="barChartOptions.series"
+          [chart]="barChartOptions.chart"
+          [xaxis]="barChartOptions.xaxis"
+          [yaxis]="barChartOptions.yaxis"
+          [dataLabels]="barChartOptions.dataLabels"
+          [title]="barChartOptions.title">
+        </apx-chart>
+      </div>
+
+      <!-- Heatmap -->
+      <div class="md:col-span-2 bg-white shadow rounded-xl p-4 border border-gray-200">
+        <apx-chart
+          *ngIf="heatmapChartOptions"
+          [series]="heatmapChartOptions.series"
+          [chart]="heatmapChartOptions.chart"
+          [xaxis]="heatmapChartOptions.xaxis"
+          [plotOptions]="heatmapChartOptions.plotOptions"
+          [dataLabels]="heatmapChartOptions.dataLabels"
+          [title]="heatmapChartOptions.title"
+          [tooltip]="heatmapChartOptions.tooltip">
+        </apx-chart>
+      </div>
+
+    </div>
+  </div>
+</div>

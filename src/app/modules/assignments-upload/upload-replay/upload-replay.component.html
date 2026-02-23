@@ -1,0 +1,100 @@
+<div class="h-[50vh] w-[50vw] relative">
+    <div class="flex justify-center">
+        <div class="w-full">
+            <button mat-dialog-close class="m-4 sm:m-6 sm:mx-7 absolute -top-4 -right-4 z-40">
+                <mat-icon class=" hover:scale-110 transition duration-5000 transform" svgIcon="mat_outline:close">
+                </mat-icon>
+            </button>
+
+            <div class="hidden sm:block">
+                <div class="flex mx-6">
+                    <div class=" text-2xl font-semibold">{{data?.assignment?.assignmentName ?? data?.assignment?.displayName}}</div>
+                    <!-- upload timer -->
+                    <div class="ml-6 flex items-center leading-5 text-md text-secondary">
+                        <mat-icon class="icon-size-5 text-primary" [svgIcon]="'heroicons_solid:clock'"></mat-icon>
+                        <div class="ml-1.5 text-primary">{{counter | formatTimeConditional}}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- <div class="font-bold text-accent-600">{{data?.assignment?.assignmentName}}</div> -->
+
+            <mat-stepper labelPosition="bottom" linear #stepper class="bg-transparent" [animationDuration]="1000">
+                <div>
+                    <div *ngFor="let assignment of submissions | keyvalue; let i = index">
+                        <mat-step>
+                            <ng-template matStepLabel>
+                                <span
+                                    [matTooltip]="data?.assignment?.assignments?.[i]?.title ">{{data?.assignment?.assignments?.[i]?.title}}</span>
+
+                                <div *ngIf="data.parent === 'replay'" class="flex items-center">
+                                    <mat-icon class="icon-size-4 text-inherit"
+                                        [svgIcon]="'heroicons_outline:clock'"></mat-icon>
+                                    &nbsp;
+                                    <p class="text-sm">{{submittedSteps['submissionId_'+ (i + 1)].timeTaken |
+                                        formatTime}}</p>
+                                </div>
+                            </ng-template>
+                            <ng-template matStepContent>
+                                <table>
+                                    <!-- <tr>
+                                        <th class="w-1/3 pb-4 text-primary text-left ">Title</th>
+                                        <td class="pb-4 text-secondary text-left">
+                                            {{data?.assignment?.assignments?.[i]?.title}}</td>
+                                    </tr> -->
+                                    <tr>
+                                        <th class="w-1/3 pb-4 text-primary text-left ">Due Date</th>
+                                        <td class="pb-4 text-secondary text-left">
+                                            {{data?.assignment?.assignmentDueDate?.seconds*1000|date:'medium'}}</td>
+                                    </tr>
+                                    <tr *ngIf="data.parent === 'replay'">
+                                        <th class="w-1/3 pb-4 text-primary text-left ">Attempt Time</th>
+                                        <td class="pb-4 text-secondary text-left">
+                                            {{lastAttemptTime?.seconds*1000|date:'medium'}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th class="w-1/3 pb-4 text-primary text-left">Instructions</th>
+                                        <td class="pb-4 text-secondary text-left">
+                                            <div *ngIf="data?.assignment?.assignments?.[i]?.instructions?.includes('<'); else textOnly" [innerHTML]="data?.assignment?.assignments?.[i]?.instructions"></div>
+                                            <ng-template #textOnly>{{data?.assignment?.assignments?.[i]?.instructions}}</ng-template>
+                                        </td>
+                                    </tr>
+                                    <tr *ngIf="data.parent === 'replay'">
+                                        <th class="w-1/3  text-primary text-left">Assignment</th>
+                                        <td class=" text-secondary text-left">
+                                            <a [href]="assignment.value.submissionPath|getDownloadURL" target="_blank"
+                                                class="bg-primary-600 hover:bg-primary-500 text-white px-4 leading-6 "
+                                                mat-stroked-button>
+                                                <span class="text-sm">View Upload</span>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    <tr *ngIf="data.parent === 'table'">
+                                        <th class="w-1/3  text-primary text-left">Assignment</th>
+                                        <td class=" text-secondary text-left">
+                                            <label
+                                                class="max-w-36 flex flex-col items-center scale-90 mat-flat-button bg-primary active:bg-primary-400 text-white hover:bg-primary-700">
+                                                <div class="flex items-center m-2">
+                                                    <button disabled class="">
+                                                        Upload
+                                                    </button>
+                                                </div>
+                                            </label>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </ng-template>
+                        </mat-step>
+                    </div>
+                </div>
+
+                <!-- Icon overrides. -->
+                <ng-template matStepperIcon="camera">
+                    <mat-icon> perm_media</mat-icon>
+                </ng-template>
+                <ng-template matStepperIcon="pdf">
+                    <mat-icon>receipt</mat-icon>
+                </ng-template>
+            </mat-stepper>
+        </div>
+    </div>

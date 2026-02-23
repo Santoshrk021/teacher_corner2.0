@@ -1,0 +1,109 @@
+<form [formGroup]="batchInfoForm">
+    <div class=" h-[58vh]  grid grid-cols-12 ">
+        <div formArrayName="batchsFormArr"
+            class="px-2 pt-1 h-full overflow-y-auto col-span-11 bg-slate-50  rounded-xl border">
+            <mat-stepper labelPosition="bottom" linear #batchStepperRef class=" bg-transparent"
+                [animationDuration]="1000">
+                <mat-step *ngFor="let batch of getFormArr.controls let i=index;let l=last" [formGroupName]="i">
+                    <ng-template matStepLabel>
+                        {{batch?.value?.batchName}}
+                    </ng-template>
+
+                    <div class="mt-1 font-bold ">
+
+                        <div class="pt-1 ">
+                            <div class="bg-primary-50 rounded-xl">
+                                <div class="p-4 grid grid-cols-2 gap-8">
+                                    <div>
+                                        <mat-form-field floatLabel="always" class="w-full text-accent-600">
+                                            <mat-label class="text-[#282B66]">Batch number</mat-label>
+                                            <input id="batchNo" matInput [formControlName]="'batchNumber'"
+                                                [readonly]="disabled" placeholder="Enter batch number" />
+                                        </mat-form-field>
+
+                                        <mat-form-field floatLabel="always" class="w-full text-accent-600">
+                                            <mat-label class="text-[#282B66]">Number of allowed
+                                                submissions</mat-label>
+                                            <input id="numberOfAllowedSubmissions" matInput
+                                                [formControlName]="'numberOfAllowedSubmissions'"
+                                                placeholder="Enter number of allowed submissions" />
+                                            <mat-error *ngIf="batch?.get('numberOfAllowedSubmissions')?.invalid ">
+                                                Number of allowed submissions is required
+                                            </mat-error>
+                                        </mat-form-field>
+
+
+                                    </div>
+
+                                    <div>
+                                        <mat-form-field floatLabel="always" class="w-full text-accent-600">
+                                            <mat-label class="text-[#282B66]">Batch name</mat-label>
+                                            <input (keyup)="onBatchNameChange(i,$event)" id="title" matInput formControlName="batchName" type="text"
+                                                placeholder="Enter batch name" />
+                                            <mat-error *ngIf="batch?.get('batchName')?.invalid ">
+                                                Batch name is required
+                                            </mat-error>
+                                        </mat-form-field>
+
+                                        <mat-form-field floatLabel="always" class="w-full text-accent-600">
+                                            <mat-label class="text-[#282B66]">Start date and time</mat-label>
+                                            <input [min]="minEventStartDate" #ref (dateChange)="onStartDateChange(ref.value,i)" 
+                                                required matInput [ngxMatDatetimePicker]="picker"
+                                                placeholder="Choose date and time" formControlName="startDate">
+                                            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                                            <ngx-mat-datetime-picker #picker [stepHour]="1" [stepMinute]="1"
+                                                [stepSecond]="1" [showSeconds]="false" [enableMeridian]="true">
+                                            </ngx-mat-datetime-picker>
+                                        </mat-form-field>
+
+                                        <mat-form-field floatLabel="always" class="w-full text-accent-600">
+                                            <mat-label class="text-[#282B66]">End date and time</mat-label>
+                                            <input [min]="minDate?.[i]" required matInput [ngxMatDatetimePicker]="pickerEnd"
+                                                placeholder="Choose date and time" formControlName="endDate">
+                                            <mat-datepicker-toggle matSuffix [for]="pickerEnd"></mat-datepicker-toggle>
+                                            <ngx-mat-datetime-picker #pickerEnd [stepHour]="1" [stepMinute]="1"
+                                                [stepSecond]="1" [showSeconds]="false" [enableMeridian]="true">
+                                            </ngx-mat-datetime-picker>
+                                        </mat-form-field>
+
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div *ngIf="i>0" class="mt-2 flex flex-row-reverse">
+                            <button (click)="removeBatch(i)" type="button" mat-flat-button color="warn">Remove</button>
+                        </div>
+                    </div>
+                </mat-step>
+
+            </mat-stepper>
+
+        </div>
+        <div class="col-span-1">
+            <button class="mt-2" (click)="addNewBatch()">
+                <mat-icon matTooltip="Add New Assignment"
+                    class="ml-4 icon-size-8 text-primary-600 cursor-pointer plusIcon active:text-primary-500"
+                    [svgIcon]="'heroicons_solid:plus-circle'">
+                </mat-icon>
+            </button>
+        </div>
+    </div>
+</form>
+
+<div class="flex justify-between pt-3">
+    <button matStepperPrevious mat-stroked-button type="button"
+        class="bg-primary text-white  arrowBtnBack disabled:bg-primary-100">
+        <mat-icon class="mr-2 icon-size-5  text-white arrowIconBack"
+            [svgIcon]="'heroicons_solid:arrow-sm-left'"></mat-icon>
+        Back
+    </button>
+    <button (click)="onClickNext()" matStepperNext mat-stroked-button type="button" [disabled]="batchInfoForm?.invalid"
+        class="bg-primary text-white arrowBtn disabled:bg-primary-100">
+        Next
+        <mat-icon class="ml-2 icon-size-5  text-white arrowIcon"
+            [svgIcon]="'heroicons_solid:arrow-sm-right'"></mat-icon>
+    </button>
+</div>

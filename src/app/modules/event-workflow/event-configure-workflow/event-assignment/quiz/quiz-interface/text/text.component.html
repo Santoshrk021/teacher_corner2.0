@@ -1,0 +1,65 @@
+<div *ngIf="quizData.Resources.length>0 ;else noResource">
+    <div class="flex flex-col">
+        <div>
+            <p class="mb-4">{{quizData.Title}}</p>
+
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="order-2 sm:order-1">
+                <textarea class="form-control border border-primary-200 rounded-md w-full p-2"
+                    placeholder="Write your answer here" id="exampleFormControlTextarea1" rows="3"></textarea>
+            </div>
+            <div class="h-100 flex-auto border-t w-full max-w-screen-xl mx-auto order-1 sm:order-2">
+                <!-- tabs -->
+                <div class="flex flex-wrap">
+                    <div class="w-full">
+                        <ul class="flex mb-0 list-none flex-wrap pt-3 pb-4 flex-row">
+                            <li class="-mb-px mr-2 last:mr-0 flex-auto text-center"
+                                *ngFor="let res of quizData.Resources ; let i = index">
+                                <a class=" text-sm uppercase px-5 py-3 shadow-lg border rounded-full block leading-normal scale-90 cursor-pointer line-clamp-1"
+                                    (click)="toggleTabs(i)"
+                                    [ngClass]="{'text-primary bg-white ': openTab !== i, 'text-white bg-primary': openTab === i}">
+                                    {{res.DisplayTitle}}
+                                </a>
+                            </li>
+
+                        </ul>
+                        <div class="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 ">
+                            <div class="px-4 py-5 flex-auto">
+                                <div class="tab-content tab-space">
+                                    <div *ngFor="let res of quizData.Resources ; let i = index"
+                                        [ngClass]="{'hidden': openTab !== i, 'block': openTab === i}">
+                                        <div *ngIf="res.Type === 'image'; else otherRes">
+                                            <img [src]="res.URL" alt="Image loading...">
+                                        </div>
+                                        <ng-template #otherRes>
+                                            <div *ngIf="res.Type ==='video' ;else pdfContainer" class="">
+                                                <div *ngIf="res?.URL">
+                                                    <app-video [videoUrl]="res.URL"></app-video>
+                                                </div>
+                                            </div>
+                                        </ng-template>
+                                        <ng-template #pdfContainer>
+                                            <ng-container class="pdf-container" *ngIf="res.Type ==='pdf'">
+                                                <div class="flex justify-center items-center w-[30vw] h-[50vh] pb-2">
+                                                    <app-pdf [pdfUrl]="res.URL" class='w-full h-full'></app-pdf>
+                                                </div>
+                                            </ng-container>
+                                        </ng-template>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<ng-template #noResource>
+    <p class="mb-4">{{quizData.Title}}</p>
+
+    <textarea class="form-control border border-primary-200 rounded-md w-full p-2"
+        placeholder="Write your answer here" id="exampleFormControlTextarea1" rows="3"></textarea>
+</ng-template>

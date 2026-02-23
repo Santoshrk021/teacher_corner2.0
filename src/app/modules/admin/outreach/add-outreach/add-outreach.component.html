@@ -1,0 +1,26 @@
+<div class="p-6 w-full">
+  <div class="flex items-center justify-between mb-4">
+    <div class="text-xl font-bold text-secondary">Add Outreach</div>
+    <button mat-icon-button (click)="close()">
+      <mat-icon svgIcon="mat_outline:close"></mat-icon>
+    </button>
+  </div>
+
+  <div class="w-full">
+    <app-institution-info
+      [showContinueButton]="false"
+      [skipInstitutionCodeValidation]="true"
+      (institutionInfoEmitter)="onInstitutionSelected($event)">
+    </app-institution-info>
+  </div>
+
+  <div class="flex justify-end gap-2 pt-4">
+    <button mat-stroked-button color="warn" type="button" (click)="close()">Cancel</button>
+    <button mat-flat-button color="primary" type="button" [disabled]="saving" (click)="save()">
+      <ng-container *ngIf="!saving">Save</ng-container>
+      <ng-container *ngIf="saving">
+        <mat-spinner diameter="18"></mat-spinner>
+      </ng-container>
+    </button>
+  </div>
+</div>

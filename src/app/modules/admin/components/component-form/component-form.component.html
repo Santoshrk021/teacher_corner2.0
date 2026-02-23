@@ -1,0 +1,175 @@
+<div class="flex flex-col mt-2">
+    <div class="flex flex-col w-140 m-auto rounded-xl bg-[#eff5fa]">
+        <div class="ml-10 pr-10 my-6 h-[60vh] overflow-y-auto">
+            <form [formGroup]="editForm">
+
+                <mat-form-field appearance="fill" class="w-full" floatLabel="always">
+                    <mat-label class="text-accent-600">Component Name</mat-label>
+                    <input matInput formControlName="componentName" placeholder="Enter Component Name" [readonly]="isReadOnly" [required]="addMode"/>
+                </mat-form-field>
+
+                <mat-form-field *ngIf="!addMode" appearance="fill" class="w-full" floatLabel="always" >
+                    <mat-label class="text-accent-600">Component Code</mat-label>
+                    <input matInput formControlName="componentCode" placeholder="Enter Component Code" [readonly]="isReadOnly"  [required]="addMode"/>
+                </mat-form-field>
+
+                <mat-form-field appearance="fill" class="w-full" floatLabel="always" >
+                    <mat-label class="text-accent-600">Group Name</mat-label>
+                    <mat-select formControlName="groupName" placeholder="Select Group Name" [required]="addMode" [compareWith]="compareGroupOptions">
+                        <mat-option disabled>Select</mat-option>
+                        <mat-option *ngFor="let group of groupOption" [value]="group">
+                            {{group.displayName}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="fill" class="w-full" floatLabel="always">
+                    <mat-label class="text-accent-600">Category Name</mat-label>
+                    <mat-select formControlName="category" placeholder="Select Category Name"  [required]="addMode" 
+                    (selectionChange)="onCategoryChange($event.value)" [compareWith]="compareCategoryOptions">
+                        <mat-option disabled>Select</mat-option>
+                        <mat-option *ngFor="let category of !addMode ? categoryOptions : category" [value]="category">
+                            {{category.displayName}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="fill" class="w-full" floatLabel="always">
+                    <mat-label class="text-accent-600">Sub Category Name</mat-label>
+                    <mat-select formControlName="subCategory" placeholder="Select Sub Category Name"  [required]="addMode" [compareWith]="compareSubCategoryOptions">
+                        <mat-option disabled>Select</mat-option>
+                        <mat-option *ngFor="let subCategory of !addMode ? subCategoryOptions : subCategories" [value]="subCategory">
+                            {{subCategory.displayName}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <!-- <mat-form-field appearance="fill" class="w-full" floatLabel="always">
+                    <mat-label class="text-accent-600">Attribute Name</mat-label>
+                    <mat-select formControlName="attribute" placeholder="Select Attribute Name"  [required]="addMode">
+                        <mat-option disabled>Select</mat-option>
+                        <mat-option *ngFor="let attributes of attribute" [value]="attributes.displayName">
+                            {{attributes.displayName}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field> -->
+
+                <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                    <mat-label class="text-[#282B66]">Component Size</mat-label>
+
+                    <input id="componentSize" #componentSizeInput matInput formControlName="componentSize"
+                        placeholder="Enter component size" [matAutocomplete]="auto"
+                        (focus)="isAddNewComponentSize = false" />
+
+                    <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete"
+                        [displayWith]="displayComponentSize">
+
+                        <mat-option *ngFor="let option of filteredComponentSizeOptions$ | async" [value]="option">
+                            {{ option.displayName }}
+                        </mat-option>
+
+                        <mat-option *ngIf="!isAddNewComponentSize" class="add-option"
+                            (mousedown)="onAddNewComponentSizeClick($event)">
+                            <span class="bg-gray-200 rounded-full text-gray-500 py-2 px-4 w-full">
+                                Add A New Component size &nbsp;&nbsp;
+                                <mat-icon class="m-0" svgIcon="feather:plus-circle"></mat-icon>
+                            </span>
+                        </mat-option>
+                        <mat-option *ngIf="isAddNewComponentSize" [value]="addNewComponentSize.value">
+                            <div class="flex flex-row">
+                                <input #addNewComponentSize matInput id="addNewComponentSize"
+                                    placeholder="Enter New Component Size" [formControl]="newComponentSizeControl"
+                                    (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()" />
+
+                                <!-- 
+                            <button mat-icon-button color="warn" (click)="cancelAddNewComponentSize()"
+                                matTooltip="Cancel">
+                                <mat-icon svgIcon="heroicons_solid:x-mark"></mat-icon>
+                            </button> -->
+                                <span>
+                                    <mat-icon class="m-0 text-red-500" svgIcon="heroicons_solid:x-mark"
+                                        matTooltip="Clear the field"
+                                        (click)="cancelAddNewComponentSize(); isAddNewComponentSize = false"></mat-icon>
+                                </span>
+                                <!-- <button mat-icon-button color="primary" (click)="saveNewComponentSize()"
+                                    matTooltip="Save">
+                                    <mat-icon svgIcon="heroicons_solid:check"></mat-icon>
+                                </button> -->
+                                <span>
+                                    <mat-icon class="m-0 ml-2 text-green-500" svgIcon="heroicons_solid:check"
+                                        matTooltip="Save new component size"
+                                        (click)="saveNewComponentSize()"></mat-icon>
+                                </span>
+                            </div>
+                        </mat-option>
+                    </mat-autocomplete>
+                </mat-form-field>
+
+                <mat-form-field appearance="fill" class="w-full" floatLabel="always">
+                    <mat-label class="text-accent-600">Quantity</mat-label>
+                    <input matInput type="number" formControlName="quantity" placeholder="Enter Quantity" [readonly]="isReadOnly"  [required]="addMode"/>
+                </mat-form-field>
+
+
+                <label class="flex justify-start">Images</label>
+                <div class="grid grid-cols-2 gap-27 mt-1">
+                    <label
+                        for="imageUpload"
+                        class="border border-primary relative w-60 flex flex-col items-center rounded-lg p-2 cursor-pointer rounded-r-none bg-slate-100 text-primary-600"
+                    >
+                        Upload Image
+                    </label>
+
+                    <input
+                        id="imageUpload"
+                        type="file"
+                        multiple
+                        accept=".jpg, .jpeg, .png"
+                        class="w-120 hidden"
+                        (change)="onFileSelected($event)"
+                    />  
+
+                    
+                <!-- Only active when there are image paths -->
+                 <div *ngIf="hasImages()"
+                    class="w-3/5 md:ml-1 sm:mr-1 p-2 border border-primary-600 rounded-lg rounded-l-none bg-primary-600 text-white cursor-pointer relative md:left-1 sm:left-0 md:text-base sm:text-[10px]">
+                    <a (click)="showFiles('imageUrl')" target="_blank" class="w-full h-full flex items-center justify-center">
+                        <p>View</p>
+                    </a>
+                </div>
+
+                <!-- Disabled button -->
+                <div  *ngIf="!hasImages()"
+                class="w-3/5 md:ml-1 sm:mr-1 p-2 border border-gray-400 rounded-lg rounded-l-none bg-gray-400 text-white cursor-pointer relative md:left-1 sm:left-0 md:text-base sm:text-[10px]">
+                    <a class="w-full h-full flex items-center justify-center">
+                        <p>View</p>
+                    </a>
+                </div>
+                </div>
+              
+            </form>
+        </div>
+    </div>
+    <div class="flex justify-center" *ngIf="!(addMode)">
+        <button
+          class="px-4 py-2 mt-2 rounded-full w-16 text-white transition-colors duration-200"
+          [disabled]="!(isFormModified )|| isSaving"
+          [ngClass]="{
+            'bg-gray-400 cursor-not-allowed': !(isFormModified) || isSaving,
+            'bg-primary cursor-pointer': isFormModified && !(isSaving)
+          }"
+          (click)="saveChanges()"
+        >
+          <ng-container *ngIf="!(isSaving); else loadingTemplate">Save</ng-container>
+          <ng-template #loadingTemplate>
+            <mat-spinner [diameter]="24"></mat-spinner>
+          </ng-template>
+        </button>
+      </div>
+      
+      
+</div>
+        
+            
+
+  

@@ -1,0 +1,383 @@
+notification_master document
+/* ----------------------------- createNotificationMaster.js ----------------------------- */
+/* LIVE Firestore version (GROUP-BY-USER; SPLIT ONLY OVER-CAP USERS):
+   - One top-level `notifications` object
+   - Grouped: notifications.<userId>.approvalRequest|assignmentDueDates.<docId> = <original>
+   - ≤MAX_PER_MASTER_DOC entries per Master doc
+   - Users with total <= MAX_PER_MASTER_DOC are NEVER split across masters
+   - Users with total  > MAX_PER_MASTER_DOC are split across multiple masters (chunks) as needed
+   - Back-ref: Notifications/<docId> gets { masterDocId, updatedAt }
+*/
+
+const { writeFile, readFile } = require('../../helperFunctions');
+
+const MASTER_COLLECTION = 'Master';
+const MASTER_TYPE = 'NOTIFICATION';
+const MASTER_PREFIX = 'notification_master_';
+
+// *** choose your strict cap here ***
+const MAX_PER_MASTER_DOC = 600;  // set to 800 if you want
+
+const BUCKET_APPROVAL   = 'approvalRequest';
+const BUCKET_ASSIGNMENT = 'assignmentDueDates';
+
+/* ------------------------------ detectors ------------------------------ */
+
+function isApproval(n) {
+  return !!(
+    n?.approvalRequest === true ||
+    n?.schoolRepUid ||
+    n?.schoolRepDoc ||
+    n?.actionTakenBy
+  );
+}
+
+function isAssignment(n) {
+  const inTitle = typeof n?.title === 'string' && /assignment/i.test(n.title);
+  const inDesc  = typeof n?.description === 'string' && /assignment/i.test(n.description);
+  return !!(n?.assignmentId || inTitle || inDesc);
+}
+
+/* ------------------------------ helpers ------------------------------ */
+
+// Count current number of notification entries (leaf docIds) in a master
+function countMasterEntries(master) {
+  const root = master?.notifications || {};
+  let count = 0;
+  for (const userId of Object.keys(root)) {
+    const buckets = root[userId] || {};
+    for (const b of Object.keys(buckets)) {
+      const entries = buckets[b] || {};
+      count += Object.keys(entries).length;
+    }
+  }
+  return count;
+}
+
+function newMasterBody(masterDocId) {
+  const nowISO = new Date().toISOString();
+  return {
+    docId: masterDocId,
+    type: MASTER_TYPE,
+    creationDate: nowISO,
+    createdAt: nowISO,
+    updatedAt: nowISO,
+    notifications: {} // <userId> -> <bucket> -> <docId> -> entry
+  };
+}
+
+function masterIdFromNum(num) {
+  return `${MASTER_PREFIX}${String(num).padStart(2, '0')}`;
+}
+
+function parseSuffix(id) {
+  const m = id?.match(/_(\d{2})$/);
+  return m ? parseInt(m[1], 10) : null;
+}
+
+/** Deep merge source into target (plain objects only; mutates target) */
+function deepMerge(target, source) {
+  for (const k of Object.keys(source)) {
+    const sv = source[k];
+    if (sv && typeof sv === 'object' && !Array.isArray(sv)) {
+      if (!target[k] || typeof target[k] !== 'object') target[k] = {};
+      deepMerge(target[k], sv);
+    } else {
+      target[k] = sv;
+    }
+  }
+  return target;
+}
+
+/** Load the latest master (by creationDate desc), if any */
+async function getLatestNotificationMaster(db) {
+  const snap = await db.collection(MASTER_COLLECTION)
+    .where('type', '==', MASTER_TYPE)
+    .orderBy('creationDate', 'desc')
+    .limit(1)
+    .get();
+
+  if (snap.empty) return null;
+
+  const d = snap.docs[0];
+  const data = d.data() || {};
+  return {
+    ref: d.ref,
+    id: d.id,
+    data,
+    count: countMasterEntries(data),
+    suffix: parseSuffix(d.id),
+  };
+}
+
+/** Create a fresh master with next suffix (or _01 if none) */
+async function createFreshMasterDoc(db, lastSuffix) {
+  const next = (typeof lastSuffix === 'number' && !isNaN(lastSuffix)) ? lastSuffix + 1 : 1;
+  const masterDocId = masterIdFromNum(next);
+  await db.collection(MASTER_COLLECTION).doc(masterDocId).set(newMasterBody(masterDocId), { merge: false });
+  return { masterDocId, count: 0 };
+}
+
+/**
+ * Get a writable master:
+ * - If none exists → create _01
+ * - If latest has < MAX entries → use it
+ * - If latest is full → create next
+ */
+async function ensureWritableMaster(db) {
+  const latest = await getLatestNotificationMaster(db);
+  if (!latest) return await createFreshMasterDoc(db, null);
+  if (latest.count >= MAX_PER_MASTER_DOC) return await createFreshMasterDoc(db, latest.suffix);
+  return { masterDocId: latest.id, count: latest.count };
+}
+
+/**
+ * Persist (merge) a nested accumulator into a master doc with set({merge:true}).
+ * Expects accumulator shape: { notifications: { <userId>: { <bucket>: { <docId>: entry }}}}
+ */
+async function writeAccumulatorToMaster(db, masterDocId, accumulator) {
+  if (!accumulator || !accumulator.notifications || !Object.keys(accumulator.notifications).length) return;
+  const payload = {
+    updatedAt: new Date().toISOString(),
+    notifications: accumulator.notifications
+  };
+  await db.collection(MASTER_COLLECTION).doc(masterDocId).set(payload, { merge: true });
+}
+
+/**
+ * Batch update back-references on Notifications collection.
+ */
+async function batchUpdateNotifications(db, pairs) {
+  const CHUNK = 400;
+  const nowISO = new Date().toISOString();
+  for (let i = 0; i < pairs.length; i += CHUNK) {
+    const batch = db.batch();
+    const slice = pairs.slice(i, i + CHUNK);
+    for (const { docId, masterDocId } of slice) {
+      batch.update(db.collection('Notifications').doc(docId), { masterDocId, updatedAt: nowISO });
+    }
+    await batch.commit();
+    console.log(`Updated Notifications docs ${i + 1}–${Math.min(i + CHUNK, pairs.length)}`);
+  }
+}
+
+/* ------------------------------ grouping helpers ------------------------------ */
+
+/** Group qualifying notifications by user and bucket, preserving original fields */
+function groupByUser(qualifying) {
+  /** shape: { [userId]: { approvalRequest: { [docId]: entry }, assignmentDueDates: { [docId]: entry } } } */
+  const grouped = {};
+  for (const n of qualifying) {
+    const docId = n.docId;
+    const userId = n.userId;
+    const isAppr = isApproval(n);
+    const isAssign = isAssignment(n);
+    if (!isAppr && !isAssign) continue;
+
+    const bucket = isAppr ? BUCKET_APPROVAL : BUCKET_ASSIGNMENT;
+    const entry  = { ...n, docId };
+
+    if (!grouped[userId]) grouped[userId] = { [BUCKET_APPROVAL]: {}, [BUCKET_ASSIGNMENT]: {} };
+    grouped[userId][bucket][docId] = entry;
+  }
+  return grouped;
+}
+
+/** Count how many docIds in a single user's group */
+function countUserGroupEntries(userGroup) {
+  let c = 0;
+  const appr = userGroup[BUCKET_APPROVAL] || {};
+  const assign = userGroup[BUCKET_ASSIGNMENT] || {};
+  c += Object.keys(appr).length;
+  c += Object.keys(assign).length;
+  return c;
+}
+
+/** Convert a user's group into a flat list of { bucket, docId, entry } for splitting */
+function flattenUserGroup(userGroup) {
+  const list = [];
+  for (const [docId, entry] of Object.entries(userGroup[BUCKET_APPROVAL] || {})) {
+    list.push({ bucket: BUCKET_APPROVAL, docId, entry });
+  }
+  for (const [docId, entry] of Object.entries(userGroup[BUCKET_ASSIGNMENT] || {})) {
+    list.push({ bucket: BUCKET_ASSIGNMENT, docId, entry });
+  }
+  // Optional deterministic sort by docId
+  list.sort((a, b) => a.docId.localeCompare(b.docId));
+  return list;
+}
+
+/* ------------------------------ ingest core ------------------------------ */
+
+/**
+ * Ingest by users:
+ * - For users with total <= MAX_PER_MASTER_DOC: never split; roll to a new master first if needed.
+ * - For users with total  > MAX_PER_MASTER_DOC: split that user only, across as many masters as needed.
+ */
+async function ingestByUserWithSplitForOverCap(db, grouped) {
+  let { masterDocId, count } = await ensureWritableMaster(db);
+  let used = count;
+
+  const mapping = [];
+  let accumulator = { notifications: {} };
+  let accCount = 0;
+
+  const flush = async () => {
+    if (!accCount) return;
+    await writeAccumulatorToMaster(db, masterDocId, accumulator);
+    accumulator = { notifications: {} };
+    accCount = 0;
+  };
+
+  const userIds = Object.keys(grouped).sort(); // deterministic
+
+  for (const userId of userIds) {
+    const userGroup = grouped[userId];
+    const userCount = countUserGroupEntries(userGroup);
+
+    if (userCount <= MAX_PER_MASTER_DOC) {
+      // never split this user
+      if ((used + userCount) > MAX_PER_MASTER_DOC && used > 0) {
+        await flush();
+        const latest = await getLatestNotificationMaster(db);
+        const next = await createFreshMasterDoc(db, latest ? latest.suffix : null);
+        masterDocId = next.masterDocId;
+        used = 0;
+      }
+
+      // merge entire user into accumulator
+      deepMerge(accumulator.notifications, {
+        [userId]: {
+          [BUCKET_APPROVAL]:   userGroup[BUCKET_APPROVAL]   || {},
+          [BUCKET_ASSIGNMENT]: userGroup[BUCKET_ASSIGNMENT] || {},
+        }
+      });
+
+      // back-refs
+      for (const docId of Object.keys(userGroup[BUCKET_APPROVAL] || {})) {
+        mapping.push({ docId, masterDocId });
+      }
+      for (const docId of Object.keys(userGroup[BUCKET_ASSIGNMENT] || {})) {
+        mapping.push({ docId, masterDocId });
+      }
+
+      used += userCount;
+      accCount += userCount;
+
+      // write now to keep payload small
+      await flush();
+    } else {
+      // user over cap: split ONLY this user across multiple masters
+      console.warn(`User ${userId} has ${userCount} notifications (> ${MAX_PER_MASTER_DOC}). Splitting across masters.`);
+
+      const flat = flattenUserGroup(userGroup);
+      let idx = 0;
+
+      while (idx < flat.length) {
+        // ensure room in current master
+        let remaining = MAX_PER_MASTER_DOC - used;
+        if (remaining === 0) {
+          await flush();
+          const latest = await getLatestNotificationMaster(db);
+          const next = await createFreshMasterDoc(db, latest ? latest.suffix : null);
+          masterDocId = next.masterDocId;
+          used = 0;
+          remaining = MAX_PER_MASTER_DOC;
+        }
+
+        const take = Math.min(remaining, flat.length - idx);
+
+        // build a partial bucket map for this chunk
+        const chunkAppr = {};
+        const chunkAssign = {};
+
+        for (let i = 0; i < take; i++) {
+          const { bucket, docId, entry } = flat[idx + i];
+          if (bucket === BUCKET_APPROVAL)   { chunkAppr[docId]  = entry; }
+          else if (bucket === BUCKET_ASSIGNMENT) { chunkAssign[docId] = entry; }
+        }
+
+        // merge this chunk (subset of user's docs) into accumulator
+        const partial = {
+          [userId]: {
+            ...(Object.keys(chunkAppr).length   ? { [BUCKET_APPROVAL]:   chunkAppr } : {}),
+            ...(Object.keys(chunkAssign).length ? { [BUCKET_ASSIGNMENT]: chunkAssign } : {}),
+          }
+        };
+        deepMerge(accumulator.notifications, partial);
+
+        // back-refs for this chunk
+        for (let i = 0; i < take; i++) {
+          const { docId } = flat[idx + i];
+          mapping.push({ docId, masterDocId });
+        }
+
+        used += take;
+        accCount += take;
+        idx += take;
+
+        // write each chunk to keep payload very small, then continue
+        await flush();
+      }
+    }
+  }
+
+  // final touch
+  await db.collection(MASTER_COLLECTION)
+    .doc(masterDocId)
+    .set({ updatedAt: new Date().toISOString() }, { merge: true });
+
+  return mapping;
+}
+
+/* ---------------------------- main entry ---------------------------- */
+
+/**
+ * @param {FirebaseFirestore.Firestore} db
+ * @param {*} storage (unused)
+ * @param {string} projectName used only if readFromExport=true
+ * @param {{ readFromExport?: boolean }} options
+ */
+async function createNotificationMaster(db, storage, projectName, options = {}) {
+  const { readFromExport = false } = options;
+
+  // 1) Load notifications
+  let notificationsArray;
+  if (readFromExport) {
+    notificationsArray = readFile(`notifications_${projectName}`, 'sources');
+    console.log(`Loaded ${notificationsArray.length} notifications from sources for project '${projectName}'`);
+  } else {
+    const snap = await db.collection('Notifications').get();
+    notificationsArray = snap.docs.map(d => ({ docId: d.id, ...d.data() })); // ensure docId
+    console.log(`Loaded ${notificationsArray.length} notifications from Firestore`);
+  }
+
+  // 2) Filter to approval/assignment & ensure docId + userId
+  const qualifying = [];
+  for (const n of notificationsArray) {
+    if (!n?.docId || !n?.userId) continue;
+    if (isApproval(n) || isAssignment(n)) {
+      qualifying.push({ ...n, docId: n.docId });
+    }
+  }
+  console.log(`Qualified ${qualifying.length} notifications`);
+
+  if (!qualifying.length) return;
+
+  // 3) Group by user
+  const grouped = groupByUser(qualifying);
+
+  // 4) Ingest by user, allowing split only for over-cap users
+  const mapping = await ingestByUserWithSplitForOverCap(db, grouped);
+
+  // 5) Back-reference on Notifications/*
+  await batchUpdateNotifications(db, mapping);
+
+  // 6) Optional audit file
+  try {
+    writeFile(mapping, `notification_master_doc_updates_audit`, projectName || 'live', 'results');
+  } catch {}
+  console.log('Notification master migration complete (group-by-user; split only over-cap users).');
+}
+
+module.exports = { script: createNotificationMaster };

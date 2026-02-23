@@ -1,0 +1,49 @@
+// .inventory-grid {
+//     grid-template-columns: repeat(7,1fr);
+// }
+.inventory-grid {
+    grid-template-columns: 0.7fr 0.7fr 0.7fr 1fr 1fr 1fr 0.7fr 2fr 0.5fr 0.3fr 0.3fr;
+    // grid-template-columns: 1fr 0.7fr 1fr 1fr 1fr 1fr 2fr 50px 30px;
+//    grid-template-columns: 9% 11% 13% 10% 17% 10% 10%;
+//    grid-template-columns:50px 70px 90px 80px 130px 70px 60px;
+}
+
+// @media only screen and (max-width:900px) {
+//     .inventory-grid {
+//         grid-template-columns: 90px 110px 130px 110px 160px 110px 110px;
+//      }
+// }
+
+:host ::ng-deep .mat-tab-group .mat-tab-header .mat-tab-label-container .mat-tab-list .mat-tab-labels .mat-tab-label.mat-tab-label-active {
+    background-color: #F1F5F9 !important;
+    color: #179AD7 !important;
+    border-radius: 20px !important;
+    border: 1px solid #179AD7;
+    scale: 90%
+}
+
+:host::ng-deep.mat-tab-group .mat-tab-header .mat-tab-label-container {
+    padding: 5px 24px;
+    background-color: transparent;
+    height: 50px;
+}
+
+:host::ng-deep.mat-tab-group .mat-tab-header .mat-tab-label-container .mat-tab-list .mat-tab-labels .mat-tab-label {
+    color: #179AD7;
+    scale: 90%
+}
+
+
+
+@media only screen and (max-width:900px) {
+    .dynamicwidth {
+        width: 1000px;
+    }
+}
+
+
+@media only screen and (max-width:900px) {
+    .changeNosearchresult {
+       margin-left: 150px;
+    }
+}

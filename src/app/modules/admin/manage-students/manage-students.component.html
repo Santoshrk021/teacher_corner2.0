@@ -1,0 +1,38 @@
+<div class=" p-2 w-full">
+    <!-- Institution Bulk Upload card -->
+    <mat-stepper [linear]="true" #stepper class="bg-transparent h-full w-full py-4 px-6">
+
+        <!-- Institution selection -->
+        <mat-step>
+            <ng-template matStepLabel>Institution Selection</ng-template>
+            <ng-template matStepContent>
+                <div class="mt-2 ">
+                    <app-institution-info [stepper]="stepper" [instititutionSubRef]="instititutionSub"
+                        (institutionInfoEmitter)="catchInstitutionInfoEvent($event)"></app-institution-info>
+                </div>
+            </ng-template>
+        </mat-step>
+
+        <!-- Classroom selection -->
+        <mat-step>
+            <ng-template matStepLabel>Classroom Selection</ng-template>
+            <ng-template matStepContent>
+                <div class="mt-2 relative">
+                    <app-student-info [institutionInfo]="institutionInfo" [stepper]="stepper" [type]="'CLASSROOM'"
+                        [display]="'Classroom'"></app-student-info>
+                </div>
+            </ng-template>
+        </mat-step>
+
+        <!-- STEM Club selection -->
+        <mat-step>
+            <ng-template matStepLabel>STEM Club Selection</ng-template>
+            <ng-template matStepContent>
+                <div class="mt-2 relative">
+                    <app-student-info [institutionInfo]="institutionInfo" [stepper]="stepper" [type]="'STEM-CLUB'"
+                        [display]="'STEM Club'"></app-student-info>
+                </div>
+            </ng-template>
+        </mat-step>
+    </mat-stepper>
+</div>

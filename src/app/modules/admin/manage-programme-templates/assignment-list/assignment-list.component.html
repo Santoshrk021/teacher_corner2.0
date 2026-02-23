@@ -1,0 +1,87 @@
+<ng-container *ngIf="isDataLoaded; else dataNotLoaded">
+    <div class="h-[63vh] overflow-auto bg-primary-50 rounded-xl p-8 mt-1">
+        <div class="grid grid-cols-2 gap-4">
+            <mat-form-field appearance="fill" class="w-full" floatLabel="always">
+                <mat-label>Assignment Type</mat-label>
+                <mat-select [value]="filterOptions[0]" (selectionChange)="assignmentChange($event)">
+                    <mat-option *ngFor="let option of filterOptions" [value]="option" name="option">
+                        {{option}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field class="example-form-field" class=" w-full" floatLabel="never">
+                <mat-label>Search Assignment</mat-label>
+                <input matInput name="searchElement" placeholder="Search Here" autocomplete="off"
+                    (keyup)="filterAssignment($event)">
+                <mat-icon svgIcon="heroicons_outline:search"></mat-icon>
+            </mat-form-field>
+        </div>
+        <h4 class="text-accent-600 font-medium">Assignments</h4>
+        <form [formGroup]="assignmentListForm" (ngSubmit)="onSubmit()">
+            <div class="ex3 grid grid-cols-2 gap-3 w-full">
+                <!-- <div formControlName="doneList" cdkDropList #todoList="cdkDropList" [cdkDropListData]="assignments" [cdkDropListConnectedTo]="[doneList]" class="example-list ex3 myBox w-full" (cdkDropListDropped)="drop($event)"> -->
+                <div cdkDropList #todoList="cdkDropList" [cdkDropListData]="assignments"
+                    [cdkDropListConnectedTo]="[doneList]" class="example-list ex3 myBox w-full"
+                    (cdkDropListDropped)="drop($event)">
+                    <div class="example-box border" *ngFor="let item of assignments" cdkDrag>
+                        <span><strong>{{item?.displayName}} ({{item?.type}})</strong>
+                        </span> <span slot="end" class="pin ml-3"></span>
+                    </div>
+                </div>
+                <div cdkDropList #doneList="cdkDropList" [cdkDropListData]="selectedAssignments"
+                    [cdkDropListConnectedTo]="[todoList]" class="example-list ex3 myBox w-full"
+                    (cdkDropListDropped)="drop($event)">
+                    <div class="example-box border w-full" *ngFor="let item of selectedAssignments" [item]="item"
+                        cdkDrag formControlName="selectedAssignments">
+                        <!-- <input type="hidden" formControlName="selectedAssignments" placeholder="Item" hidden/> -->
+                        <!-- <div class="grid grid-cols-2 gap-2 w-full items-center"> -->
+                        <div class="w-full relative">
+                            <strong>
+                                {{item?.displayName}} ({{item?.type}})
+                            </strong>
+                            <button type="button" class="-mt-2.5 -mb-4 -pt-2.5 -pb-4 absolute right-0" mat-icon-button
+                                (click)="editAssignmentDueDate(item)" [matTooltip]="'Enter edit mode'">
+                                <mat-icon class="icon-size-4 text-current"
+                                    [svgIcon]="'heroicons_solid:pencil'"></mat-icon>
+                            </button>
+                        </div>
+                        <!-- </div> -->
+                    </div>
+                </div>
+            </div>
+            <!-- <div *ngIf="!addNewTemplateFlag" class="w-full h-auto text-center relative mt-3">
+            <button mat-raised-button class=" mb-10" color="primary" [disabled]="selectedAssignments.length==0"
+              type="submit">save</button>
+          </div> -->
+        </form>
+    </div>
+
+    <div *ngIf="addNewTemplateFlag" class="flex justify-between">
+        <button matStepperPrevious mat-stroked-button type="button"
+            class="bg-primary text-white  arrowBtnBack disabled:bg-primary-100">
+            <mat-icon class="mr-2 icon-size-5  text-white arrowIconBack"
+                [svgIcon]="'heroicons_solid:arrow-sm-left'"></mat-icon>
+            Back
+        </button>
+
+        <button matStepperNext mat-stroked-button type="button" (click)="onSubmit()"
+            class="bg-primary text-white arrowBtn disabled:bg-primary-100">
+            {{selectedAssignments.length?'Continue':'Skip'}}
+            <mat-icon class="ml-2 icon-size-5  text-white arrowIcon"
+                [svgIcon]="'heroicons_solid:arrow-sm-right'"></mat-icon>
+        </button>
+    </div>
+
+    <div *ngIf="!addNewTemplateFlag" class="text-center pt-2">
+        <button mat-stroked-button type="button" (click)="onSubmit(assignmentListForm)"
+            class="bg-primary text-white  disabled:bg-primary-100">
+            Save
+        </button>
+    </div>
+</ng-container>
+
+<ng-template #dataNotLoaded>
+    <div class="flex justify-center items-center">
+        <mat-spinner diameter="40"></mat-spinner>
+    </div>
+</ng-template>

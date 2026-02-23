@@ -1,0 +1,23 @@
+.inventory-grid {
+    grid-template-columns: repeat(3, 150px) 50px 50px  auto ;
+    // grid-template-columns: 1.5fr 1fr repeat(4, 1fr) repeat(8, 1fr) ;
+    // grid-template-columns: 100px 0.5fr repeat(8, 1fr) ;
+}
+
+.inventory-grid-2{
+    grid-template-columns: repeat(3, 150px) 50px 50px  repeat(4, 1fr)
+}
+
+.inventory-grid3 {
+    grid-template-columns: repeat(3, 150px) 50px 50px  repeat(6, 1fr)
+    // grid-template-columns: 1.5fr 1fr repeat(4, 1fr) repeat(8, 1fr) ;
+    // grid-template-columns: 100px 0.5fr repeat(8, 1fr) ;
+}
+
+.inventory-grid4 {
+    grid-template-columns: repeat(3, 150px) 50px 50px  repeat(5, 1fr)
+    // grid-template-columns: 1.5fr 1fr repeat(4, 1fr) repeat(8, 1fr) ;
+    // grid-template-columns: 100px 0.5fr repeat(8, 1fr) ;
+}
+
+

@@ -1,0 +1,57 @@
+<div *ngIf="nominatedObj"
+    class=" flex flex-col rounded-2xl bg-card shadow max-w-60 h-66 justify-between   hover:cursor-pointer relative">
+    <div class="p-4">
+        <div class="flex justify-between">
+            <div class="mb-4">
+                <p class="text-gray-600 mb-2 font-medium">
+
+                </p>
+                <p class="text-lg text-primary-700 font-medium rounded-full py-0.5 px-3 bg-primary-100 w-max">Grade
+                    {{grade.grade}}</p>
+            </div>
+            <div class="w-16 h-16">
+
+                <!-- <img src="../../../assets/grade-icons/Raman Awards - Grade {{grade}}.png" alt="Learing unit image icon"
+                    class="w-16"> -->
+                <img [src]="grade?.thumbImagePath | getDownloadURL"
+                    alt="contest icon by grade" class="w-16" (error)="setFallbackImage($event)">
+            </div>
+        </div>
+        <div
+            class="max-w-fit mt-4 pl-2 text-accent-400 font-medium rounded-lg text font-small  dark:text-gray-300 dark:bg-gray-700">
+            Nominated : <span
+                class="text-primary-700 rounded-full py-0.5 px-3 bg-primary-100">{{nominatedObj[grade.grade]?nominatedObj[grade.grade]:0}}/{{stageInfo?.maximumNomination}}</span>
+        </div>
+    </div>
+    <div class="relative h-0.5">
+        <div class="h-0.5 bg-primary-100 w-full">
+        </div>
+    </div>
+    <div class=" text bg-gray-50 dark:bg-transparent rounded-b-2xl text-center px-6 flex flex-col">
+        <div matTooltipPosition="above"
+            [matTooltip]="addNominationTooltip(nominatedObj[grade.grade]==stageInfo?.maximumNomination)">
+            <button
+                [disabled]="(nominatedObj[grade.grade] == stageInfo?.maximumNomination || today > stageInfo?.nominationEndDate?.seconds) && !isNominationException"
+                mat-stroked-button (click)="addNomination()" class="my-2">
+                <span class="inline-flex items-center mx-2">
+                    <span>Add Nomination</span>
+                    <mat-icon class="ml-1.5 icon-size-5" [svgIcon]="'heroicons_solid:arrow-sm-right'"></mat-icon>
+                </span>
+            </button>
+        </div>
+
+        <div matTooltipPosition="below"
+            [matTooltip]="nominatedObj[grade.grade]==0 && today < stageInfo?.nominationEndDate?.seconds?'You Dont Have Any Nomination':''">
+            <button [disabled]="!nominatedObj[grade.grade]" (click)="viewNomination()" mat-stroked-button class="my-2">
+                <span class="inline-flex items-center">
+                    <span>View Nominations</span>
+                    <mat-icon class="ml-1.5 icon-size-5" [svgIcon]="'heroicons_solid:arrow-sm-right'"></mat-icon>
+                </span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="!nominatedObj"
+    class="w-60 h-64 flex justify-center items-center  rounded-2xl bg-white shadow border animate-pulse">
+</div>

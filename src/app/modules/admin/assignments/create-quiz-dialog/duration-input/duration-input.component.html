@@ -1,0 +1,22 @@
+<form [formGroup]="indexFormGroup">
+    <div class="grid grid-cols-12 gap-3 items-center">
+        <span class="font-semibold text-[#282B66]">Duration</span>
+        <mat-form-field class="col-span-2 w-full text-accent-600">
+            <mat-label class="text-[#282B66]">Hours</mat-label>
+            <input [min]="0" [max]="23" matInput formControlName="durationInHours" type="number"
+                placeholder="Enter hours" (input)="timeValidation('durationInHours')">
+        </mat-form-field>
+
+        <mat-form-field class="col-span-2 w-full text-accent-600">
+            <mat-label class="text-[#282B66]">Minutes</mat-label>
+            <input [min]="0" [max]="59" matInput formControlName="durationInMinutes" type="number"
+                placeholder="Enter minutes" (input)="timeValidation('durationInMinutes')">
+        </mat-form-field>
+
+        <mat-form-field class="col-span-2 w-full text-accent-600">
+            <mat-label class="text-[#282B66]">Seconds</mat-label>
+            <input [min]="0" [max]="59" matInput formControlName="durationInSeconds" type="number"
+                placeholder="Enter seconds" (input)="timeValidation('durationInSeconds')">
+        </mat-form-field>
+    </div>
+</form>

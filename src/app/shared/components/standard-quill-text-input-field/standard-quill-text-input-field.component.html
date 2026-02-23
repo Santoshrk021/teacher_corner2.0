@@ -1,0 +1,13 @@
+<form [formGroup]="formRelatedDetails['formGroupName']">
+    <quill-editor id="quillEditor-{{formRelatedDetails['index']}}" #editor [formControlName]="formRelatedDetails['formControlName']"
+        [placeholder]="placeHolder" [modules]="{ toolbar: toolbarProperties }"
+        class=" bg-white border rounded-lg border-slate-300 mb-2 overflow-auto font-normal">
+    </quill-editor>
+    <!--
+        min-h-[46.22px] max-h-[100.22px]
+        [modules]="{ toolbar: false }"
+        [ngStyle]="{ 'min-height': '46.22px', 'max-height': '168.22px' }"
+        'overflow':'hidden', 'height': '46.22px', 'border-radius': '8px', 'border-width': '1px', 'border-color': 'rgb(203 213 225 / 1 !important) !important;',
+        min-h-[46.22px] max-h-[168.22px]
+    -->
+</form>

@@ -1,0 +1,54 @@
+<form [formGroup]="assignmentInfoForm">
+    <div class="  h-[62vh] overflow-auto ">
+        <div class="pt-1 flex justify-center">
+            <div class="bg-primary-50 rounded-xl border p-4 w-100">
+                <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                    <mat-label class="text-[#282B66]">Assignment Name</mat-label>
+                    <input id="title" matInput formControlName="displayName" type="text"
+                        placeholder="Enter form display name">
+                    <mat-error *ngIf="assignmentInfoForm.get('displayName').invalid">
+                        Form title is required
+                    </mat-error>
+                </mat-form-field>
+
+                <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                    <mat-label class="text-[#282B66]">Creator Name</mat-label>
+                    <input id="creator" matInput formControlName="creator" type="text" placeholder="Enter creator name">
+                    <mat-error *ngIf="assignmentInfoForm.get('creator').invalid">
+                        Creator name is required
+                    </mat-error>
+                </mat-form-field>
+
+                <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                    <mat-label class="text-[#282B66]">Author Name</mat-label>
+                    <input id="author" matInput formControlName="author" type="text" placeholder="Enter Author Name">
+                    <mat-error *ngIf="assignmentInfoForm.get('author').invalid">
+                        Author name is required
+                    </mat-error>
+                </mat-form-field>
+
+                <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                    <mat-label class="text-[#282B66]">Status</mat-label>
+                    <mat-select formControlName="status" placeholder="Select the status">
+                        <mat-option disabled>Select</mat-option>
+                        <mat-option *ngFor="let status of statusList" [value]="status">{{status}}</mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="assignmentInfoForm.get('status').invalid">
+                        Status is required
+                    </mat-error>
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex flex-row-reverse pt-3">
+        <button matStepperNext (click)="onClickNext()" [disabled]="!assignmentInfoForm.valid" mat-stroked-button
+            [matTooltip]="tooltipMessage" type="button" class="bg-primary text-white arrowBtn disabled:bg-primary-100">
+            Next
+            <mat-icon *ngIf="assignmentInfoForm.valid" class="ml-2 icon-size-5 text-white arrowIcon"
+                [svgIcon]="'heroicons_solid:arrow-sm-right'"></mat-icon>
+            <mat-icon *ngIf="!assignmentInfoForm.valid" class="ml-2 icon-size-5 text-white"
+                [svgIcon]="'heroicons_solid:arrow-sm-right'"></mat-icon>
+        </button>
+    </div>
+</form>

@@ -1,0 +1,123 @@
+<div class="flex flex-col sm:flex-row items-center md:items-start sm:justify-center md:justify-start flex-auto min-w-0">
+    <div
+        class="my-auto md:flex md:items-center md:justify-end w-full sm:w-auto md:h-full md:w-1/2 py-8 px-4 sm:p-12 md:p-16 sm:rounded-2xl md:rounded-none sm:shadow md:shadow-none sm:bg-card">
+        <div class="w-full max-w-80 sm:w-80 mx-auto sm:mx-0">
+            <!-- Logo -->
+            <div class="w-72 sm:w-50 mx-auto">
+                <img class="mx-auto" src="assets/images/logo/thinktacLogo_noTagline_colour.svg">
+            </div>
+
+            <!-- Title -->
+            <div class="mt-8 text-center text-4xl text-accent-600 font-extrabold tracking-tight leading-tight">Sign in
+            </div>
+            <!-- <div class="flex items-baseline mt-0.5 font-medium text-accent-600">
+                <div>Don't have an account?</div>
+                <a class="ml-1 text-primary-500 hover:underline" [routerLink]="['/sign-up']">Sign up
+                </a>
+            </div> -->
+
+            <!-- Phone field -->
+            <mat-form-field class="mt-2 w-full text-accent-600 text-center ">
+                <mat-label class="text-accent-600 text-center ">Phone number</mat-label>
+                <span class="mr-1">{{selectedCountryCode}}</span>
+                <input id="phone" [maxLength]="10" pattern="^[0-9]{10}" matInput
+                    placeholder="Enter valid 10 digits phone number" [(ngModel)]="phoneNumber"
+                    (ngModelChange)="onchangePhone()">
+            </mat-form-field>
+
+            <!-- For recaptcha -->
+            <div class="mb-1" id="recaptcha-container" [hidden]="captchaHide">
+            </div>
+
+            <!-- For captcha verification -->
+            <div class="mb-1" [hidden]="sendOTPBtnHide">
+                <div class="mb2 d-flex">
+                    <span>
+                        <input type="checkbox" [(ngModel)]="consentInput">
+                        <small class="text-muted"> By proceeding, I agree to
+                            receive notification and communication emails, SMSs, WhatsApp and Telegram messages from
+                            Raman Awards
+                            and ThinkTac. You may withdraw your consent at any time.</small>
+                    </span>
+                </div>
+
+                <!-- Send OTP button -->
+                <button class="fuse-mat-button-large w-full mt-6" mat-flat-button [color]="'primary'"
+                    [disabled]="sendOTPBtnTimeDisabled || !consentInput"
+                    title="{{sendOTPBtnTimeDisabled?'If you do not receive OTP, click on Resend OTP button after 30 seconds':''}}"
+                    (click)="sendLoginCode()">
+                    {{resendOTPBtnHide?'Send OTP':'Resend OTP'}}
+                </button>
+            </div>
+
+            <!-- OTP field -->
+            <div *ngIf="windowRef?.confirmationResult" [hidden]="hideVerification" class="mt-6">
+                <mat-form-field class="w-full text-accent-600">
+                    <mat-label class="text-accent-600">Enter your Verification Code</mat-label>
+                    <input id="otp" matInput type="otp" type="text" name="code" [(ngModel)]="verificationCode">
+                    <mat-error>
+                        OTP is required
+                    </mat-error>
+                </mat-form-field>
+
+                <!-- Login btn -->
+                <button class="mt-1 fuse-mat-button-large w-full" mat-flat-button [color]="'primary'"
+                    (click)="verifyLoginCode()" [disabled]="disableLoginBtn">Login
+                </button>
+
+                <div class="error text-center fw-bold" *ngIf="invalidOTP">Oops!! Invalid OTP, Please enter 6 digits
+                    Correct
+                    OTP </div>
+            </div>
+        </div>
+    </div>
+    <div
+        class="relative hidden md:flex flex-auto items-center justify-center w-1/2 h-full p-16 lg:px-28 overflow-hidden bg-[#282A65] dark:border-l">
+        <!-- Background - @formatter:off -->
+        <!-- Rings -->
+        <svg class="absolute inset-0 pointer-events-none" viewBox="0 0 960 540" width="100%" height="100%"
+            preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
+            <g class="text-gray-700 opacity-25" fill="none" stroke="currentColor" stroke-width="100">
+                <circle r="234" cx="196" cy="23"></circle>
+                <circle r="234" cx="790" cy="491"></circle>
+            </g>
+        </svg>
+        <!-- Dots -->
+        <svg class="absolute -top-16 -right-16 text-gray-700" viewBox="0 0 220 192" width="220" height="192"
+            fill="none">
+            <defs>
+                <pattern id="837c3e70-6c3a-44e6-8854-cc48c737b659" x="0" y="0" width="20" height="20"
+                    patternUnits="userSpaceOnUse">
+                    <rect x="0" y="0" width="4" height="4" fill="currentColor"></rect>
+                </pattern>
+            </defs>
+            <rect width="220" height="192" fill="url(#837c3e70-6c3a-44e6-8854-cc48c737b659)"></rect>
+        </svg>
+        <!-- @formatter:on -->
+        <!-- Content -->
+        <div class="z-10 relative w-full max-w-2xl">
+            <div class="text-7xl font-bold leading-none text-gray-100">
+                <div>Welcome to Teacher Corner<span class="text-primary"></span></div>
+                <!-- <div class="text-sm text-center">Powered by Think<span class="text-primary">TAC</span></div> -->
+            </div>
+            <div class="mt-6 text-lg tracking-tight leading-6 text-gray-400">
+                ThinkTac helps you learn Science and Mathematics by using simple materials from our TACtivity kits.<br>
+                Join us and start loving your curriculum today!
+            </div>
+            <div class="flex items-center mt-8">
+                <div class="flex flex-0 items-center -space-x-1.5">
+                    <img class="flex-0 w-10 h-10 rounded-full ring-4 ring-offset-1 ring-gray-800 ring-offset-gray-800 object-cover"
+                        src="https://ui-avatars.com/api/?bold=true&color=049BD8&format=svg&size=512&rounded=true&name=chandra+shekhar">
+                    <img class="flex-0 w-10 h-10 rounded-full ring-4 ring-offset-1 ring-gray-800 ring-offset-gray-800 object-cover"
+                        src="https://ui-avatars.com/api/?bold=true&color=A168D2&format=svg&size=512&rounded=true&name=J+H">
+                    <img class="flex-0 w-10 h-10 rounded-full ring-4 ring-offset-1 ring-gray-800 ring-offset-gray-800 object-cover"
+                        src="https://ui-avatars.com/api/?bold=true&color=9C27F1&format=svg&size=512&rounded=true&name=M+A">
+                    <img class="flex-0 w-10 h-10 rounded-full ring-4 ring-offset-1 ring-gray-800 ring-offset-gray-800 object-cover"
+                        src="https://ui-avatars.com/api/?bold=true&color=7D905E&format=svg&size=512&rounded=true&name=S+R">
+                </div>
+                <div class="ml-4 font-medium tracking-tight text-gray-400">More than 17k people joined us, it's your
+                    turn</div>
+            </div>
+        </div>
+    </div>
+</div>

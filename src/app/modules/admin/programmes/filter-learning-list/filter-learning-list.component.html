@@ -1,0 +1,16 @@
+<div class="grid grid-cols-3 gap-4">
+  <mat-form-field appearance="fill" class="w-full" floatLabel="always">
+    <mat-label>Filter</mat-label>
+    <mat-select>
+      <mat-option *ngFor="let version of versionArr" [value]="version" (click)="getVersionTacDetails(version)"
+        name="version">
+        {{version}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field class="example-form-field" class="mt-6 w-full" floatLabel="never">
+    <input matInput name="searchElement" placeholder="Search Here" autocomplete="off" (keyup)="filteractivity($event)">
+    <mat-icon svgIcon="heroicons_outline:search"></mat-icon>
+  </mat-form-field>
+</div>

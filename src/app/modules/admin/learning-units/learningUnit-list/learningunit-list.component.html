@@ -1,0 +1,252 @@
+<!-- eslint-disable @angular-eslint/template/eqeqeq -->
+<div class="w-full overflow-y-auto py-3">
+    <app-filter-learningunit-list [allLearningunits]="learningUnitsCopy" (changeLang)="onlanguageChange($event)"
+        (changeVersion)="onversionChange($event)" (searchLearningUnitsOutput)="onSearchChanged($event)"
+        (newLearningUnitAdded)="addedNewLU($event)" (updateSearch)="updateSearch($event)">
+    </app-filter-learningunit-list>
+
+    <div class="dynamicwidth">
+        <div class="w-full grid d-flex">
+            <div class="inventory-grid grid py-5 gap-3 px-8 md:px-8 shadow text-md font-semibold text-secondary bg-gray-50 dark:bg-black dark:bg-opacity-5 "
+                matSort matSortDisableClear (matSortChange)="sortData($event)">
+                <div>Image</div>
+                <div [mat-sort-header]="'learningUnitCode'">Code</div>
+                <div [mat-sort-header]="'learningUnitDisplayName'" class="">Display Name</div>
+                <div [mat-sort-header]="'version'">Version</div>
+                <div [mat-sort-header]="'isoCode'">Language</div>
+                <div [mat-sort-header]="'status'">Status</div>
+                <div [mat-sort-header]="'type'">Type</div>
+                <div [mat-sort-header]="'Maturity'">Maturity</div>
+                <div [mat-sort-header]="'creationDate'">Creation Date</div>
+                <div [mat-sort-header]="'tacOwnerName'">Owner</div>
+                <div class="ml-2">View Details</div>
+                <div class="ml-2">Delete</div>
+            </div>
+
+            <div class=" h-[calc(100vh_-_268px)]  overflow-scroll" infiniteScroll [infiniteScrollDistance]="1"
+                [infiniteScrollUpDistance]="2" [infiniteScrollThrottle]="300" [scrollWindow]="false"
+                (scrolled)="onScroll()">
+
+                <ng-container *ngFor="let tac of allLearningUnits; let i = index; trackBy: trackByFn">
+                    <div class=" inventory-grid grid items-center text-secondary gap-3 py-3 px-8 md:px-8 border-b border-gray-300 "
+                        matSort matSortDisableClear>
+                        <div class="flex items-center">
+                            <div
+                                class="relative flex flex-0 items-center justify-center w-12 h-12 mr-6 rounded overflow-hidden border">
+                                <img class="w-12" *ngIf="tac?.learningUnitPreviewImage"
+                                    [alt]="'learning unit thumbnail image'"
+                                    [src]="tac?.learningUnitPreviewImage|getDownloadURL" loading="lazy">
+                                <div class="flex items-center justify-center w-full h-full text-xs font-semibold leading-none text-center uppercase"
+                                    *ngIf="!tac.learningUnitPreviewImage">
+                                    NO THUMB
+                                </div>
+                            </div>
+                        </div>
+
+                        <div [title]="tac.learningUnitCode" class="truncate" [matTooltip]="tac?.learningUnitCode"
+                            matTooltipPosition="above" [cdkCopyToClipboard]="tac?.learningUnitCode"
+                            (click)="copyToClipboard(tac?.learningUnitCode)">
+                            {{tac?.learningUnitCode}}
+                        </div>
+
+                        <div class=" ml-1" [title]="tac?.learningUnitDisplayName"
+                            [matTooltip]="tac?.learningUnitDisplayName" matTooltipPosition="above"
+                            [cdkCopyToClipboard]="tac?.learningUnitDisplayName"
+                            (click)="copyToClipboard(tac?.learningUnitDisplayName)">
+
+                            <ng-container *ngIf="tac?.learningUnitDisplayName?.length > 25; else showFullText1">
+                                {{tac?.learningUnitDisplayName | slice:0:25 }}...
+                            </ng-container>
+
+                            <ng-template #showFullText1>
+                                {{tac?.learningUnitDisplayName}}
+                            </ng-template>
+                        </div>
+
+                        <div class="truncate ml-1 " [title]="tac?.version" [matTooltip]="tac?.version"
+                            matTooltipPosition="above" [cdkCopyToClipboard]="tac?.version"
+                            (click)="copyToClipboard(tac?.version)">
+                            {{tac?.version}}
+                        </div>
+
+                        <div class="truncate ml-3 " [title]="tac?.isoCode" [matTooltip]="tac?.isoCode"
+                            matTooltipPosition="above" [cdkCopyToClipboard]="tac?.isoCode"
+                            (click)="copyToClipboard(tac?.isoCode)">
+                            {{tac?.isoCode}}
+                        </div>
+
+                        <div class=" ml-2" [title]="tac.status" [matTooltip]="tac.status" matTooltipPosition="above"
+                            [cdkCopyToClipboard]="tac?.status" (click)="copyToClipboard(tac?.status)">
+                            <ng-container *ngIf="tac?.status.length > 4; else showFullText8">
+                                {{tac.status | slice:0:4 }}...
+                            </ng-container>
+
+                            <ng-template #showFullText8>
+                                {{tac.status}}
+                            </ng-template>
+                        </div>
+
+                        <div class=" ml-1" [title]="tac.type" [matTooltip]="tac.type" matTooltipPosition="above"
+                            [cdkCopyToClipboard]="tac?.type" (click)="copyToClipboard(tac?.type)">
+
+                            <ng-container *ngIf="tac?.type?.length >6; else showFullOwner">
+                                {{tac.type | slice:0:6 }}...
+                            </ng-container>
+
+                            <ng-template #showFullOwner>
+                                {{tac.type}}
+                            </ng-template>
+                        </div>
+
+
+                        <div class="truncate ml-2 " [title]="tac.Maturity" [matTooltip]="tac.Maturity"
+                            matTooltipPosition="above" [cdkCopyToClipboard]="tac?.Maturity"
+                            (click)="copyToClipboard(tac?.Maturity)">
+                            {{tac.Maturity}}
+                        </div>
+
+                        <div class="truncate lg:ml-1 xs:ml-3"
+                            [title]="tac.creationDate.seconds*1000| date: 'dd/MM/yyyy'"
+                            [matTooltip]="tac.creationDate.seconds*1000| date: 'dd/MM/yyyy'"
+                            [cdkCopyToClipboard]="tac?.creationDate?(tac?.creationDate?.seconds*1000| date: 'dd/MM/yyyy'):''"
+                            (click)="copyToClipboardDate(tac?.creationDate)">
+                            {{tac.creationDate.seconds*1000| date: 'dd/MM/yyyy'}}
+                        </div>
+
+                        <div class=" lg:ml-1 xs:ml-0" [title]="tac.tacOwnerName" matTooltipPosition="above"
+                            [matTooltip]="tac.tacOwnerName" [cdkCopyToClipboard]="tac?.tacOwnerName"
+                            (click)="copyToClipboard(tac?.tacOwnerName)">
+
+                            <ng-container *ngIf="tac.tacOwnerName!==''; else showNotNull">
+                                {{tac.tacOwnerName}}
+                            </ng-container>
+
+                            <ng-template #showNotNull>
+                                Not Available
+                            </ng-template>
+                        </div>
+
+                        <div class="sm:ml-5  xs:ml-1">
+                            <button class="min-w-10 min-h-7 h-7 px-2 leading-6 " mat-stroked-button
+                                (click)="toggleDetails(tac)"
+                                [ngClass]="{'bg-slate-200':selectedLearningUnit?.docId==tac?.docId}">
+                                <mat-icon class="icon-size-5"
+                                    [svgIcon]="selectedLearningUnit?.docId==tac?.docId ? 'heroicons_solid:chevron-up' : 'heroicons_solid:chevron-down'"
+                                    matTooltip="Details">
+                                </mat-icon>
+                            </button>
+                        </div>
+
+                        <div class="sm:ml-3 xs:ml-4">
+                            <div *ngIf="startLoading && selectedLUDel.docId==tac.docId; else saveButton">
+                                <mat-spinner [diameter]="30"></mat-spinner>
+                                <hint *ngIf="fileDeleting" style="font-size: 10px;">{{filestobeDeleted}}/{{allfiles}}
+                                    files moved</hint>
+                                <hint *ngIf="workflowDeletion" style="font-size: 10px;">workflow files moving</hint>
+                            </div>
+
+                            <ng-template #saveButton>
+                                <mat-icon
+                                    class="text-red-500  cursor-pointer transition duration-500 transform  hover:scale-[115%]"
+                                    svgIcon="delete_outline" matTooltip="Delete" (click)="deleteLU(tac)"></mat-icon>
+                            </ng-template>
+                        </div>
+                    </div>
+
+                    <div class="grid">
+                        <ng-container *ngIf="selectedLearningUnit?.docId === tac?.docId">
+                            <ng-container *ngTemplateOutlet="rowDetailsTemplate;context: {$implicit: tac}">
+                            </ng-container>
+                        </ng-container>
+                    </div>
+                </ng-container>
+            </div>
+
+            <p class="px-2 pt-3 text-secondary">
+                {{loadingMessage}}
+            </p>
+        </div>
+    </div>
+</div>
+
+<ng-template #rowDetailsTemplate let-learningunit>
+    <div class=" border-b border-slate-300 overflow-scroll bg-blue-100 p-4 pt-10">
+        <mat-tab-group disablePagination="false">
+
+            <!-- Info Tab -->
+            <mat-tab label="Basic Info">
+                <ng-template matTabContent>
+                    <app-basic-info [luDetailsInput]="selectedLuDetails" [allLUList]="allLearningunits"
+                        [maturityDetails]="learningUnitMaturity" [EditLuStatus]="LuEditStatus"
+                        (closeAfterEditLU)="collapseAfterEditLU($event)" [allLUdata]="allLUFromColl"></app-basic-info>
+                </ng-template>
+            </mat-tab>
+
+            <!-- Description Tab -->
+            <mat-tab label="Descriptions">
+                <ng-template matTabContent>
+                    <app-description [luDetailsInput]="selectedLuDetails"></app-description>
+                </ng-template>
+            </mat-tab>
+
+            <!-- Images Tab -->
+            <mat-tab label="Images">
+                <ng-template matTabContent>
+                    <app-images (updatedHeadlineImgPathEvent)="updatedHeadlineImg($event)"
+                        [luDetailsInput]="selectedLuDetails" [allLUList]="allLearningunits"></app-images>
+                </ng-template>
+            </mat-tab>
+
+            <!-- New Resources Tab -->
+            <div *ngFor="let res of uncommonResource; let i = index">
+                <mat-tab [label]="res.value">
+                    <ng-template matTabContent>
+                        <app-resources [luDetailsInput]="selectedLuDetails" [allLUList]="allLearningunits"
+                            [luResources]="tacResourceCopy" [key]="res.key" [allResources]="resourcesLU"
+                            [maturityObj]="maturityObj" [cumulativeMaturities]="cumulativeMaturities"
+                            [selectLUhardCopy]="selectLUhardCopy"></app-resources>
+                    </ng-template>
+                </mat-tab>
+            </div>
+
+            <!-- External Resources Tab -->
+            <mat-tab label="External Resources">
+                <ng-template matTabContent>
+                    <app-external-resource [luDetailsInput]="selectedLuDetails"></app-external-resource>
+                </ng-template>
+            </mat-tab>
+
+            <!-- Associated LU Tab -->
+            <mat-tab label="Associated LU">
+                <ng-template matTabContent>
+                    <app-associated-lu [allLUList]="allLearningunits"
+                        [luDetailsInput]="selectedLuDetails"></app-associated-lu>
+                </ng-template>
+            </mat-tab>
+            <!-- Compponents Tab -->
+            <mat-tab label="Components">
+                <ng-template matTabContent>
+                    Componets tab here
+                     <app-component></app-component>
+                </ng-template>
+            </mat-tab>
+
+            <!-- Additional Resources Tab -->
+            <mat-tab label="Additional Resources">
+                <ng-template matTabContent>
+                    <app-additional-resources [luDetailsInput]="selectedLuDetails"
+                        (additionResUpdate)="updateAddedResValue($event)"
+                        [maturityObj]="maturityObj"></app-additional-resources>
+                </ng-template>
+            </mat-tab>
+
+            <!-- Version Changes Tab -->
+            <mat-tab label="Version Changes">
+                <ng-template matTabContent>
+                    <app-version-changes [luDetailsInput]="selectedLuDetails"
+                        [allLUList]="allLearningunits"></app-version-changes>
+                </ng-template>
+            </mat-tab>
+        </mat-tab-group>
+    </div>
+</ng-template>

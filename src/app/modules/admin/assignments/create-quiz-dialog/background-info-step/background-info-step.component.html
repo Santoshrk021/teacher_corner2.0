@@ -1,0 +1,230 @@
+<div class="h-[57vh]">
+  <div class="relative pt-1 h-full">
+    <!-- Uploading overlay -->
+    <div *ngIf="isInlineUploading"
+      class="absolute h-full w-full flex justify-center items-center z-80 bg-[#ffffff7b]">
+      <div class="flex items-center gap-2 rounded-lg bg-cyan-50 px-4 py-3 text-sm text-cyan-800 border border-cyan-200 shadow-lg">
+        <mat-spinner diameter="24"></mat-spinner>
+        <span class="font-medium">Processing...</span>
+      </div>
+    </div>
+
+    <!-- Scrollable content area -->
+    <div class="h-full overflow-auto rounded-lg bg-white px-4">
+      <form [formGroup]="backgroundForm" class="py-4">
+        <!-- Main Card with unified background -->
+        <div class="p-4 border rounded-xl shadow bg-primary-100">
+          <!-- Section Header -->
+          <div class="mb-4">
+            <p class="font-bold text-gray-900 text-base">Background / Case Study</p>
+          </div>
+
+          <!-- Case Study Title -->
+          <div class="mb-4">
+            <mat-form-field class="w-full text-accent-600">
+              <mat-label class="text-[#282B66]">Case Study Title</mat-label>
+              <input matInput formControlName="title" type="text" placeholder="Enter case study title" />
+            </mat-form-field>
+          </div>
+
+          <!-- Background Description -->
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <p class="font-semibold text-gray-900">Background Description</p>
+            </div>
+
+            <!-- Inline Upload Tip -->
+            <div class="mb-3 rounded-lg border border-blue-200 bg-blue-50 p-3">
+              <div class="flex items-start gap-2 text-sm text-blue-800">
+                <mat-icon class="!text-blue-500" style="font-size: 18px; width: 18px; height: 18px;">lightbulb</mat-icon>
+                <div>
+                  Use <span class="font-semibold">Image</span> or <span class="font-semibold">PDF</span> buttons in the
+                  toolbar to insert media inline.
+                  Click on an image to resize/align it. PDFs have a delete button.
+                </div>
+              </div>
+            </div>
+
+            <!-- Hidden file input for image/PDF selection -->
+            <input #inlineFileInput type="file" (change)="onInlineFileSelected($event)" class="hidden" />
+
+            <!-- Custom toolbar -->
+            <div id="custom-toolbar"
+              class="sticky top-0 z-10 rounded-t-lg border border-gray-200 border-b-0 bg-gray-50 px-2 py-1.5 flex flex-wrap items-center gap-x-1 gap-y-1">
+
+              <span class="ql-formats !m-0 flex items-center pr-2 border-r border-gray-200">
+                <button class="ql-bold" matTooltip="Bold"></button>
+                <button class="ql-italic" matTooltip="Italic"></button>
+                <button class="ql-underline" matTooltip="Underline"></button>
+                <button class="ql-strike" matTooltip="Strikethrough"></button>
+              </span>
+
+              <span class="ql-formats !m-0 flex items-center pr-2 border-r border-gray-200">
+                <select class="ql-header" matTooltip="Heading">
+                  <option value="1">H1</option>
+                  <option value="2">H2</option>
+                  <option value="3">H3</option>
+                  <option selected>Normal</option>
+                </select>
+                <select class="ql-size" matTooltip="Font Size">
+                  <option value="small">Small</option>
+                  <option selected>Normal</option>
+                  <option value="large">Large</option>
+                  <option value="huge">Huge</option>
+                </select>
+              </span>
+
+              <span class="ql-formats !m-0 flex items-center pr-2 border-r border-gray-200">
+                <button class="ql-list" value="ordered" matTooltip="Numbered List"></button>
+                <button class="ql-list" value="bullet" matTooltip="Bullet List"></button>
+                <button class="ql-indent" value="-1" matTooltip="Decrease Indent"></button>
+                <button class="ql-indent" value="+1" matTooltip="Increase Indent"></button>
+              </span>
+
+              <span class="ql-formats !m-0 flex items-center pr-2 border-r border-gray-200">
+                <button class="ql-blockquote" matTooltip="Quote"></button>
+                <button class="ql-code-block" matTooltip="Code Block"></button>
+                <button class="ql-script" value="sub" matTooltip="Subscript"></button>
+                <button class="ql-script" value="super" matTooltip="Superscript"></button>
+              </span>
+
+              <span class="ql-formats !m-0 flex items-center pr-2 border-r border-gray-200">
+                <select class="ql-color" matTooltip="Text Color"></select>
+                <select class="ql-background" matTooltip="Background Color"></select>
+              </span>
+
+              <span class="ql-formats !m-0 flex items-center pr-2 border-r border-gray-200">
+                <select class="ql-align" matTooltip="Alignment">
+                  <option selected></option>
+                  <option value="center"></option>
+                  <option value="right"></option>
+                  <option value="justify"></option>
+                </select>
+              </span>
+
+              <!-- Image & PDF insert buttons -->
+              <span class="ql-formats !m-0 flex items-center bg-cyan-50 rounded px-1.5 py-0.5 border border-cyan-200">
+                <button class="ql-image" matTooltip="Insert Image"></button>
+                <button class="ql-insertPdf" matTooltip="Insert PDF">
+                  <mat-icon style="font-size: 16px; width: 16px; height: 16px;">picture_as_pdf</mat-icon>
+                </button>
+              </span>
+
+              <span class="ql-formats !m-0 flex items-center pl-1">
+                <button class="ql-clean" matTooltip="Clear Formatting"></button>
+              </span>
+            </div>
+
+            <!-- Quill Editor -->
+            <quill-editor
+              formControlName="description"
+              [modules]="quillConfig"
+              [styles]="{height: '320px'}"
+              [format]="'html'"
+              (onEditorCreated)="onEditorCreated($event)"
+              placeholder="Enter the case study context">
+            </quill-editor>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Image Resize Modal -->
+<div *ngIf="showImageModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+  <div class="w-full max-w-md mx-4 rounded-2xl bg-white shadow-xl">
+    <!-- Modal Header -->
+    <div class="flex items-center justify-between px-5 py-4 border-b">
+      <h3 class="text-sm font-semibold text-gray-900">Resize & Align Image</h3>
+      <button type="button" (click)="deleteSelectedMedia()"
+        class="inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50">
+        <mat-icon style="font-size: 18px; width: 18px; height: 18px;">delete</mat-icon>
+        Delete
+      </button>
+    </div>
+
+    <!-- Modal Body -->
+    <div class="px-5 py-4 space-y-4">
+      <!-- Alignment Options -->
+      <div>
+        <label class="block text-xs font-semibold text-gray-700 mb-2">Alignment</label>
+        <div class="grid grid-cols-3 gap-2">
+          <button type="button"
+            *ngFor="let align of alignmentOptions"
+            (click)="selectedAlignment = align.value"
+            class="rounded-xl border px-3 py-2 text-sm flex items-center justify-center gap-2"
+            [ngClass]="selectedAlignment === align.value
+              ? 'border-cyan-500 bg-cyan-50 text-cyan-800'
+              : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'">
+            <mat-icon style="font-size: 18px; width: 18px; height: 18px;">{{ align.icon }}</mat-icon>
+            {{ align.label }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Size Options -->
+      <div *ngIf="selectedImageForResize">
+        <label class="block text-xs font-semibold text-gray-700 mb-2">Size</label>
+        <div class="space-y-2">
+          <button type="button"
+            *ngFor="let option of imageSizeOptions"
+            (click)="option.value !== 'custom' && (selectedSize = option.value)"
+            class="w-full rounded-xl border px-4 py-2 text-left flex items-center justify-between"
+            [ngClass]="selectedSize === option.value
+              ? 'border-cyan-500 bg-cyan-50'
+              : 'border-gray-200 bg-white hover:bg-gray-50'">
+            <span class="text-sm text-gray-800">{{ option.label }}</span>
+            <span *ngIf="option.value !== 'custom'" class="text-xs text-gray-500">{{ option.value }}%</span>
+          </button>
+
+          <!-- Custom width input -->
+          <div class="flex items-center gap-2 pt-1">
+            <input type="number"
+              [(ngModel)]="customImageWidth"
+              (focus)="selectedSize = 'custom'"
+              placeholder="Custom width"
+              class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500" />
+            <span class="text-xs text-gray-500">px</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="flex justify-end gap-2 px-5 py-4 border-t">
+      <button type="button" (click)="closeImageModal()"
+        class="rounded-lg px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100">
+        Cancel
+      </button>
+      <button type="button" (click)="applyImageSettings()"
+        class="rounded-lg px-4 py-2 text-sm font-semibold bg-cyan-600 text-white hover:bg-cyan-700">
+        Apply
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Footer Buttons -->
+<div class="flex justify-between pt-3">
+  <button matStepperPrevious mat-stroked-button type="button"
+    class="bg-primary text-white arrowBtnBack disabled:bg-primary-100">
+    <mat-icon class="mr-2 icon-size-5 text-white arrowIconBack"
+      [svgIcon]="'heroicons_solid:arrow-sm-left'"></mat-icon>
+    Back
+  </button>
+
+  <div class="flex items-center gap-3">
+    <button mat-stroked-button (click)="skipStep()" matStepperNext class="text-gray-700">
+      Skip
+    </button>
+
+    <button matStepperNext mat-stroked-button type="button" (click)="saveAndNext()" [disabled]="isInlineUploading"
+      class="bg-primary text-white arrowBtn disabled:bg-primary-100">
+      <span *ngIf="!isInlineUploading">Next</span>
+      <span *ngIf="isInlineUploading">Processing...</span>
+      <mat-icon *ngIf="!isInlineUploading" class="ml-2 icon-size-5 text-white arrowIcon"
+        [svgIcon]="'heroicons_solid:arrow-sm-right'"></mat-icon>
+    </button>
+  </div>
+</div>

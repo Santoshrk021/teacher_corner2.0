@@ -1,0 +1,161 @@
+<div class="py-6 h-screen w-screen overflow-hidden relative">
+  <button (click)="drawerClose()" class="m-3 absolute top-0 right-0 z-40">
+    <mat-icon class=" hover:scale-110 transition duration-5000 transform" svgIcon="mat_outline:close">
+    </mat-icon>
+  </button>
+
+  <button (click)="emptyTrash()" mat-stroked-button color="warn" class=" m-3 text-center absolute top-1 right-10 z-40">
+    <mat-icon class="text-red-500  cursor-pointer transition duration-500 transform  hover:scale-[115%]"
+      svgIcon="delete_outline">
+    </mat-icon>Empty Trash
+  </button>
+
+  <div class="pl-4 pr-22 h-10 flex justify-between">
+    <p Class=" font-bold text-lg text-accent-600">
+      View Deleted Components
+    </p>
+  </div>
+
+  <div class="w-full ">
+    <div class="grid mt-4 ">
+      <div
+        class="inventory-grid z-10 sticky top-0 grid gap-8 py-4 px-10 md:px-8 shadow text-md font-semibold text-secondary bg-gray-50 dark:bg-black dark:bg-opacity-5">
+        <div>Image</div>
+        <div>Component Name</div>
+        <div>Component Code</div>
+        <div>Group Name</div>
+        <div>Category</div>
+        <div>Sub Category</div>
+        <div>Component Size</div>
+        <div class="hidden sm:block">Quantity</div>
+        <div class="hidden sm:block">Trashed At</div>
+        <div class="hidden sm:block">Trashed By</div>
+        <!-- <div class="">View More</div> -->
+        <div class="hidden sm:block">Restore</div>
+        <div class="hidden sm:block">Delete</div>
+      </div>
+
+
+      <div class="overflow-y-auto h-[calc(100vh_-_140px)] ">
+        <ng-container *ngFor="let item of trashItems">
+          <div
+            class="inventory-grid grid items-center text-secondary gap-8 py-3 px-10 md:px-8 border-b border-gray-400 ">
+            <div class="flex items-center">
+              <div
+                class="relative flex flex-0 items-center justify-center w-12 h-12 mr-6 rounded overflow-hidden border">
+                <img class="w-12" *ngIf="item?.imageUrl && item?.imageUrl?.length" [alt]="'learning unit thumbnail image'"
+                  [src]="item?.imageUrl?.[0] |getDownloadURL" loading="lazy">
+                <div
+                  class="flex items-center justify-center w-full h-full text-xs font-semibold leading-none text-center uppercase"
+                  *ngIf="!item?.imageUrl || !item?.imageUrl?.length">
+                  NO THUMB
+                </div>
+              </div>
+            </div>
+            <div>{{item?.componentName}}</div>
+            <div>{{item?.componentCode}}</div>
+            <div>{{item?.groupName}}</div>
+            <div>{{item?.category}}</div>
+            <div>{{item?.subCategory}}</div>
+            <div>{{item?.componentSize}}</div>
+            <div class="hidden sm:block">{{item?.quantity}}</div>
+            <div>{{item?.trashAt?.seconds*1000| date: 'dd/MM/yyyy'}}</div>
+            <div>{{item?.trashedBy}}</div>
+
+            <!-- view more -->
+            <!-- <div class="">
+              <button class="min-w-10 min-h-7 h-7 px-2 leading-6" mat-stroked-button (click)="toggleDetails(item)"
+                [ngClass]="{'bg-slate-200':selectedComponent?.docId==item?.docId}">
+                <mat-icon class="icon-size-5"
+                  [svgIcon]="selectedComponent?.docId==item?.docId ? 'heroicons_solid:chevron-up' : 'heroicons_solid:chevron-down'">
+                </mat-icon>
+              </button>
+            </div> -->
+
+            <div>
+              <mat-icon (click)="restoreComponent(item)"
+                class="text-primary icon-size-5 cursor-pointer transition duration-500 transform  hover:scale-[115%]">
+
+                <span class="material-icons">
+                  restore_from_trash
+                </span>
+              </mat-icon>
+            </div>
+
+            <div>
+              <mat-icon (click)="deleteComponent(item?.docId)"
+                class="text-red-500  cursor-pointer transition duration-500 transform  hover:scale-[115%]"
+                svgIcon="delete_outline"></mat-icon>
+            </div>
+          </div>
+
+          <!-- <div class="grid">
+            <ng-container *ngIf="selectedComponent?.docId === item?.docId">
+              <ng-container *ngTemplateOutlet="rowDetailsTemplate;context: {$implicit: item}">
+              </ng-container>
+            </ng-container>
+          </div> -->
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- <ng-template #rowDetailsTemplate let-template>
+  <div class="h-100 border-b border-slate-300 overflow-scroll bg-blue-100 p-4 pt-10">
+    <mat-tab-group disablePagination="false">
+      <mat-tab>
+        <ng-template matTabLabel>Basic Info</ng-template>
+        <ng-template matTabContent>
+          <mat-card class="grid grid-cols-2 gap-2 rounded-2xl w-1/2">
+            <div>
+              <div>Component Name</div>
+              <div>Component Code</div>
+              <div>Group Name</div>
+              <div>Category</div>
+              <div>Sub Category</div>
+              <div>Component Size</div>
+              <div>Quantity</div>
+              <div>Image url</div>
+            </div>
+            <div>
+
+              <div class="font-bold">
+                {{template?.componentName ?? 'Not Available'}}
+              </div>
+              <div class="font-bold">
+                {{template?.componentCode ?? 'Not Available'}}
+              </div>
+              <div class="font-bold">
+                {{template?.category ?? 'Not Available'}}
+              </div>
+              <div class="font-bold">
+                {{template?.componentType ?? 'Not Available'}}
+              </div>
+              <div class="font-bold">
+                {{template?.attribute ?? 'Not Available'}}
+              </div>
+              <div class="font-bold">
+                {{template?.sizeUnit ?? 'Not Available'}}
+              </div>
+              <div class="font-bold">
+                {{template?.quantity ?? 'Not Available'}}
+              </div>
+              <div class="font-bold flex flex-wrap gap-2 items-center justify-start">
+                
+                <span *ngFor="let url of template?.imageUrl">
+                  
+                   <img class="w-12" [alt]="'Component image'" [src]="url | getDownloadURL" loading="lazy" />
+                </span>
+
+              </div>
+
+            </div>
+          </mat-card>
+        </ng-template>
+      </mat-tab>
+
+
+    </mat-tab-group>
+  </div>
+</ng-template> -->

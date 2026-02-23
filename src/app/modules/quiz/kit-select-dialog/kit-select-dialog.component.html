@@ -1,0 +1,202 @@
+<div class="flex flex-col w-full p-2">
+  <!-- Header -->
+  <div class="flex items-center justify-between px-6 py-4 ">
+    <div class="flex items-center">
+      <mat-icon class="mr-3 text-primary-600" svgIcon="heroicons_outline:device-phone-mobile"></mat-icon>
+      <h2 class="text-lg font-semibold">Link Kits to Classroom</h2>
+    </div>
+    <button mat-icon-button (click)="close()" class="text-white">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Content -->
+  <div class="p-2">
+    <!-- Student Count Info -->
+    <div class="mb-4 p-2 rounded-lg" [ngClass]="{
+      'bg-blue-50 border border-blue-200': !isLoadingStudents && studentCount > 0,
+      'bg-orange-50 border border-orange-200': !isLoadingStudents && studentCount === 0,
+      'bg-gray-50': isLoadingStudents
+    }">
+      <div class="flex items-center">
+        <mat-icon *ngIf="isLoadingStudents" class="text-gray-400 mr-2">hourglass_empty</mat-icon>
+        <mat-icon *ngIf="!isLoadingStudents && studentCount > 0" class="text-blue-500 mr-2">groups</mat-icon>
+        <mat-icon *ngIf="!isLoadingStudents && studentCount === 0" class="text-orange-500 mr-2">warning</mat-icon>
+        <div>
+          <span *ngIf="isLoadingStudents" class="text-gray-600">Loading student count...</span>
+          <span *ngIf="!isLoadingStudents && studentCount > 0" class="text-blue-800 font-medium">
+            {{studentCount}} Students in Classroom
+          </span>
+          <span *ngIf="!isLoadingStudents && studentCount === 0" class="text-orange-800 font-medium">
+            No students registered in classroom
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 1: USB Connection (Optional) -->
+    <div class="mb-6">
+      <div class="flex items-center mb-3">
+        <div class="flex items-center justify-center w-8 h-8 rounded-full mr-3"
+          [ngClass]="isConnected ? 'bg-green-500' : 'bg-gray-300'">
+          <span class="text-white font-bold">1</span>
+        </div>
+        <h3 class="font-medium text-gray-800">Connect USB Receiver</h3>
+        <span class="text-xs text-gray-500 ml-2">(Optional)</span>
+        <mat-icon *ngIf="isConnected" class="text-green-500 ml-2">check_circle</mat-icon>
+      </div>
+
+      <div class="ml-11">
+        <div *ngIf="!isConnected && !isConnecting" class="flex flex-col gap-2">
+          <div class="flex items-center gap-2">
+            <button mat-raised-button color="primary" (click)="connectReceiver()">
+              <mat-icon class="mr-2">usb</mat-icon>
+              Connect Receiver
+            </button>
+          </div>
+          <p class="text-xs text-gray-500">
+            USB connection is optional. You can proceed without it using cloud fallback.
+          </p>
+        </div>
+
+        <div *ngIf="isConnecting" class="flex items-center text-gray-600">
+          <mat-spinner diameter="20" class="mr-3"></mat-spinner>
+          <span>Connecting to receiver...</span>
+        </div>
+
+        <div *ngIf="isConnected" class="flex items-center text-green-600">
+          <mat-icon class="mr-2">check_circle</mat-icon>
+          <span>Receiver connected</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2: Kit Selection -->
+    <div class="mb-6">
+      <div class="flex items-center mb-3">
+        <div class="flex items-center justify-center w-8 h-8 rounded-full mr-3"
+          [ngClass]="selectedKit && validationStatus !== 'error' ? 'bg-green-500' : 'bg-primary'">
+          <span class="text-white font-bold">2</span>
+        </div>
+        <h3 class="font-medium text-gray-800">Select Kit</h3>
+        <mat-icon *ngIf="selectedKit && validationStatus !== 'error'" class="text-green-500 ml-2">check_circle</mat-icon>
+      </div>
+
+      <div class="ml-11">
+        <!-- Loading State -->
+        <div *ngIf="isLoading" class="flex items-center justify-center py-4">
+          <mat-spinner diameter="30"></mat-spinner>
+        </div>
+
+        <!-- No Kits Available -->
+        <div *ngIf="!isLoading && availableKits.length === 0" class="bg-orange-50 border border-orange-200 rounded-lg p-4">
+          <div class="flex items-start">
+            <mat-icon class="text-orange-500 mr-3">warning</mat-icon>
+            <div>
+              <p class="text-orange-800 font-medium">No Kits Available</p>
+              <p class="text-orange-700 text-sm mt-1">
+                No kits have been linked to this institution. Please contact admin or support.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Kit Selection List -->
+        <div *ngIf="!isLoading && availableKits.length > 0" class="space-y-2 max-h-40 overflow-y-auto">
+          <div *ngFor="let kit of availableKits"
+            class="w-full border rounded-lg p-3 cursor-pointer transition-all duration-200"
+            [ngClass]="{
+              'border-primary bg-primary-50': selectedKit?.docId === kit.docId,
+              'border-gray-200 hover:border-gray-400': selectedKit?.docId !== kit.docId
+            }"
+            (click)="selectKit(kit)">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center">
+                <mat-icon *ngIf="selectedKit?.docId === kit.docId" class="text-primary mr-2">radio_button_checked</mat-icon>
+                <mat-icon *ngIf="selectedKit?.docId !== kit.docId" class="text-gray-400 mr-2">radio_button_unchecked</mat-icon>
+                <div>
+                  <span class="font-medium text-gray-800">{{kit.kitId}}</span>
+                  <div class="flex items-center text-xs text-gray-500 mt-1">
+                    <span class="mr-3">Teacher: {{kit.teacherRemotes?.length || 0}}</span>
+                    <span class="mr-3 font-semibold" [ngClass]="{
+                      'text-green-600': (kit.studentRemotes?.length || 0) >= studentCount && studentCount > 0,
+                      'text-red-600': (kit.studentRemotes?.length || 0) < studentCount && studentCount > 0
+                    }">Student: {{kit.studentRemotes?.length || 0}}</span>
+                    <span>Spare: {{kit.spareRemotes?.length || 0}}</span>
+                  </div>
+                </div>
+              </div>
+              <mat-icon *ngIf="selectedKit?.docId === kit.docId" class="text-primary">check</mat-icon>
+            </div>
+          </div>
+        </div>
+
+        <!-- Validation Message -->
+        <div *ngIf="selectedKit && validationStatus" class="mt-3 p-3 rounded-lg" [ngClass]="{
+          'bg-green-50 border border-green-200': validationStatus === 'valid',
+          'bg-orange-50 border border-orange-200': validationStatus === 'warning',
+          'bg-red-50 border border-red-200': validationStatus === 'error'
+        }">
+          <div class="flex items-start">
+            <mat-icon class="mr-2" [ngClass]="{
+              'text-green-500': validationStatus === 'valid',
+              'text-orange-500': validationStatus === 'warning',
+              'text-red-500': validationStatus === 'error'
+            }">
+              {{validationStatus === 'valid' ? 'check_circle' : validationStatus === 'warning' ? 'warning' : 'error'}}
+            </mat-icon>
+            <div>
+              <p class="text-sm" [ngClass]="{
+                'text-green-800': validationStatus === 'valid',
+                'text-orange-800': validationStatus === 'warning',
+                'text-red-800': validationStatus === 'error'
+              }">{{validationMessage}}</p>
+
+              <!-- Add Student Button (disabled for now) -->
+              <button *ngIf="validationStatus === 'warning' && studentCount < (selectedKit?.studentRemotes?.length || 0)"
+                mat-stroked-button
+                class="mt-2 text-xs"
+                (click)="addExtraStudents()">
+                <mat-icon class="icon-size-4 mr-1">person_add</mat-icon>
+                Add Extra Students
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Info Box -->
+    <!-- <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
+      <div class="flex items-start">
+        <mat-icon class="text-blue-500 mr-2" style="font-size: 18px;">info</mat-icon>
+        <p class="text-blue-800 text-sm">
+          Each student remote will be mapped to a student slot (1, 2, 3...). The teacher remote will have special quiz controls.
+        </p>
+      </div>
+    </div> -->
+  </div>
+
+  <!-- Footer -->
+  <div class="flex flex-col px-6 py-4 bg-gray-50 border-t">
+    <!-- Cloud fallback notice when USB not connected -->
+    <div *ngIf="!isConnected && canProceed()" class="flex items-center gap-2 mb-3 p-2 bg-blue-50 border border-blue-200 rounded-lg">
+      <mat-icon class="text-blue-500">cloud</mat-icon>
+      <span class="text-xs text-blue-700">No USB receiver. Remote events will be received via cloud (Firestore).</span>
+    </div>
+
+    <div class="flex justify-end items-center">
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="confirm()"
+        [disabled]="!canProceed() || saving"
+      >
+        <span class="inline-flex items-center">
+          <mat-spinner *ngIf="saving" diameter="18" class="mr-2"></mat-spinner>
+          <span>{{ saving ? 'Saving...' : 'Save' }}</span>
+        </span>
+      </button>
+    </div>
+  </div>
+</div>

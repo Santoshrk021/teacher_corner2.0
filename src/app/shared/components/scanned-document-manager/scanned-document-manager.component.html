@@ -1,0 +1,331 @@
+<div class="mx-auto p-4 relative">
+    <button mat-dialog-close class="absolute -top-4 -right-2">
+        <mat-icon class="hover:scale-110 transition duration-5000 transform" svgIcon="mat_outline:close">
+        </mat-icon>
+    </button>
+
+    <div class="font-semibold text-center mb-2">Scanned Document Manager</div>
+
+    <div class="items-center">
+        <label for="imageUpload" class="border relative w-80 flex flex-col items-center rounded-lg p-2" [ngClass]="{
+                'border-slate pointer-events-none bg-slate-100 text-slate-400': loadingSpinner,
+                'border-primary cursor-pointer bg-slate-100 text-primary-600': !loadingSpinner
+            }">
+            <span class="flex">
+                <mat-progress-spinner matPrefix mode="indeterminate" diameter="20" class="mr-1"
+                    *ngIf="loadingSpinner"></mat-progress-spinner>
+                <mat-icon *ngIf="!loadingSpinner" class="text-primary mr-1"
+                    svgIcon="heroicons_outline:upload"></mat-icon>
+                Upload Scanned Document(s)
+            </span>
+        </label>
+        <input id="imageUpload" type="file" multiple accept=".jpg, .jpeg, .png, .pdf, .tiff, .webp" class="w-120 hidden"
+            [disabled]="loadingSpinner" (change)="onFileSelected($event)" />
+    </div>
+
+    <div class="mt-4 max-h-[60vh] overflow-y-auto border border-slate-200 rounded-lg">
+        <table class="w-full border-collapse">
+            <ng-container *ngIf="scannedArtefacts?.length; else noScannedArtefacts">
+                <thead class="sticky top-0 z-10">
+                    <tr class="bg-slate-100">
+                        <th
+                            class="text-primary text-left px-3 py-3 border-b border-slate-300 font-semibold whitespace-nowrap">
+                            S.No.
+                        </th>
+                        <th class="text-primary text-left px-3 py-3 border-b border-slate-300 font-semibold">
+                            File Name
+                        </th>
+                        <th
+                            class="text-primary text-left px-3 py-3 border-b border-slate-300 font-semibold whitespace-nowrap">
+                            Extracted Roll Number
+                        </th>
+                        <th class="text-primary text-left px-3 py-3 border-b border-slate-300 font-semibold">
+                            Extracted Student Name
+                        </th>
+                        <th
+                            class="text-primary text-left px-3 py-3 border-b border-slate-300 font-semibold whitespace-nowrap">
+                            Matched Student ID
+                        </th>
+                        <th class="text-primary text-left px-3 py-3 border-b border-slate-300 font-semibold">
+                            Matched Student Name
+                        </th>
+                        <th
+                            class="text-primary text-center px-3 py-3 border-b border-slate-300 font-semibold whitespace-nowrap">
+                            View Raw File
+                        </th>
+                        <th
+                            class="text-primary text-center px-3 py-3 border-b border-slate-300 font-semibold whitespace-nowrap">
+                            View Details
+                        </th>
+                        <th class="text-primary text-center px-3 py-3 border-b border-slate-300 font-semibold">
+                            Operations
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <ng-container *ngFor="let artefact of scannedArtefacts; let i = index">
+                        <tr class="hover:bg-slate-50 transition-colors"
+                            [ngClass]="{'bg-white': i % 2 === 0, 'bg-slate-50/50': i % 2 !== 0}">
+                            <td class="px-3 py-3 border-b border-slate-200 text-center">
+                                {{i + 1}}
+                            </td>
+                            <td class="px-3 py-3 border-b border-slate-200 text-secondary max-w-xs truncate"
+                                [title]="artefact?.fileName">
+                                {{artefact?.fileName}}
+                            </td>
+                            <td class="px-3 py-3 border-b border-slate-200 text-secondary text-center">
+                                <ng-container *ngIf="!isEditing(artefact); else editRollNumber">
+                                    {{(getStudentInfo(artefact)?.rollNumber?.length > 3 ?
+                                    (getStudentInfo(artefact)?.rollNumber | slice:-3) :
+                                    getStudentInfo(artefact)?.rollNumber) ?? '-'}}
+                                </ng-container>
+                                <ng-template #editRollNumber>
+                                    <div class="flex flex-col items-center">
+                                        <div class="flex items-center w-full">
+                                            <input type="text" [(ngModel)]="editingRollNumber"
+                                                (ngModelChange)="validateRollNumber()" [ngClass]="{
+                                                'border-primary': !rollNumberValidationMessage && !rollNumberValid,
+                                                'border-green-500': rollNumberValid,
+                                                'border-red-500': rollNumberValidationMessage
+                                            }"
+                                                class="w-full px-2 py-1 border rounded text-center focus:outline-none focus:ring-2 focus:ring-primary" />
+                                            <mat-progress-spinner *ngIf="rollNumberValidating" mode="indeterminate"
+                                                diameter="16" class="ml-1"></mat-progress-spinner>
+                                            <mat-icon *ngIf="rollNumberValid && !rollNumberValidating"
+                                                class="ml-1 text-green-500 icon-size-4"
+                                                svgIcon="heroicons_outline:check-circle"></mat-icon>
+                                            <mat-icon *ngIf="rollNumberValidationMessage && !rollNumberValidating"
+                                                class="ml-1 text-red-500 icon-size-4"
+                                                svgIcon="heroicons_outline:x-circle"></mat-icon>
+                                        </div>
+                                        <span *ngIf="rollNumberValidationMessage"
+                                            class="text-xs text-red-500 mt-1">{{rollNumberValidationMessage}}</span>
+                                    </div>
+                                </ng-template>
+                            </td>
+                            <td class="px-3 py-3 border-b border-slate-200 text-secondary">
+                                <ng-container *ngIf="!isEditing(artefact); else editStudentName">
+                                    {{getStudentInfo(artefact)?.name || '-'}}
+                                </ng-container>
+                                <ng-template #editStudentName>
+                                    <input type="text" [(ngModel)]="editingStudentName"
+                                        [disabled]="!rollNumberValid || rollNumberValidating"
+                                        [matTooltip]="!rollNumberValid ? 'Roll number not available' : ''" [ngClass]="{
+                                        'bg-slate-100 text-slate-400 cursor-not-allowed': !rollNumberValid || rollNumberValidating,
+                                        'border-primary': rollNumberValid
+                                    }"
+                                        class="w-full px-2 py-1 border rounded focus:outline-none focus:ring-2 focus:ring-primary" />
+                                </ng-template>
+                            </td>
+                            <td class="px-3 py-3 border-b border-slate-200 text-secondary text-center">
+                                {{artefact?.rollNumber ? (artefact.rollNumber | slice:-3) : '-'}}
+                            </td>
+                            <td class="px-3 py-3 border-b border-slate-200 text-secondary">
+                                {{artefact?.matchedStudentName || '-'}}
+                            </td>
+                            <td class="px-3 py-3 border-b border-slate-200 text-center">
+                                <a target="_blank"
+                                    class="inline-block px-3 py-1 border border-slate-300 rounded hover:bg-primary hover:text-white hover:border-primary transition-colors"
+                                    [href]="artefact?.storagePath | getDownloadURL">
+                                    View
+                                </a>
+                            </td>
+                            <td class="px-3 py-3 border-b border-slate-200 text-center">
+                                <button class="min-w-10 min-h-7 h-7 px-2 leading-6" mat-stroked-button
+                                    (click)="toggleDetails(artefact)"
+                                    [ngClass]="{'bg-slate-200': isExpanded(artefact)}">
+                                    <mat-icon class="icon-size-5"
+                                        [svgIcon]="isExpanded(artefact) ? 'heroicons_solid:chevron-up' : 'heroicons_solid:chevron-down'"
+                                        matTooltip="Details">
+                                    </mat-icon>
+                                </button>
+                            </td>
+                            <td class="px-3 py-3 border-b border-slate-200 text-center">
+                                <ng-container *ngIf="!isEditing(artefact); else editActions">
+                                    <button class="min-w-10 min-h-7 h-7 px-3 leading-6" mat-stroked-button
+                                        (click)="matchToStudent(artefact)">
+                                        Match
+                                    </button>
+                                </ng-container>
+                                <ng-template #editActions>
+                                    <div class="flex items-center justify-center gap-2">
+                                        <button mat-icon-button class="text-red-500 hover:bg-red-50"
+                                            (click)="cancelEdit()" matTooltip="Cancel">
+                                            <mat-icon svgIcon="heroicons_outline:x"></mat-icon>
+                                        </button>
+                                        <button mat-icon-button [disabled]="!rollNumberValid || rollNumberValidating"
+                                            [ngClass]="{
+                                            'text-green-500 hover:bg-green-50': rollNumberValid && !rollNumberValidating,
+                                            'text-slate-300 cursor-not-allowed': !rollNumberValid || rollNumberValidating
+                                        }" (click)="confirmEdit(artefact)"
+                                            [matTooltip]="!rollNumberValid ? 'Please enter a valid roll number first' : 'Confirm'">
+                                            <mat-icon svgIcon="heroicons_outline:check"></mat-icon>
+                                        </button>
+                                    </div>
+                                </ng-template>
+                            </td>
+                        </tr>
+                        <tr *ngIf="isExpanded(artefact)">
+                            <td colspan="9" class="p-4 bg-slate-50 border-b border-slate-200">
+                                <div *ngIf="getExtractedData(artefact); else noExtractedData"
+                                    class="max-h-96 overflow-y-auto">
+                                    <!-- Confidence Score -->
+                                    <div *ngIf="getConfidence(artefact)"
+                                        class="mb-4 p-3 bg-blue-50 rounded border border-blue-200">
+                                        <div class="flex items-center">
+                                            <span class="font-semibold text-blue-700">
+                                                Confidence Score:
+                                            </span>
+                                            <span class="ml-2 text-blue-900 font-bold">
+                                                {{getConfidence(artefact)}}%
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Student Info Section -->
+                                    <div *ngIf="getStudentInfo(artefact)" class="mb-4 p-3 bg-white rounded border">
+                                        <h4 class="font-semibold text-primary mb-2">
+                                            Student Information
+                                        </h4>
+                                        <div class="grid grid-cols-2 gap-2">
+                                            <div>
+                                                <span class="font-medium">
+                                                    Name:
+                                                </span>
+                                                {{getStudentInfo(artefact)?.name}}
+                                            </div>
+                                            <div>
+                                                <span class="font-medium">
+                                                    Class:
+                                                </span>
+                                                {{getStudentInfo(artefact)?.class}}
+                                            </div>
+                                            <div>
+                                                <span class="font-medium">
+                                                    Roll Number:
+                                                </span>
+                                                {{
+                                                getStudentInfo(artefact)?.rollNumber ?
+                                                (getStudentInfo(artefact).rollNumber | slice:-3) :
+                                                'N/A'
+                                                }}
+                                            </div>
+                                            <div>
+                                                <span class="font-medium">
+                                                    Row Number:
+                                                </span>
+                                                {{getStudentInfo(artefact)?.rowNumber || 'N/A'}}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Raw Text Section -->
+                                    <div class="mb-4 p-3 bg-white rounded border">
+                                        <h4 class="font-semibold text-primary mb-2">Raw Extracted Text</h4>
+                                        <div class="text-sm text-gray-700 whitespace-pre-wrap">
+                                            {{getRawText(artefact)}}
+                                        </div>
+                                    </div>
+
+                                    <!-- Table Data Section -->
+                                    <div *ngIf="getTableData(artefact).length > 0"
+                                        class="mb-4 p-3 bg-white rounded border">
+                                        <h4 class="font-semibold text-primary mb-2">Extracted Table Data</h4>
+                                        <table class="w-full border-collapse">
+                                            <thead>
+                                                <tr class="bg-slate-100">
+                                                    <th class="border p-2 text-left">Row Index</th>
+                                                    <th class="border p-2 text-left">Raw Data</th>
+                                                    <th class="border p-2 text-left">Column</th>
+                                                    <th class="border p-2 text-left">Value</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr *ngFor="let dataRow of getTableData(artefact)"
+                                                    class="hover:bg-slate-50">
+                                                    <td class="border p-2">{{dataRow.rowIndex}}</td>
+                                                    <td class="border p-2">{{dataRow.raw || '-'}}</td>
+                                                    <td class="border p-2">{{dataRow.columnIndex || '-'}}</td>
+                                                    <td class="border p-2">{{dataRow.value || '-'}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <!-- Temperatures Section -->
+                                    <div *ngIf="getTemperatures(artefact).length > 0"
+                                        class="mb-4 p-3 bg-white rounded border">
+                                        <h4 class="font-semibold text-primary mb-2">Temperature Data</h4>
+                                        <table class="w-full border-collapse">
+                                            <thead>
+                                                <tr class="bg-slate-100">
+                                                    <th class="border p-2 text-left">Index</th>
+                                                    <th class="border p-2 text-left">Temperature</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr *ngFor="let temp of getTemperatures(artefact)"
+                                                    class="hover:bg-slate-50">
+                                                    <td class="border p-2">{{temp.index}}</td>
+                                                    <td class="border p-2">{{temp.value}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <!-- Token Usage Section -->
+                                    <div *ngIf="getTokenUsage(artefact)" class="p-3 bg-white rounded border">
+                                        <h4 class="font-semibold text-primary mb-2">
+                                            Processing Information
+                                        </h4>
+                                        <div class="grid grid-cols-3 gap-2 text-sm">
+                                            <div>
+                                                <span class="font-medium">Input Tokens:</span>
+                                                {{getTokenUsage(artefact).inputTokens}}
+                                            </div>
+                                            <div>
+                                                <span class="font-medium">Output Tokens:</span>
+                                                {{getTokenUsage(artefact).outputTokens}}
+                                            </div>
+                                            <div>
+                                                <span class="font-medium">Total Tokens:</span>
+                                                {{getTokenUsage(artefact).totalTokens}}
+                                            </div>
+                                        </div>
+                                        <div class="mt-2 text-sm">
+                                            <span class="font-medium">
+                                                File Name:
+                                            </span>
+                                            {{getFileName(artefact)}}
+                                        </div>
+                                        <div class="mt-1 text-sm">
+                                            <span class="font-medium">Processed At:</span>
+                                            {{getProcessedAt(artefact)}}
+                                        </div>
+                                    </div>
+                                </div>
+                                <ng-template #noExtractedData>
+                                    <div class="text-center text-gray-500 p-4">
+                                        No extracted data available yet. The text extraction may still be processing.
+                                    </div>
+                                </ng-template>
+                            </td>
+                        </tr>
+                    </ng-container>
+                </tbody>
+            </ng-container>
+            <ng-template #noScannedArtefacts>
+                <tbody>
+                    <tr>
+                        <td colspan="8" class="p-8 text-center">
+                            <div class="font-semibold text-primary">
+                                No scanned artefacts have been uploaded. Kindly click the button above to upload the
+                                artefacts
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </ng-template>
+        </table>
+    </div>
+</div>

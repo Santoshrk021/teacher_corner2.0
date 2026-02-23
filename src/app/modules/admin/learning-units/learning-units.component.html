@@ -1,0 +1,7 @@
+<div class="w-full" *ngIf="allLearningUnits">
+  <app-learning-unit-list [sLang]="selectedLang" [sVer]="selectedVersion" [iChange]="inputChanged"
+    (changeLang1)="onlanguageChange($event)" (changeVersion1)="onversionChange($event)"
+    (searchLearningUnitsOutput1)="onSearchChanged($event)" [allLearningunits]="allLearningUnits"
+    [learningUnitSubject]="luSubject">
+  </app-learning-unit-list>
+</div>

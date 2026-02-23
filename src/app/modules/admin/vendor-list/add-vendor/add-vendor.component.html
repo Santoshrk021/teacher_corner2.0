@@ -1,0 +1,258 @@
+<div class="m-auto  overflow-y-scroll h-[60vh]  sm:h-[90vh] sm:w-[40vw] ">
+
+    <form *ngIf="infoForm && !loader ;else showloading" [formGroup]="infoForm" (ngSubmit)="onSubmit(infoForm)"
+        class="md:flex md:justify-center mt-4">
+        <div class=" sm:p-4    border-gray-100 bg-white relative">
+            <button mat-dialog-close class="m-4 sm:m-6 sm:mx-7 absolute -top-4 -right-4 z-40" (click)="close()">
+                <mat-icon class=" hover:scale-110 transition duration-5000 transform" svgIcon="mat_outline:close">
+                </mat-icon>
+            </button>
+            <mat-form-field class="w-full text-accent-600">
+                <mat-label class="text-[#282B66]">Country Code of Point of Contact</mat-label>
+                <input id="pointOfContactCountryCode" matInput formControlName="pointOfContactCountryCode"
+                    type="text" placeholder="Enter Country code of point of contact">
+                <!-- <mat-error *ngIf="infoForm?.get('pointOfContactCountryCode')?.hasError('required')">
+                  Country code is required.
+                </mat-error> -->
+                <!-- <mat-error *ngIf="infoForm?.get('pointOfContactCountryCode')?.hasError('pattern')">
+                  Please enter a valid country code (e.g., +1, +91).
+                </mat-error> -->
+            </mat-form-field>
+
+            <mat-form-field class="w-full text-accent-600">
+                <mat-label class="text-[#282B66]">Vendor Name</mat-label>
+                <input id="Organisation Name" matInput formControlName="vendorName" type="text"
+                    placeholder="Enter Vendor Name">
+                <mat-error *ngIf="infoForm?.get('vendorName')?.hasError('required')">
+                    Organisation Name Required.
+                </mat-error>
+            </mat-form-field>
+
+
+
+
+            <mat-form-field class="w-full text-accent-600">
+                <mat-label class="text-[#282B66]">PIN Code</mat-label>
+                <input id="Pincode" matInput formControlName="Pincode" type="text" placeholder="Enter Pincode">
+                <mat-error *ngIf="infoForm?.get('Pincode')?.hasError('required')">
+                    Pin Required.
+                </mat-error>
+            </mat-form-field>
+            <mat-form-field class="w-full text-accent-600">
+                <mat-label class="text-[#282B66]">Contact First Name</mat-label>
+                <input id="pointOfContactFirstName" matInput formControlName="pointOfContactFirstName" type="text"
+                    placeholder="Enter first name of point of contact">
+                <mat-error *ngIf="infoForm?.get('pointOfContactFirstName')?.hasError('required')">
+                    pointOfContactFirstName Required.
+                </mat-error>
+                <!-- <mat-error *ngIf="infoForm.get('pointOfContactFirstName')?.hasError('pattern')">
+                    No Numbers or special characters allowed.
+                </mat-error> -->
+            </mat-form-field>
+
+            <mat-form-field class="w-full text-accent-600">
+                <mat-label class="text-[#282B66]">Contact Last Name</mat-label>
+                <input id="pointOfContactSurname" matInput formControlName="pointOfContactSurname" type="text"
+                    placeholder="Enter Contact Last Name">
+                <mat-error *ngIf="infoForm?.get('pointOfContactSurname')?.hasError('required')">
+                    Contact Last Name Required.
+                </mat-error>
+                <!-- <mat-error *ngIf="infoForm.get('pointOfContactSurname')?.hasError('pattern')">
+                    No Numbers or special characters allowed.
+                </mat-error> -->
+            </mat-form-field>
+
+            <mat-form-field class="w-full text-accent-600 ">
+                <mat-label class="text-[#282B66]">Choose Country </mat-label>
+                <mat-select formControlName="Country" placeholder="Select Visit Country" class="px-1.5">
+                    <mat-option class="bg-white" value="" disabled selected>Select</mat-option>
+                    <mat-option *ngFor="let Country of countries" [value]="Country" [matTooltip]="Country"
+                        class="bg-white">
+                        <span class="text-sm">{{Country}}</span>
+                    </mat-option>
+                </mat-select>
+                <mat-error *ngIf="infoForm?.get('Country')?.invalid && infoForm?.get('Country')?.touched">
+                    Country of Visit is required
+                </mat-error>
+            </mat-form-field>
+
+            <!-- <mat-form-field class="w-full text-accent-600">
+                <mat-label class="text-[#282B66]">Point Of Contact FullName</mat-label>
+                <input id="pointOfContactFullName" matInput [formControlName]="'pointOfContactFullName'" type="text"
+                    placeholder="Enter FullName of point of contact"
+                    (focusout)="capitalizeText('pointOfContactFullName')">
+                <mat-error *ngIf="infoForm?.get('pointOfContactFullName')?.hasError('required')">
+                    pointOfContactFullName Required.
+                </mat-error>
+                <mat-error *ngIf="infoForm?.get('pointOfContactFullName')?.hasError('pattern')">
+                    No Numbers or special characters allowed.
+                </mat-error>
+            </mat-form-field> -->
+
+
+
+            <mat-form-field class="w-full text-accent-600">
+                <mat-label class="text-[#282B66]">Point of Contact Phone Number</mat-label>
+                <span class="mr-1">+91 </span>
+                <input id="pointOfContactPhoneNumber" matInput formControlName="pointOfContactPhoneNumber"
+                    type="text" placeholder="Enter Point of Contact Phone Number" [maxLength]="10" pattern="^[0-9]{10}">
+                <mat-error *ngIf="infoForm?.get('pointOfContactPhoneNumber')?.hasError('required')">
+                    Point of Contact Phone Number Required.
+                </mat-error>
+                <mat-error *ngIf="infoForm?.get('pointOfContactPhoneNumber')?.hasError('pattern')">
+                    No Numbers or special characters allowed.
+                </mat-error>
+            </mat-form-field>
+
+
+            <!-- <mat-form-field class="w-full text-accent-600">
+                <mat-label class="text-[#282B66]">Vendor Name</mat-label>
+                <input id="vendorName" matInput [formControlName]="'vendorName'" type="text"
+                    placeholder="Enter vendor Name">
+                <mat-error *ngIf="infoForm?.get('vendorName')?.hasError('required')">
+                    vendorName Required.
+                </mat-error>
+                <mat-error *ngIf="infoForm?.get('vendorName')?.hasError('pattern')">
+                    No Numbers or special characters allowed.
+                </mat-error>
+            </mat-form-field> -->
+
+            <mat-form-field class="w-full text-accent-600">
+                <mat-label class="text-[#282B66]">Phone number of Organisation </mat-label>
+                <span class="mr-1">+91 </span>
+                <input id="vendorNumber" matInput formControlName="vendorNumber" type="text"
+                    placeholder="Enter Phone number of Organisation" [maxLength]="10" pattern="^[0-9]{10}">
+                <mat-error *ngIf="infoForm?.get('vendorNumber')?.hasError('required')">
+                    vendorNumber Required.
+                </mat-error>
+                <mat-error *ngIf="infoForm?.get('vendorNumber')?.hasError('pattern')">
+                    No Numbers or special characters allowed.
+                </mat-error>
+            </mat-form-field>
+
+            <!-- <mat-form-field class="w-full text-accent-600">
+                <mat-label class="text-[#282B66]">Address of vendor Organisation </mat-label>
+                <input id="vendorName" matInput [formControlName]="'vendorAddress'" type="text"
+                    placeholder="Enter Address of vendor Organisation" (focusout)="capitalizeText('vendorAddress')">
+                <mat-error *ngIf="infoForm?.get('vendorAddress')?.hasError('required')">
+                    vendor Address Required.
+                </mat-error>
+                <mat-error *ngIf="infoForm?.get('vendorAddress')?.hasError('pattern')">
+                    No Numbers or special characters allowed.
+                </mat-error>
+            </mat-form-field> -->
+
+            <div formGroupName="vendorAddress">
+                <!-- <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                    <mat-label class="text-[#282B66]">School Pincode</mat-label>
+                    <input id="pincode" matInput formControlName="pincode" type="text"
+                        placeholder="Enter school pincode" >
+                    <mat-error *ngIf="infoForm?.get('vendorAddress.pincode').invalid ">
+                        School pincode is required
+                    </mat-error>
+                </mat-form-field> -->
+
+                <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                    <mat-label class="text-[#282B66]">Route</mat-label>
+                    <input id="city" matInput formControlName="route" type="text" placeholder="Enter Route">
+                    <mat-error *ngIf="infoForm?.get('vendorAddress.route')?.hasError('required')">
+                        Route name is required
+                    </mat-error>
+                </mat-form-field>
+
+                <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                    <mat-label class="text-[#282B66]">Street Name</mat-label>
+                    <input id="street" matInput formControlName="street" type="text" placeholder="Enter street name">
+                    <mat-error *ngIf="infoForm?.get('vendorAddress.street')?.hasError('required')">
+                        Street name is required
+                    </mat-error>
+                </mat-form-field>
+
+                <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                    <mat-label class="text-[#282B66]">Locality Name</mat-label>
+                    <input id="village" matInput formControlName="village" type="text" placeholder="Enter locality name"
+                        [matAutocomplete]="locality">
+                    <mat-autocomplete autoActiveFirstOption #locality="matAutocomplete">
+                        <mat-option *ngFor="let option of options" [value]="option">
+                            {{option}}
+                        </mat-option>
+                    </mat-autocomplete>
+                    <mat-error *ngIf="infoForm?.get('vendorAddress.village')?.hasError('required')">
+                        Locality name is required
+                    </mat-error>
+                </mat-form-field>
+                <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                    <mat-label class="text-[#282B66]">Sublocality(Landmark)</mat-label>
+                    <input id="city" matInput formControlName="sublocality" type="text"
+                        placeholder="Enter landmark name">
+                    <mat-error *ngIf="infoForm?.get('vendorAddress.sublocality')?.hasError('required')">
+                        Sublocality name is required
+                    </mat-error>
+                </mat-form-field>
+                <!-- City Name-->
+                <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                    <mat-label class="text-[#282B66]">City Name</mat-label>
+                    <input id="city" matInput formControlName="city" type="text" placeholder="Enter city name">
+                    <mat-error *ngIf="infoForm?.get('vendorAddress.city')?.hasError('required')">
+                        City name is required
+                    </mat-error>
+                </mat-form-field>
+
+                <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                    <mat-label class="text-[#282B66]">Sub District Name</mat-label>
+                    <input id="district" matInput formControlName="subDistrict" type="text"
+                        placeholder="Enter sub district name">
+                    <mat-error *ngIf="infoForm?.get('vendorAddress.subDistrict')?.hasError('required')">
+                        Sub District name is required
+                    </mat-error>
+                </mat-form-field>
+
+                <!-- District Name-->
+                <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                    <mat-label class="text-[#282B66]">District Name</mat-label>
+                    <input id="district" matInput formControlName="district" type="text"
+                        placeholder="Enter district name">
+                    <mat-error *ngIf="infoForm?.get('vendorAddress.district')?.hasError('required')">
+                        District name is required
+                    </mat-error>
+                </mat-form-field>
+
+                <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                    <mat-label class="text-[#282B66]">State Name</mat-label>
+                    <input id="state" matInput formControlName="state" type="text" placeholder="Enter state name">
+                    <mat-error *ngIf="infoForm?.get('vendorAddress.state')?.hasError('required')">
+                        State name is required
+                    </mat-error>
+                </mat-form-field>
+
+                
+            </div>
+            <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                <mat-label class="text-[#282B66]"> vendor Gps Coordinates</mat-label>
+                <input id="state" matInput formControlName="vendorGpsCoordinates" type="text" placeholder="Enter Vendor GPS cooridinates">
+                <mat-error *ngIf="infoForm?.get('vendorGpsCoordinates')?.hasError('required')">
+                    Vendor Gps Coordinates is required
+                </mat-error>
+            </mat-form-field>
+
+
+            <div class="flex flex-col">
+                <!-- continue button -->
+                <div>
+                    <button type="submit" color="brand" class="fuse-mat-stroked-button-large w-full mt-2 cursor-pointer"
+                        [ngClass]="{'custom-button': infoForm.valid,
+                            'disabled-button': !infoForm.valid}" mat-flat-button [disabled]=" !infoForm.valid"
+                       >
+                        Submit
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </form>
+    <ng-template #showloading>
+        <div class="flex justify-center items-center h-[60vh]">
+            <mat-spinner color="accent" diameter="50"></mat-spinner>
+        </div>
+    </ng-template>
+</div>

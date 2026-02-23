@@ -1,0 +1,123 @@
+<div class="py-6 h-screen w-screen overflow-hidden">
+  <div class="pl-4 pr-4 h-10 flex justify-between">
+    <div class="font-bold text-lg text-accent-600">
+      {{ contestDetails?.contestTitle }}
+    </div>
+
+    <div *ngIf="userAccessLevel > 9" class="text-md text-accent-600">
+      Institutions Registered Since Contest Start Date:
+      {{ institutionsCreatedPostContestStart }}
+    </div>
+
+    <div *ngIf="userAccessLevel > 9" class="text-md text-accent-600">
+      Registrations Received: {{ numberOfNominations }}
+    </div>
+
+    <div class="-mt-4">
+      <div *ngIf="userAccessLevel > 9" class="w-[300px] h-[30px]">
+        <mat-form-field appearance="fill" class="w-full">
+          <input matInput [value]="searchTerm" (input)="onSearch($event.target.value)"
+            placeholder="Search by Institution" />
+          <mat-icon matPrefix svgIcon="heroicons_solid:search"></mat-icon>
+        </mat-form-field>
+      </div>
+    </div>
+
+
+    <div class="-mt-1">
+      <button (click)="drawerClose()">
+        <mat-icon class="hover:scale-110 transition duration-5000 transform" svgIcon="mat_outline:close"></mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- HEADER -->
+  <div
+    class="w-full py-4 px-1 shadow text-md font-semibold text-secondary bg-gray-50 dark:bg-black dark:bg-opacity-5 grid items-center header-grid"
+    [style.gridTemplateColumns]="
+      (userAccessLevel > 9 ? 'repeat(4, minmax(7rem, 1.2fr))' : 'repeat(3, minmax(7rem, 1.2fr))')
+      + (nominatedClasses?.length ? ' repeat(' + nominatedClasses.length + ', minmax(0, 1fr))' : '')
+    " [style.gridTemplateRows]="'auto auto'" style="gap: .75rem" matSort matSortDisableClear>
+    <!-- group title stays the same -->
+    <div *ngIf="nominatedClasses?.length" class="text-center font-bold"
+      [style.gridColumn]="(userAccessLevel > 9 ? 5 : 4) + ' / -1'" [style.gridRow]="'1'">
+      Classwise Registrations
+    </div>
+
+    <!-- fixed headers on row 2 -->
+    <div class="text-center -mt-6 font-bold" [style.gridRow]="'2'">Institution Name</div>
+    <div *ngIf="userAccessLevel > 9" class="text-center -mt-6 font-bold" [style.gridRow]="'2'">Institution ID</div>
+    <div class="text-center -mt-6 font-bold" [matTooltip]="'Representative Name'" [style.gridRow]="'2'">Representative
+      Name</div>
+    <div class="text-center -mt-6 font-bold" [matTooltip]="'Representative Phone'" [style.gridRow]="'2'">Representative
+      Phone</div>
+
+    <!-- per-class headers on row 2 -->
+    <!-- <div *ngFor="let classKey of nominatedClasses" class="text-center font-bold" [style.gridRow]="'2'">
+      Class {{ classKey }}
+    </div> -->
+
+
+    <div *ngFor="let classKey of nominatedClasses" class="text-center font-bold" [style.gridRow]="'2'"
+      [matTooltip]="isNumber(classKey) ? 'Class ' + classKey : classKey" matTooltipPosition="above">
+      <ng-container *ngIf="isNumber(classKey); else nonNumericClass">
+        Class {{ classKey }}
+      </ng-container>
+      <ng-template #nonNumericClass>
+        {{ classKey }}
+      </ng-template>
+    </div>
+  </div>
+
+  <!-- BODY -->
+  <ng-container *ngIf="instituteNominatedForContest?.length">
+    <div class="h-[calc(100vh_-_180px)] overflow-y-auto overflow-x-hidden">
+      <div *ngFor="let institute of instituteNominatedForContest"
+        class="inventory-grid grid items-center text-secondary py-4 px-1 border-b border-gray-300"
+        [style.gridTemplateColumns]="
+          (userAccessLevel > 9 ? 'repeat(4, minmax(7rem, 1.2fr))' : 'repeat(3, minmax(7rem, 1.2fr))')
+          + (nominatedClasses?.length ? ' repeat(' + nominatedClasses.length + ', minmax(0, 1fr))' : '')
+        " style="gap: .75rem">
+        <div class="pl-2 truncate text-center" [matTooltip]="institute?.institutionName || 'Not Available'"
+          [ngClass]="{ 'text-red-500': !institute?.institutionName }">
+          {{ institute?.institutionName || 'Not Available' }}
+        </div>
+
+        <div *ngIf="userAccessLevel > 9" [matTooltip]="institute?.docId || 'Not Available'" class="truncate text-center"
+          [ngClass]="{ 'text-red-500': !institute?.docId }">
+          {{ institute?.docId || 'Not Available' }}
+        </div>
+
+        <div class="text-center truncate" [ngClass]="{ 'text-red-500': !institute?.representativeFirstName }">
+          {{
+          institute?.representativeFirstName
+          ? institute?.representativeFirstName + ' ' + institute?.representativeLastName
+          : 'Not Available'
+          }}
+        </div>
+
+        <div class="text-center truncate" [matTooltip]="
+            institute?.representativeCountryCode && institute?.representativePhoneNumber
+              ? institute?.representativeCountryCode + institute?.representativePhoneNumber
+              : 'Not Available'
+          " matTooltipPosition="above" [ngClass]="{ 'text-red-500': !institute?.representativePhoneNumber }">
+          {{
+          institute?.representativeCountryCode && institute?.representativePhoneNumber
+          ? institute?.representativeCountryCode + institute?.representativePhoneNumber
+          : 'Not Available'
+          }}
+        </div>
+
+        <div *ngFor="let classKey of nominatedClasses" class="text-center truncate">
+          {{ institute?.nominationsByClasses?.[classKey] || 0 }}
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <div>
+    <p class="px-2 pt-3 text-secondary">
+      {{ loadingMessage }}
+    </p>
+  </div>
+</div>

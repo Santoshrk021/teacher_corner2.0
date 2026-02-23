@@ -1,0 +1,95 @@
+<div class="bg-gray-100 rounded-xl relative">
+    <!-- Close Button -->
+    <button
+        mat-dialog-close
+        (click)="closeDialog()"
+        class="absolute top-2 -mt-6 -mr-8 right-2 z-50 p-1"
+    >
+        <mat-icon
+            class="hover:scale-110 transition duration-1000 transform"
+            svgIcon="mat_outline:close"
+        ></mat-icon>
+    </button>
+
+    <!-- Main Content Section (After loading) -->
+    <div class="p-6 w-full max-w-sm mx-auto">
+        <h2 class="text-2xl font-semibold text-center mb-4">
+            Generate Certificate
+        </h2>
+
+        <!-- Select Student Dropdown -->
+        <mat-form-field class="w-full text-accent-600">
+            <mat-label class="text-[#282B66]">Select Student Name</mat-label>
+            <mat-select
+                [(ngModel)]="selectedStudents"
+                multiple
+                placeholder="Select Student Name"
+                (opened)="resetLoader()"
+            >
+                <!-- Select All Option -->
+                <mat-option
+                    *ngIf="studentNames.length > 0"
+                    (click)="toggleSelectAll($event)"
+                >
+                    Select All
+                    <span class="loader ml-16" *ngIf="isLoadingSelectAll">
+                    </span>
+                </mat-option>
+
+                <!-- Student List -->
+                <mat-option
+                    *ngFor="let student of studentNames; trackBy: trackByFn"
+                    [value]="student"
+                    [disabled]="student?.isCertificateGenerated"
+                >
+                    {{ student?.fullName }}
+                    <span
+                        *ngIf="student?.isCertificateGenerated"
+                        class="text-red-500"
+                    >
+                        (Certificate Generated)
+                    </span>
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+
+        <!-- manual toggle to whether to display school name in certificate in future may require
+        <mat-form-field class="w-full text-accent-600 -mt-4" floatLabel="always" appearance="none">
+            <mat-slide-toggle
+              class="w-full"
+              [color]="'primary'"
+              [(ngModel)]="displaySchoolNameInCertificate"
+            >
+              Display School Name in Certificate
+            </mat-slide-toggle>
+            <input matInput hidden />
+          </mat-form-field> -->
+
+        <!-- Generate Certificate Button -->
+        <div class="text-center">
+            <button
+                (click)="generatePdf()"
+                class="bg-primary disabled:bg-primary-100 text-white px-4 py-2 rounded-2xl"
+                [disabled]="isGenerating"
+            >
+                <span *ngIf="!isGenerating">Generate Certificate</span>
+                <mat-progress-spinner
+                    *ngIf="isGenerating"
+                    [diameter]="24"
+                    [mode]="'indeterminate'"
+                    color="accent"
+                ></mat-progress-spinner>
+            </button>
+        </div>
+
+        <!-- View Certificate Button -->
+        <div class="text-center mt-4" *ngIf="firebasePdfUrl">
+            <button
+                (click)="openPdfInNewTab()"
+                class="bg-green-600 text-white px-4 py-2 rounded-2xl hover:bg-green-700 transition duration-200"
+            >
+                View Certificate
+            </button>
+        </div>
+    </div>
+</div>

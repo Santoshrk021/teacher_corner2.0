@@ -1,0 +1,75 @@
+<div class="sm:px-6  grid grid-cols-2 overflow-y-auto">
+    <div class="sm:border-r border-primary-300 sm:pr-3">
+        <div class="-mt-1.5  mb-12  w-full" [title]="trashUINotEditable?matTooltipMsg:''">
+            <mat-label class="text-accent-600 text-sm font-medium ">Associated Learning
+                Units</mat-label>
+            <div class="flex-auto border-b border-primary-500 mt-2 pb-1">
+                <mat-chip-list #chipList01 [disabled]="trashUINotEditable==true?true:false">
+                    <mat-chip [removable]="true" [selectable]="true" class="border bg-blue-100 text-blue-800"
+                        *ngFor="let item of associatedLu">
+                        {{item.learningUnitName}} ({{item.version}})
+                        <mat-icon [ngClass]="trashUINotEditable==true?'hidden':''" class="icon-size-5 text-red-700"
+                            matChipRemove [svgIcon]="'heroicons_solid:x-circle'"
+                            (click)="remove(item,'associatedtags')"></mat-icon>
+                    </mat-chip>
+                    <mat-icon [ngClass]="trashUINotEditable==true?'hidden':''"
+                        (click)="learingUnitDialog('associatedtags', associatedLu)"
+                        matTooltip="Click To Select Learning Units "
+                        class="icon-size-8 text-primary-600 cursor-pointer plusIcon active:text-primary-500"
+                        [svgIcon]="'heroicons_solid:plus-circle'"></mat-icon> </mat-chip-list>
+            </div>
+        </div>
+        <div class="">
+
+            <div class="-mt-1.5 mb-12 w-full" [title]="trashUINotEditable?matTooltipMsg:''">
+                <mat-label class="text-accent-600 text-sm font-medium  ">Prerequisite Learning
+                    Units</mat-label>
+                <div class="flex-auto border-b border-primary-500 mt-2 pb-1 ">
+                    <mat-chip-list #chipList01 [disabled]="trashUINotEditable==true?true:false">
+                        <mat-chip [removable]="true" [selectable]="true" class="border  bg-blue-100 text-blue-800"
+                            *ngFor="let item of prerequisiteLu">
+                            {{item.learningUnitName}}({{item.version}})
+                            <mat-icon [ngClass]="trashUINotEditable==true?'hidden':''" class="icon-size-5 text-red-700"
+                                matChipRemove [svgIcon]="'heroicons_solid:x-circle'"
+                                (click)="remove(item,'prerequisitetag')"></mat-icon>
+                        </mat-chip>
+                        <mat-icon [ngClass]="trashUINotEditable==true?'hidden':''"
+                            (click)="learingUnitDialog('prerequisitetag',prerequisiteLu)"
+                            matTooltip="Click To Select Learning Units "
+                            class="icon-size-8 text-primary-600 cursor-pointer plusIcon active:text-primary-500"
+                            [svgIcon]="'heroicons_solid:plus-circle'"></mat-icon>
+                        <!-- <input [placeholder]="'Type Learning Unit Name...'" [matChipInputFor]="chipList01"> -->
+                    </mat-chip-list>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="-mt-1.5 mb-1 w-full ml-3" [title]="trashUINotEditable?matTooltipMsg:''">
+        <mat-label class="text-accent-600 text-sm font-medium ">Similar Learning
+            Units</mat-label>
+
+        <div class="flex-auto border-b border-primary-500 mt-2 pb-1">
+            <mat-chip-list #chipList01 [disabled]="trashUINotEditable==true?true:false">
+                <mat-chip [removable]="true" [selectable]="true" class="border  bg-blue-100 text-blue-800"
+                    *ngFor="let item of similarLu">
+                    {{item.learningUnitName}}({{item.version}})
+                    <mat-icon [ngClass]="trashUINotEditable==true?'hidden':''" class="icon-size-5 text-red-700"
+                        matChipRemove [svgIcon]="'heroicons_solid:x-circle'"
+                        (click)="remove(item,'similartags')"></mat-icon>
+                </mat-chip>
+                <mat-icon [ngClass]="trashUINotEditable==true?'hidden':''"
+                    (click)="learingUnitDialog('similartags',similarLu)" matTooltip="Click To Select Learning Units "
+                    class="icon-size-8 text-primary-600 cursor-pointer plusIcon active:text-primary-500"
+                    [svgIcon]="'heroicons_solid:plus-circle'"></mat-icon>
+                <!-- <input [placeholder]="'Type Learning Unit Name...'" [matChipInputFor]="chipList01"> -->
+            </mat-chip-list>
+        </div>
+    </div>
+
+</div>
+<div [ngClass]="trashUINotEditable==true?'hidden':''" class="sm:px-6 w-full text-center mt-[40px] -mb-5">
+    <button type="submit" mat-raised-button color="primary" (click)="saveDB()" class=" px-2 leading-6" [disabled]="!enableForm">
+        Save
+    </button>
+</div>

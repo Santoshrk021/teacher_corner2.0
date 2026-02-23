@@ -1,0 +1,79 @@
+<div class="w-[60vw] h-[81vh] relative ">
+    <button mat-dialog-close class=" absolute -top-4 -right-4 z-40">
+        <mat-icon class=" hover:scale-110 transition duration-1000 transform" svgIcon="mat_outline:close">
+        </mat-icon>
+    </button>
+
+    <mat-stepper [linear]="true" #stepper class="bg-transparent h-full w-full">
+        <mat-step>
+            <ng-template matStepLabel>
+                <span (click)="$event.stopPropagation()" (mousedown)="$event.stopPropagation()"
+                    [matTooltip]="'Create Contest'">
+                    Create Contest
+                </span>
+            </ng-template>
+            <app-basic-info-contest [contestInfo]="this.data?.contestInfo" [isUpdate]="isupdate"
+                (contestBasicInfo)="catchBasicInfoEvent($event)"
+                (isClassorStemClubDependentEvent)="handleClassorStemClubDependent($event)">
+            </app-basic-info-contest>
+        </mat-step>
+
+        <mat-step>
+            <ng-template matStepLabel>
+                <span (click)="$event.stopPropagation()" (mousedown)="$event.stopPropagation()"
+                    [matTooltip]="'Create Category'">
+                    Create Category
+                </span>
+            </ng-template>
+            <ng-template matStepContent>
+                <app-categories-contest
+                  
+                  [contestInfo]="data?.contestInfo"
+                  [contestDocInfo]="contestDoc"
+                  [isContestClassroomDependent]="isContestGradeclassroomdependent"
+                  [isUpdate]="isupdate"
+                  (contestCategoryInfo)="catchCategoryInfoEvent($event)">
+                </app-categories-contest>
+              </ng-template>
+              
+        </mat-step>
+
+        <mat-step>
+            <ng-template matStepLabel>
+                <span (click)="$event.stopPropagation()" (mousedown)="$event.stopPropagation()"
+                    [matTooltip]="'Configure Stages'">
+                    Configure Stages
+                </span>
+            </ng-template>
+            <app-stage-info-contest [contestInfo]="this.data?.contestInfo" [contestBasicInfo]="contestBasicInfo"
+                (contestStageInfo)="catchStageInfoEvent($event)">
+            </app-stage-info-contest>
+        </mat-step>
+
+        <mat-step *ngIf="isContestGradeclassroomdependent">
+            <ng-template matStepLabel>
+                <span (click)="$event.stopPropagation()" (mousedown)="$event.stopPropagation()"
+                    [matTooltip]="'Contest Visibility'">
+                    Contest Visibility
+                </span>
+            </ng-template>
+            <app-contest-visibility [contestInfo]="this.data?.contestInfo" [isUpdate]="isupdate"
+                (contestVisibiltyInfo)="catchContestVisibiltyEvent($event)" [contestCategories]="contestCategoryInfo"
+                [allinst]="allInst">
+            </app-contest-visibility>
+        </mat-step>
+
+        <mat-step>
+            <ng-template matStepLabel>
+                <span (click)="$event.stopPropagation()" (mousedown)="$event.stopPropagation()" [matTooltip]="'Review'">
+                    Review
+                </span>
+            </ng-template>
+            <app-review-contest [contestInfo]="this.data?.contestInfo" [contestBasicInfo]="contestBasicInfo"
+            [isContestGradeclassroomdependent]="isContestGradeclassroomdependent"
+            [contestCategoryInfo]="contestCategoryInfo" [contestStagesInfo]="contestStagesInfo"
+                [contestDocInfo]="contestDoc" [contestVisibiltyInfo]="contestVisibiltyInfo" [isUpdate]="isupdate">
+            </app-review-contest>
+        </mat-step>
+    </mat-stepper>
+</div>

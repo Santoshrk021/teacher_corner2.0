@@ -1,0 +1,123 @@
+<div class=" p-2 w-full" *ngIf="isLoaded; else notLoaded">
+    <!-- Institution Bulk Upload card -->
+    <mat-stepper [linear]="true" #stepper class="bg-transparent h-full w-full py-4 px-6"
+        (selectionChange)="onStepChange($event)">
+
+        <ng-container *ngIf="accessLevel !== 9">
+            <!-- Institution selection -->
+            <mat-step>
+                <ng-template matStepLabel>Institution Selection</ng-template>
+                <ng-template matStepContent>
+                    <div class="mt-2 ">
+                        <app-institute-selection [stepper]="stepper" [instititutionSubRef]="instititutionSub"
+                            (institutionCountry)="catchCountryEvent($event)"></app-institute-selection>
+                    </div>
+                </ng-template>
+            </mat-step>
+        </ng-container>
+
+
+        <ng-container *ngIf="accessLevel !== 9">
+            <!-- Add Teachers -->
+            <mat-step>
+                <ng-template matStepLabel>Add Teachers</ng-template>
+                <ng-template matStepContent>
+                    <div class=" min-h-[calc(100vh_-_216px)] relative">
+                        <app-add-teachers [stepper]="stepper" [instititutionSubRef]="instititutionSub"
+                            [selectedClassroomsSub]="clsSubject" [index]="selectedIndex"
+                            [country]="country"></app-add-teachers>
+
+                        <button matStepperPrevious type="button"
+                            class="absolute bottom-0 left-0 text-primary-600 fuse-mat-stroked-button-large "
+                            mat-stroked-button>
+                            Previous Step
+                        </button>
+
+                        <button matStepperNext type="button"
+                            class="absolute bottom-0 right-0 text-primary-600 fuse-mat-stroked-button-large "
+                            mat-stroked-button>
+                            Next Step
+                        </button>
+                    </div>
+                </ng-template>
+            </mat-step>
+
+            <!-- Add STEM Club Teachers -->
+            <mat-step>
+                <ng-template matStepLabel>Add STEM Club Teachers</ng-template>
+                <ng-template matStepContent>
+                    <div class=" min-h-[calc(100vh_-_216px)] relative">
+                        <app-add-stem-club-teachers [stepper]="stepper" [instititutionSubRef]="instititutionSub"
+                            [selectedClassroomsSub]="clsSubject" [index]="selectedIndex"
+                            [country]="country"></app-add-stem-club-teachers>
+
+                        <button matStepperPrevious type="button"
+                            class="absolute bottom-0 left-0 text-primary-600 fuse-mat-stroked-button-large "
+                            mat-stroked-button>
+                            Previous Step
+                        </button>
+
+                        <button *ngIf="environment.projectName !== 'Jigyaasa'" matStepperNext type="button"
+                            class="absolute bottom-0 right-0 text-primary-600 fuse-mat-stroked-button-large "
+                            mat-stroked-button>
+                            Next Step
+                        </button>
+                    </div>
+                </ng-template>
+            </mat-step>
+        </ng-container>
+
+
+        <!-- Add Students -->
+        <mat-step *ngIf="environment.projectName !== 'Jigyaasa'">
+            <ng-template matStepLabel>Add Students</ng-template>
+            <ng-template matStepContent>
+                <div class=" min-h-[calc(100vh_-_216px)] relative">
+                    <app-add-students [stepper]="stepper" [instititutionSubRef]="instititutionSub"
+                        [selectedClassroomsSub]="clsSubject" [index]="selectedIndex" [country]="country"
+                        [accessLevel]="accessLevel" [loggedInTeacher]="loggedInTeacher" ></app-add-students>
+                    <button *ngIf="accessLevel !== 9" matStepperPrevious type="button"
+                        class="absolute bottom-0 left-0 text-primary-600 fuse-mat-stroked-button-large "
+                        mat-stroked-button>
+                        Previous Step
+                    </button>
+
+                    <button matStepperNext type="button"
+                        class="absolute bottom-0 right-0 text-primary-600 fuse-mat-stroked-button-large "
+                        mat-stroked-button>
+                        Next Step
+                    </button>
+                </div>
+            </ng-template>
+        </mat-step>
+
+        <!-- Add STEM Club Students -->
+        <mat-step *ngIf="environment.projectName !== 'Jigyaasa'">
+            <ng-template matStepLabel>Add STEM Club Students</ng-template>
+            <ng-template matStepContent>
+                <div class=" min-h-[calc(100vh_-_216px)] relative">
+                    <app-add-stem-club-students [stepper]="stepper" [instititutionSubRef]="instititutionSub"
+                        [selectedClassroomsSub]="clsSubject" [index]="selectedIndex" [country]="country"
+                        [accessLevel]="accessLevel" [loggedInTeacher]="loggedInTeacher"></app-add-stem-club-students>
+                    <button matStepperPrevious type="button"
+                        class="absolute bottom-0 left-0 text-primary-600 fuse-mat-stroked-button-large "
+                        mat-stroked-button>
+                        Previous Step
+                    </button>
+                </div>
+            </ng-template>
+        </mat-step>
+    </mat-stepper>
+</div>
+
+<ng-template #noClass>
+    <div class="flex justify-center item-center">
+        <p class="text-accent font-semibold">NO CLASSES AVAILABLE</p>
+    </div>
+</ng-template>
+
+<ng-template #notLoaded>
+    <div class="flex justify-center items-center w-full h-full">
+        <mat-spinner diameter="50"></mat-spinner>
+    </div>
+</ng-template>

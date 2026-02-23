@@ -1,0 +1,26 @@
+<div [formGroup]="qusForm" class="flex flex-col h-full w-full">
+    <div>
+        <p class="mb-4">{{quizData?.questionTitle}}</p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 h-full w-full">
+
+        <!-- <div class="p-2 whitespace-pre-line	order-2 sm:order-1" formGroupName="blanks">
+            <span *ngFor="let obj of qusForm.get('blanksObj')|keyvalue; let i=index;let last = last;">
+                <span [formGroupName]="obj.key">
+                    {{qusForm.get('quesSplit').value[i]}}
+                    <select class="border-2 border-gray-200 rounded-md ">
+                        <option [value]="defaultOption" selected>---
+                        </option>
+                        <option *ngFor="let op of obj.value" [ngValue]="op">
+                            {{op.name}}
+                        </option>
+                    </select>
+                    <span *ngIf="last">
+                        {{qusForm.get('quesSplit').value[i+1]}}
+                    </span>
+                </span>
+            </span>
+        </div> -->
+    </div>
+</div>

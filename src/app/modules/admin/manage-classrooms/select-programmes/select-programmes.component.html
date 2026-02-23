@@ -1,0 +1,80 @@
+<div class=" h-[63vh] overflow-auto bg-primary-50 rounded-xl p-8 mt-1">
+  <div class="grid grid-cols-2 gap-4">
+    <!-- <mat-form-field appearance="fill" class="w-full">
+        <mat-label>Filter Learning unit</mat-label>
+        <mat-select>
+          <mat-option *ngFor="let option of filterOptions" [value]="option" name="option">
+            {{option}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field> -->
+
+    <mat-form-field class="example-form-field" class=" w-full" floatLabel="never">
+      <mat-label>Search Programmes</mat-label>
+      <input matInput name="searchElement" placeholder="Search Here" autocomplete="off"
+        (keyup)="searchProgrammeInput($event)">
+      <mat-icon svgIcon="heroicons_outline:search"></mat-icon>
+    </mat-form-field>
+    <section class="example-section">
+      <mat-checkbox class="example-margin mt-6" [(ngModel)]="checked" (change)="onCheckboxChange($event)">
+        Show All the Programmes
+      </mat-checkbox>
+    </section>
+
+  </div>
+  <h4 class="text-accent-600 font-medium">Programmes List</h4>
+  <form *ngIf="selectProgrammeForm" [formGroup]="selectProgrammeForm" (ngSubmit)="onSubmit(selectProgrammeForm)">
+    <div class="ex3 grid grid-cols-2 gap-4 w-full mt-2">
+      <div cdkDropList #todoList="cdkDropList" [cdkDropListData]="allProgrammes" [cdkDropListConnectedTo]="[doneList]"
+        class="example-list ex3 myBox " (cdkDropListDropped)="drop($event)">
+        <div class="example-box border " *ngFor="let item of allProgrammes" cdkDrag>
+          <span><strong>{{item?.programmeName}}</strong>
+          </span>
+          <!-- <span slot="end" class="pin ml-3">{{item?.version}}</span> -->
+        </div>
+      </div>
+      <div cdkDropList #doneList="cdkDropList" [cdkDropListData]="selectedProgrammes"
+        [cdkDropListConnectedTo]="[todoList]" class="example-list ex3 myBox w-full" (cdkDropListDropped)="drop($event)">
+        <div class="example-box border " *ngFor="let item of selectedProgrammes; let i=index" [item]="item" cdkDrag formControlname=" selectedProgrammeList">
+          <div class="flex justify-between items-center w-full">
+            <span><strong>{{item?.programmeName}}</strong></span>
+
+            <button type="button" class="-m-2 -p-2" mat-icon-button (click)="editLearningUnitDetails(item)"
+              [matTooltip]="'Enter edit mode'">
+              <mat-icon class="icon-size-4 text-current" [svgIcon]="'heroicons_solid:pencil'"></mat-icon>
+            </button>
+            <!-- <mat-slide-toggle class="" [color]="'primary'" [checked]="item?.sequentiallyLocked"
+              (change)="onSlideToggleChange($event, i)">
+              Is sequentially locked?
+            </mat-slide-toggle> -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </form>
+</div>
+
+<!-- <div *ngIf="!addNewProgramFlag" class="w-full mt-2 text-center relative">
+    <button mat-raised-button color="primary" type="submit" class=""
+      [disabled]="selectedProgrammes.length==0">save</button>
+  </div> -->
+
+<!-- <div *ngIf="addNewProgramFlag" class="flex justify-between">
+    <button matStepperPrevious mat-stroked-button type="button"
+      class="bg-primary text-white  arrowBtnBack disabled:bg-primary-100">
+      <mat-icon class="mr-2 icon-size-5  text-white arrowIconBack" [svgIcon]="'heroicons_solid:arrow-sm-left'"></mat-icon>
+      Back
+    </button>
+    <button  matStepperNext mat-stroked-button type="button"  [disabled]="!selectedProgrammes.length"
+      class="bg-primary text-white arrowBtn disabled:bg-primary-100">
+      Continue
+      <mat-icon class="ml-2 icon-size-5  text-white arrowIcon" [svgIcon]="'heroicons_solid:arrow-sm-right'"></mat-icon>
+    </button>
+  </div> -->
+
+<div class="text-center pt-2">
+  <button mat-stroked-button (click)="onSubmit(selectProgrammeForm)" type="submit" class="bg-primary text-white">
+    Save
+  </button>
+</div>

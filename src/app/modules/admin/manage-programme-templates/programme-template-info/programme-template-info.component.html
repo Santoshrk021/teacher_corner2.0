@@ -1,0 +1,44 @@
+<div class="relative h-[85vh] w-[75vw]">
+    <button mat-dialog-close class="absolute top-0 right-0 z-40">
+        <mat-icon class="hover:scale-110 transition duration-5000 transform" (click)="close()"
+            svgIcon="mat_outline:close">
+        </mat-icon>
+    </button>
+
+    <mat-stepper [linear]="true" #stepper class="bg-transparent w-full h-full">
+        <mat-step>
+            <ng-template matStepLabel>Create Programme Templates</ng-template>
+            <ng-template matStepContent>
+                <app-add-new-programme-template [stepper]="stepper" [stepperData]="stepperData"
+                    [addNewTemplateFlag]="addNewTemplateFlag">
+                </app-add-new-programme-template>
+            </ng-template>
+        </mat-step>
+
+        <mat-step>
+            <ng-template matStepLabel>Select Learning Units</ng-template>
+            <ng-template matStepContent>
+                <app-learning-unit-list [stepper]="stepper" [stepperData]="stepperData"
+                    [addNewTemplateFlag]="addNewTemplateFlag">
+                </app-learning-unit-list>
+            </ng-template>
+        </mat-step>
+
+        <mat-step>
+            <ng-template matStepLabel>Select Assignments</ng-template>
+            <ng-template matStepContent>
+                <app-assignment-list [stepper]="stepper" [stepperData]="stepperData"
+                    [addNewTemplateFlag]="addNewTemplateFlag">
+                </app-assignment-list>
+            </ng-template>
+        </mat-step>
+
+        <mat-step>
+            <ng-template matStepLabel>Review</ng-template>
+            <ng-template matStepContent>
+                <app-review-programme-template [stepper]="stepper" [stepperData]="stepperData"
+                    [addNewTemplateFlag]="addNewTemplateFlag"></app-review-programme-template>
+            </ng-template>
+        </mat-step>
+    </mat-stepper>
+</div>

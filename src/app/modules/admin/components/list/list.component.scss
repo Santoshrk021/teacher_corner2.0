@@ -1,0 +1,30 @@
+.inventory-grid {
+    // grid-template-columns: 5% 12% 14% 12% 8% 8% 8% 10% 8% 5%;
+    // grid-template-columns: 5% 11% 16% 11% 8% 8% 8% 10% 8% 5%;
+    grid-template-columns: 5% 8% 10% 10% 8% 8% 10% 8% 10% 8% 5%;
+//    grid-template-columns: 5% 8% 8% 10% 8% 10% 6% 8% 6% 8% 8% 5%;
+}
+
+.not-available {
+    color: red;
+}
+
+
+:host ::ng-deep .mat-tab-group .mat-tab-header .mat-tab-label-container .mat-tab-list .mat-tab-labels .mat-tab-label.mat-tab-label-active {
+    background-color: #F1F5F9 !important;
+    color: #179AD7 !important;
+    border-radius: 20px !important;
+    border: 1px solid #179AD7;
+    scale: 90%
+}
+
+:host::ng-deep.mat-tab-group .mat-tab-header .mat-tab-label-container {
+    padding: 5px 24px;
+    background-color: transparent;
+    height: 50px;
+}
+
+:host::ng-deep.mat-tab-group .mat-tab-header .mat-tab-label-container .mat-tab-list .mat-tab-labels .mat-tab-label {
+    color: #179AD7;
+    scale: 90%
+}

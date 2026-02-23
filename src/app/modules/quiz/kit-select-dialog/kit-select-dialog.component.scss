@@ -1,0 +1,8 @@
+::ng-deep .quiz-remote-setup-dialog .mat-mdc-dialog-container {
+  padding: 0 !important;
+  overflow-x: hidden;
+}
+
+.bg-primary-50 {
+  background-color: rgba(var(--fuse-primary-rgb), 0.05);
+}

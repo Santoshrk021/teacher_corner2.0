@@ -1,0 +1,16 @@
+/* Let grid children actually shrink inside tracks */
+.header-grid > div,
+.inventory-grid.grid > div {
+  min-width: 0;             /* critical to prevent overflow */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Optional: keep numbers centered and compact */
+.inventory-grid .text-center,
+.header-grid .text-center {
+  text-align: center;
+}
+
+/* No nth-child hacks needed with the two-row header. */

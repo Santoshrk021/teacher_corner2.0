@@ -1,0 +1,28 @@
+export interface FuseConfirmationConfig1
+{
+    title?: string;
+    message?: string;
+    icon?: {
+        show?: boolean;
+        name?: string;
+        color?: 'primary' | 'accent' | 'warn' | 'basic' | 'info' | 'success' | 'warning' | 'error';
+    };
+    actions?: {
+        confirm?: {
+            show?: boolean;
+            label?: string;
+            color?: 'primary' | 'accent' | 'warn';
+        };
+        cancel?: {
+            show?: boolean;
+            label?: string;
+        };
+        confirmnew: {
+            show?: boolean;
+            label?: string;
+            color?: 'primary' | 'accent' | 'warn';
+
+        };
+    };
+    dismissible?: boolean;
+}

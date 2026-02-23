@@ -1,0 +1,38 @@
+.inventory-grid {
+    grid-template-columns: repeat(8, 1fr);
+}
+
+.inventory-grid-2 {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.arrowBtn {
+    &:hover {
+        .arrowIcon {
+            animation: bounce 1s infinite;
+
+        }
+    }
+}
+
+.arrowAnime {
+    animation: bounce 1s infinite;
+}
+
+@keyframes bounce {
+
+    0% {
+        transform: translateX(0%);
+        animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+    }
+
+    100% {
+        transform: translateX(0%);
+        animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+    }
+
+    50% {
+        transform: translateX(35%);
+        animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+    }
+}

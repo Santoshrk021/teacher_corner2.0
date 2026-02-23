@@ -1,0 +1,17 @@
+<div class="mr-6">
+    <table>
+        <tr>
+            <th class="w-1/3 pb-4 text-primary text-left ">Due Date</th>
+            <td class="pb-4 text-secondary text-left"
+                [ngClass]="{'text-red-600 text-bold': !assignment?.dueDate}">
+                {{assignment?.dueDate ? (assignment?.dueDate?.seconds*1000 |
+                date) : 'Not Available'}}</td>
+        </tr>
+        <tr class="">
+            <th class="w-1/3 pb-4 text-primary text-left">Instructions</th>
+            <td class="pb-4 text-secondary text-left">
+                {{assignment?.instructions}}
+            </td>
+        </tr>
+    </table>
+</div>

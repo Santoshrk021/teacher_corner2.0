@@ -1,0 +1,181 @@
+.inventory-grid {
+    // grid-template-columns: 48px auto 40px;
+
+    // @screen sm {
+    //     grid-template-columns: 48px auto 112px 72px;
+    // }
+
+    // @screen md {
+    //     grid-template-columns: 48px 112px auto 112px 72px;
+    // }
+
+    // @screen lg {
+    //grid-template-columns: 9%  12% 18% 8% 10% 10% 9% 6%;
+    //  }
+
+     //grid-template-columns: 1fr repeat(2,2fr) 1fr 1fr 1fr 1fr 70px 50px;
+    // grid-template-columns: 5% 9% 9% repeat(4, 6%) /*6% 6% 6% 6%*/ 10% 9% 8% 6% 4%;
+    grid-template-columns: 5% 9% 9% repeat(6, 6%) 8% 6% 5% 5%;
+}
+
+
+@media only screen and (max-width:300px) {
+    .inventory-grid {
+        // grid-template-columns: 70px 110px 200px 100px 110px 120px 120px 30px 40px;
+        grid-template-columns: 60px 60px 90px 100px 70px 70px 70px 60px 90px 90px 60px 20px;
+
+    }
+}
+
+@media only screen and (min-width: 300px) and (max-width: 500px) {
+    .inventory-grid {
+        // grid-template-columns: 60px 100px 170px 90px 130px 110px 110px 80px 20px;
+        grid-template-columns: 60px 60px 90px 100px 70px 70px 70px 60px 90px 90px 60px 20px;
+
+    }
+}
+
+.dynamicwidth {
+    width: 100%;
+}
+
+
+@media only screen and (max-width:900px) {
+    .dynamicwidth {
+        width: 1100px;
+    }
+}
+
+// .inventory-grid {
+//     grid-template-columns: repeat(8, 1fr);
+// }
+
+// .inventory-grid {
+//     //grid-template-columns: 120px 80px 100px 100px 70px 50px 70px 70px repeat(2,1fr);
+//     grid-template-columns: 70px 80px 80px 110px 50px 40px 40px 70px repeat(2,1fr);
+//        // grid-template-columns: repeat(9,6fr);
+//     }
+
+// .inventory-grid{
+//     grid-template-columns: 48px 45px auto auto auto auto auto auto;
+// }
+
+
+
+.arrowBtn {
+    &:hover {
+        .arrowIcon {
+            animation: bounce 1s infinite;
+
+        }
+    }
+
+
+}
+
+.arrowAnime {
+    animation: bounce 1s infinite;
+}
+
+@keyframes bounce {
+
+    0% {
+        transform: translateX(0%);
+        animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+    }
+
+    100% {
+        transform: translateX(0%);
+        animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+    }
+
+    50% {
+        transform: translateX(35%);
+        animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+    }
+}
+
+
+:host ::ng-deep .mat-tab-group .mat-tab-header .mat-tab-label-container .mat-tab-list .mat-tab-labels .mat-tab-label.mat-tab-label-active {
+    background-color: #F1F5F9 !important;
+    color: #179AD7 !important;
+    border-radius: 20px !important;
+    border: 1px solid #179AD7;
+    scale: 90%
+}
+
+:host::ng-deep.mat-tab-group .mat-tab-header .mat-tab-label-container {
+    padding: 5px 10px;
+    background-color: transparent;
+    height: 50px;
+}
+
+
+:host::ng-deep.mat-tab-group .mat-tab-header .mat-tab-label-container .mat-tab-list .mat-tab-labels .mat-tab-label {
+    color: #179AD7;
+    scale: 90% !important
+}
+
+:host::ng-deep .mat-tab-header-pagination-before,
+:host::ng-deep.mat-tab-header-pagination-after {
+    @media (max-width:600px) {
+        display: none !important;
+    }
+
+    background:rgba(255, 255, 255, 0) !important;
+    box-shadow: none !important;
+}
+
+// :host::ng-deep .mat-tab-header {
+//     overflow-x: scroll !important;
+// }
+
+// :host::ng-deep .mat-tab-label-container {
+//     overflow: visible !important;
+// }
+
+
+// :host::ng-deep.mat-form-field.mat-form-field-appearance-fill .mat-form-field-wrapper .mat-form-field-flex {
+//     // min-height: 25px !important;
+//     background-color: #F1F5F9 !important;
+// }
+:host::ng-deep.mat-form-field.mat-form-field-appearance-fill .mat-form-field-wrapper .chipContainer.mat-form-field-flex {
+    height: 100px !important
+}
+
+:host::ng-deep body.light .mat-chip.mat-standard-chip,
+body .light .mat-chip.mat-standard-chip {
+    background-color: #91daff !important;
+}
+
+.mat-chip.mat-standard-chip {
+    background-color: #91daff !important;
+}
+
+.plusIcon {
+    transition: transform .3s ease-in-out;
+
+    &:hover {
+        transform: rotate(90deg);
+    }
+
+
+
+}
+
+// ::ng-deep.mat-tab-label, ::ng-deep.mat-tab-label-active{
+//     min-width: 0!important;
+//     padding: 2px!important;
+//     margin-left: 120px!important;
+//    }
+// :host::ng-deep.mat-tab-body-content {
+//     padding:4px
+// }
+
+.quizAsmntBtn {
+    &:hover {
+        .plusIcon {
+            transform: rotate(90deg);
+        }
+    }
+}

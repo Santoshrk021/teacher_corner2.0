@@ -1,0 +1,793 @@
+<div class="w-full h-full flex flex-col">
+  <div class="dynamicwidth flex-1 flex flex-col">
+    <div class="w-full flex-1 flex flex-col">
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="flex items-center justify-center py-10">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="!isLoading && filteredKits.length === 0" class="flex flex-col items-center justify-center py-10 text-gray-500">
+        <mat-icon class="text-6xl mb-4" style="font-size: 64px; width: 64px; height: 64px;">inventory_2</mat-icon>
+        <p class="text-lg">No kits found</p>
+      </div>
+
+      <!-- Table Header -->
+      <ng-container *ngIf="!isLoading && filteredKits.length > 0">
+        <div class="kit-grid-extended grid py-5  flex-center gap-3 px-5 md:px-5 shadow text-md font-semibold text-secondary bg-gray-50 dark:bg-black dark:bg-opacity-5"
+          matSort matSortDisableClear (matSortChange)="sortData($event)">
+          <div [mat-sort-header]="'kitId'">Kit ID</div>
+          <div [mat-sort-header]="'teacherRemotes'">Teacher</div>
+          <div [mat-sort-header]="'studentRemotes'">Student</div>
+          <div [mat-sort-header]="'spareRemotes'">Spare</div>
+          <div class="flex justify-center">Institution</div>
+          <div [mat-sort-header]="'status'">Status</div>
+          <div [mat-sort-header]="'createdAt'">Created On</div>
+          <div class="ml-2">View More</div>
+          <div class="ml-2">Report</div>
+          <div class="ml-2">Delete</div>
+        </div>
+
+        <!-- Table Body -->
+        <div class="h-[calc(100vh_-_268px)] overflow-scroll">
+          <ng-container *ngFor="let kit of filteredKits; trackBy: trackByFn">
+            <!-- Row -->
+            <div class="kit-grid-extended grid items-center text-secondary gap-3 py-3 px-5 md:px-5 border-b border-gray-300">
+              <!-- Kit ID -->
+              <div class="truncate" [matTooltip]="kit.kitId" matTooltipPosition="above">
+                {{kit.kitId}}
+              </div>
+
+              <!-- Teacher Count -->
+              <div class="truncate ml-1">
+                {{kit.teacherRemotes?.length || 0}}
+              </div>
+
+              <!-- Student Count -->
+              <div class="truncate ml-1">
+                {{kit.studentRemotes?.length || 0}}
+              </div>
+
+              <!-- Spare Count -->
+              <div class="truncate ml-1">
+                {{kit.spareRemotes?.length || 0}}
+              </div>
+
+              <!-- Institution Name -->
+              <div class="truncate" [matTooltip]="kit.institutionName || 'Not assigned'" matTooltipPosition="above">
+                <span *ngIf="kit.institutionName" class="font-medium">
+                  {{kit.institutionName}}
+                </span>
+                <span *ngIf="!kit.institutionName" class="text-gray-400 flex justify-center">
+                  -
+                </span>
+              </div>
+
+              <!-- Status -->
+              <div class="truncate ml-1">
+                <span class="px-2 py-1 rounded-lg text-md font-medium" [ngClass]="getStatusClass(kit.status)">
+                  {{kit.status | titlecase}}
+                </span>
+              </div>
+
+              <!-- Created Date -->
+              <div class="truncate ml-2" [matTooltip]="formatDate(kit.createdAt)" matTooltipPosition="above">
+                {{formatDate(kit.createdAt)}}
+              </div>
+
+              <!-- View More Button -->
+              <div class="sm:ml-5 xs:ml-1">
+                <button class="min-w-10 min-h-7 h-7 px-2 leading-6" mat-stroked-button
+                  (click)="toggleDetails(kit)"
+                  [ngClass]="{'bg-slate-200': isExpanded(kit)}">
+                  <mat-icon class="icon-size-5"
+                    [svgIcon]="isExpanded(kit) ? 'heroicons_solid:chevron-up' : 'heroicons_solid:chevron-down'">
+                  </mat-icon>
+                </button>
+              </div>
+
+              <!-- Report Button -->
+              <div class="flex justify-center">
+                <ng-container *ngIf="kit.status === 'dispatched'">
+                  <ng-container *ngIf="isGeneratingReport(kit.docId); else reportIcon">
+                    <mat-progress-spinner
+                      mode="indeterminate"
+                      diameter="20"
+                      [strokeWidth]="3"
+                      class="inline-block align-middle">
+                    </mat-progress-spinner>
+                  </ng-container>
+                  <ng-template #reportIcon>
+                    <mat-icon
+                      (click)="generateKitReport(kit)"
+                      class="text-primary icon-size-5 cursor-pointer transition duration-500 transform hover:scale-[115%]"
+                      matTooltip="Download Report">
+                      cloud_download
+                    </mat-icon>
+                  </ng-template>
+                </ng-container>
+                <span *ngIf="kit.status !== 'dispatched'" class="text-gray-400">-</span>
+              </div>
+
+              <!-- Delete Button -->
+              <div class="flex justify-center">
+                <mat-icon class="text-red-500 cursor-pointer transition duration-500 transform hover:scale-[115%]"
+                  svgIcon="delete_outline" matTooltip="Delete" (click)="deleteKit(kit)">
+                </mat-icon>
+              </div>
+            </div>
+
+            <!-- Expanded Details -->
+            <div class="grid">
+              <ng-container *ngIf="isExpanded(kit)">
+                <div class="border-b border-slate-300 overflow-scroll bg-blue-100 p-1 pt-4">
+                  <mat-tab-group [(selectedIndex)]="selectedTab" class="kit-tabs">
+                    <!-- Basic Info Tab -->
+                    <mat-tab>
+                      <ng-template matTabLabel>Basic Info</ng-template>
+                      <ng-template matTabContent>
+                        <div class="p-6 bg-white">
+                          <div class="grid grid-cols-2 gap-8">
+                            <!-- Left Side - Kit Details -->
+                            <div class="grid grid-cols-2 gap-4">
+                              <!-- Kit ID - Disabled -->
+                              <mat-form-field appearance="outline" class="w-full">
+                                <mat-label>Kit ID</mat-label>
+                                <input matInput [value]="kit.kitId" disabled>
+                                <mat-icon matPrefix class="mr-2 text-gray-400">inventory_2</mat-icon>
+                              </mat-form-field>
+
+                              <!-- Total Remotes - Disabled -->
+                              <mat-form-field appearance="outline" class="w-full">
+                                <mat-label>Total Remotes</mat-label>
+                                <input matInput [value]="kit.totalRemotes" disabled>
+                                <mat-icon matPrefix class="mr-2 text-gray-400">settings_remote</mat-icon>
+                              </mat-form-field>
+
+                              <!-- Status - Editable with dynamic options -->
+                              <mat-form-field appearance="outline" class="w-full">
+                                <mat-label>Status</mat-label>
+                                <mat-select [value]="kit.status" (selectionChange)="updateStatus(kit, $event.value)">
+                                  <mat-option *ngFor="let status of getStatusOptions(kit)" [value]="status">
+                                    {{getStatusLabel(status)}}
+                                  </mat-option>
+                                </mat-select>
+                                <mat-icon matPrefix class="mr-2 text-gray-400">toggle_on</mat-icon>
+                              </mat-form-field>
+
+                              <!-- Created At - Disabled -->
+                              <mat-form-field appearance="outline" class="w-full">
+                                <mat-label>Created At</mat-label>
+                                <input matInput [value]="formatDate(kit.createdAt)" disabled>
+                                <mat-icon matPrefix class="mr-2 text-gray-400">calendar_today</mat-icon>
+                              </mat-form-field>
+
+                              <!-- Updated At - Disabled -->
+                              <mat-form-field appearance="outline" class="w-full">
+                                <mat-label>Updated At</mat-label>
+                                <input matInput [value]="formatDate(kit.updatedAt)" disabled>
+                                <mat-icon matPrefix class="mr-2 text-gray-400">update</mat-icon>
+                              </mat-form-field>
+
+                              <!-- Teacher Remotes Count - Disabled -->
+                              <mat-form-field appearance="outline" class="w-full">
+                                <mat-label>Teacher Remotes</mat-label>
+                                <input matInput [value]="kit.teacherRemotes?.length || 0" disabled>
+                                <mat-icon matPrefix class="mr-2 text-green-500">school</mat-icon>
+                              </mat-form-field>
+
+                              <!-- Student Remotes Count - Disabled -->
+                              <mat-form-field appearance="outline" class="w-full">
+                                <mat-label>Student Remotes</mat-label>
+                                <input matInput [value]="kit.studentRemotes?.length || 0" disabled>
+                                <mat-icon matPrefix class="mr-2 text-blue-500">groups</mat-icon>
+                              </mat-form-field>
+
+                              <!-- Spare Remotes Count - Disabled -->
+                              <mat-form-field appearance="outline" class="w-full">
+                                <mat-label>Spare Remotes</mat-label>
+                                <input matInput [value]="kit.spareRemotes?.length || 0" disabled>
+                                <mat-icon matPrefix class="mr-2 text-orange-500">build</mat-icon>
+                              </mat-form-field>
+                            </div>
+
+                            <!-- Right Side - Institution Assignment -->
+                            <div class="border-l pl-6">
+                              <h3 class="text-lg font-semibold text-gray-700 mb-4">Assign Kit to Institution</h3>
+
+                              <!-- Already Dispatched - Show info and Receive Back option -->
+                              <ng-container *ngIf="kit.status === 'dispatched' && kit.institutionName">
+                                <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
+                                  <div class="flex items-center gap-2 mb-1">
+                                    <mat-icon class="text-blue-600 icon-size-5">business</mat-icon>
+                                    <span class="font-medium text-blue-800 text-sm">Currently Dispatched To:</span>
+                                  </div>
+                                  <p class="font-semibold text-blue-900 ml-7">{{kit.institutionName}}</p>
+                                  <p *ngIf="kit.dispatchedAt" class="text-xs text-blue-600 ml-7 mt-1">
+                                    Dispatched on: {{formatDate(kit.dispatchedAt)}}
+                                  </p>
+                                </div>
+                                <div class="flex justify-center">
+                                  <button mat-raised-button color="primary" class="text-sm" (click)="receiveBackKit(kit)">
+                                    <mat-icon class="mr-1 icon-size-4">assignment_return</mat-icon>
+                                    Receive Back
+                                  </button>
+                                </div>
+                              </ng-container>
+
+                              <!-- Not Dispatched - Show Dispatch option -->
+                              <ng-container *ngIf="kit.status !== 'dispatched'">
+                                <!-- Previous institution info if any (hide when in dispatch mode) -->
+                                <div *ngIf="kit.lastInstitutionName && kit.receivedBackAt && !isDispatchMode(kit)" class="bg-gray-50 border border-gray-200 rounded-lg p-2 mb-3">
+                                  <p class="text-xs text-gray-600">Previously assigned to:</p>
+                                  <p class="font-medium text-gray-800 text-sm">{{kit.lastInstitutionName}}</p>
+                                  <p class="text-xs text-gray-500">Received back: {{formatDate(kit.receivedBackAt)}}</p>
+                                </div>
+
+                                <!-- Not in Dispatch Mode - Show Dispatch Button -->
+                                <ng-container *ngIf="!isDispatchMode(kit)">
+                                  <div class="flex justify-center">
+                                    <button mat-raised-button color="primary" class="text-sm" (click)="startDispatch(kit)">
+                                      <mat-icon class="mr-1 icon-size-4">local_shipping</mat-icon>
+                                      Dispatch to Institution
+                                    </button>
+                                  </div>
+                                </ng-container>
+
+                                <!-- In Dispatch Mode - Show Institution Selection Flow -->
+                                <ng-container *ngIf="isDispatchMode(kit)">
+                                  <div class="space-y-3 bg-gray-50 rounded-lg p-4">
+                                    <!-- Pincode Input -->
+                                    <mat-form-field appearance="outline" class="w-full">
+                                      <mat-label>Search school from pincode</mat-label>
+                                      <input matInput [(ngModel)]="dispatchPincode" type="text" maxlength="6" placeholder="Enter School Pincode">
+                                    </mat-form-field>
+
+                                    <!-- Board Selection + Search Button -->
+                                    <div class="grid grid-cols-3 gap-2">
+                                      <mat-form-field appearance="outline" class="col-span-2">
+                                        <mat-label>Select Board</mat-label>
+                                        <mat-select [(ngModel)]="dispatchBoard">
+                                          <mat-option value="" disabled>Select Board</mat-option>
+                                          <mat-option *ngFor="let board of boardList" [value]="board?.code">
+                                            {{board?.name}}
+                                          </mat-option>
+                                        </mat-select>
+                                      </mat-form-field>
+                                      <button mat-flat-button color="primary" class="h-14 mt-3" (click)="searchInstitutions()"
+                                        [disabled]="!dispatchPincode || !dispatchBoard">
+                                        Search
+                                      </button>
+                                    </div>
+
+                                    <!-- School Selection (only show after search) -->
+                                    <mat-form-field appearance="outline" class="w-full" *ngIf="searchClicked">
+                                      <mat-label>Select School</mat-label>
+                                      <mat-select [(ngModel)]="selectedInstitution" [compareWith]="compareInstitutions">
+                                        <mat-option value="" disabled>Select school from the list</mat-option>
+                                        <mat-option *ngFor="let school of institutions$ | async" [value]="school.payload?.doc?.data() || school">
+                                          {{school.payload?.doc?.data()?.institutionName || school.institutionName}}
+                                        </mat-option>
+                                      </mat-select>
+                                      <mat-icon matPrefix class="mr-2 text-gray-400">business</mat-icon>
+                                    </mat-form-field>
+
+                                    <!-- Action Buttons -->
+                                    <div class="flex gap-2 pt-2">
+                                      <button mat-raised-button color="primary" class="flex-1"
+                                        [disabled]="!selectedInstitution"
+                                        (click)="confirmDispatch(kit)">
+                                        <mat-icon class="mr-1">check</mat-icon>
+                                        Confirm Dispatch
+                                      </button>
+                                      <button mat-stroked-button color="warn" (click)="cancelDispatch()">
+                                        <mat-icon>close</mat-icon>
+                                      </button>
+                                    </div>
+                                  </div>
+                                </ng-container>
+                              </ng-container>
+
+                              <!-- No institution ever assigned -->
+                              <ng-container *ngIf="!kit.institutionName && kit.status !== 'dispatched' && !isDispatchMode(kit)">
+                                <p class="text-gray-500 text-sm mt-2">
+                                  This kit has not been assigned to any institution yet.
+                                </p>
+                              </ng-container>
+                            </div>
+                          </div>
+                        </div>
+                      </ng-template>
+                    </mat-tab>
+
+                    <!-- Teacher Remotes Tab -->
+                    <mat-tab>
+                      <ng-template matTabLabel>Teacher Remotes ({{kit.teacherRemotes?.length || 0}})</ng-template>
+                      <ng-template matTabContent>
+                        <div class="p-4 bg-white">
+                          <!-- Header with Edit/Save/Cancel buttons -->
+                          <div class="flex justify-between items-center mb-3">
+                            <!-- USB Status (only in edit mode) -->
+                            <div *ngIf="isEditingRemotes(kit, 'teacher')" class="flex items-center gap-2">
+                              <ng-container *ngIf="usbConnected">
+                                <span class="flex items-center gap-1 text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full">
+                                  <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                                  USB Connected
+                                </span>
+                              </ng-container>
+                              <ng-container *ngIf="!usbConnected && !usbConnecting">
+                                <button mat-stroked-button color="primary" class="text-xs h-7" (click)="connectUsb()">
+                                  <mat-icon class="icon-size-4 mr-1">usb</mat-icon>
+                                  Connect USB
+                                </button>
+                              </ng-container>
+                              <ng-container *ngIf="usbConnecting">
+                                <span class="flex items-center gap-2 text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded-full">
+                                  <mat-spinner diameter="12"></mat-spinner>
+                                  Connecting...
+                                </span>
+                              </ng-container>
+                            </div>
+                            <div *ngIf="!isEditingRemotes(kit, 'teacher')"></div>
+
+                            <!-- Edit/Save/Cancel buttons -->
+                            <div class="flex items-center">
+                              <ng-container *ngIf="!isEditingRemotes(kit, 'teacher')">
+                                <button mat-icon-button matTooltip="Edit Remotes" (click)="startEditingRemotes(kit, 'teacher')" class="text-gray-500 hover:text-primary">
+                                  <mat-icon>edit</mat-icon>
+                                </button>
+                              </ng-container>
+                              <ng-container *ngIf="isEditingRemotes(kit, 'teacher')">
+                                <button mat-icon-button color="primary" matTooltip="Save Changes" (click)="saveEditedRemotes(kit, 'teacher')">
+                                  <mat-icon>check</mat-icon>
+                                </button>
+                                <button mat-icon-button color="warn" matTooltip="Discard Changes" (click)="cancelEditingRemotes(kit, 'teacher')">
+                                  <mat-icon>close</mat-icon>
+                                </button>
+                              </ng-container>
+                            </div>
+                          </div>
+
+                          <!-- View Mode -->
+                          <ng-container *ngIf="!isEditingRemotes(kit, 'teacher')">
+                            <div *ngIf="kit.teacherRemotes?.length === 0" class="text-gray-500 text-center py-4">
+                              No teacher remotes
+                            </div>
+                            <div *ngIf="kit.teacherRemotes?.length > 0"
+                              class="max-h-[200px]"
+                              [ngClass]="{'overflow-y-auto': kit.teacherRemotes?.length > 4}">
+                              <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                <div *ngFor="let remote of kit.teacherRemotes"
+                                  class="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
+                                  <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white font-bold mx-auto mb-2">
+                                    T{{remote.slotNumber}}
+                                  </div>
+                                  <div class="text-xs font-mono text-gray-600 truncate" [matTooltip]="remote.mac">
+                                    {{remote.mac}}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </ng-container>
+
+                          <!-- Edit Mode -->
+                          <ng-container *ngIf="isEditingRemotes(kit, 'teacher')">
+                            <div class="max-h-[200px]" [ngClass]="{'overflow-y-auto': getEditedRemotes(kit, 'teacher').length > 4}">
+                              <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                <!-- Existing Remotes with Delete Button -->
+                                <div *ngFor="let remote of getEditedRemotes(kit, 'teacher'); let i = index"
+                                  class="bg-green-50 border border-green-200 rounded-lg p-3 text-center relative">
+                                  <!-- Delete Button -->
+                                  <div class="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center cursor-pointer hover:bg-red-600 transition-colors"
+                                    (click)="removeEditedRemote(kit, 'teacher', i)"
+                                    matTooltip="Remove Remote">
+                                    <mat-icon class="text-white" style="font-size: 14px; width: 14px; height: 14px;">close</mat-icon>
+                                  </div>
+                                  <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white font-bold mx-auto mb-2">
+                                    T{{remote.slotNumber}}
+                                  </div>
+                                  <div class="text-xs font-mono text-gray-600 truncate" [matTooltip]="remote.mac">
+                                    {{remote.mac}}
+                                  </div>
+                                </div>
+
+                                <!-- Add Button -->
+                                <div class="border-2 border-dashed border-green-300 rounded-lg p-3 text-center flex flex-col items-center justify-center cursor-pointer hover:bg-green-50 transition-colors min-h-[80px]"
+                                  [ngClass]="{'bg-green-100 animate-pulse': isListeningForRemote(kit, 'teacher')}"
+                                  (click)="startListeningForRemote(kit, 'teacher')">
+                                  <mat-icon class="text-green-500 mb-1">add_circle</mat-icon>
+                                  <span class="text-xs text-green-600">
+                                    {{isListeningForRemote(kit, 'teacher') ? 'Press remote...' : 'Add Remote'}}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </ng-container>
+                        </div>
+                      </ng-template>
+                    </mat-tab>
+
+                    <!-- Student Remotes Tab -->
+                    <mat-tab>
+                      <ng-template matTabLabel>Student Remotes ({{kit.studentRemotes?.length || 0}})</ng-template>
+                      <ng-template matTabContent>
+                        <div class="p-4 bg-white">
+                          <!-- Header with Edit/Save/Cancel buttons -->
+                          <div class="flex justify-between items-center mb-3">
+                            <!-- USB Status (only in edit mode) -->
+                            <div *ngIf="isEditingRemotes(kit, 'student')" class="flex items-center gap-2">
+                              <ng-container *ngIf="usbConnected">
+                                <span class="flex items-center gap-1 text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full">
+                                  <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                                  USB Connected
+                                </span>
+                              </ng-container>
+                              <ng-container *ngIf="!usbConnected && !usbConnecting">
+                                <button mat-stroked-button color="primary" class="text-xs h-7" (click)="connectUsb()">
+                                  <mat-icon class="icon-size-4 mr-1">usb</mat-icon>
+                                  Connect USB
+                                </button>
+                              </ng-container>
+                              <ng-container *ngIf="usbConnecting">
+                                <span class="flex items-center gap-2 text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded-full">
+                                  <mat-spinner diameter="12"></mat-spinner>
+                                  Connecting...
+                                </span>
+                              </ng-container>
+                            </div>
+                            <div *ngIf="!isEditingRemotes(kit, 'student')"></div>
+
+                            <!-- Edit/Save/Cancel buttons -->
+                            <div class="flex items-center">
+                              <ng-container *ngIf="!isEditingRemotes(kit, 'student')">
+                                <button mat-icon-button matTooltip="Edit Remotes" (click)="startEditingRemotes(kit, 'student')" class="text-gray-500 hover:text-primary">
+                                  <mat-icon>edit</mat-icon>
+                                </button>
+                              </ng-container>
+                              <ng-container *ngIf="isEditingRemotes(kit, 'student')">
+                                <button mat-icon-button color="primary" matTooltip="Save Changes" (click)="saveEditedRemotes(kit, 'student')">
+                                  <mat-icon>check</mat-icon>
+                                </button>
+                                <button mat-icon-button color="warn" matTooltip="Discard Changes" (click)="cancelEditingRemotes(kit, 'student')">
+                                  <mat-icon>close</mat-icon>
+                                </button>
+                              </ng-container>
+                            </div>
+                          </div>
+
+                          <!-- View Mode -->
+                          <ng-container *ngIf="!isEditingRemotes(kit, 'student')">
+                            <div *ngIf="kit.studentRemotes?.length === 0" class="text-gray-500 text-center py-4">
+                              No student remotes
+                            </div>
+                            <div *ngIf="kit.studentRemotes?.length > 0"
+                              class="max-h-[200px]"
+                              [ngClass]="{'overflow-y-auto': kit.studentRemotes?.length > 4}">
+                              <div class="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-3">
+                                <div *ngFor="let remote of kit.studentRemotes"
+                                  class="bg-blue-50 border border-blue-200 rounded-lg p-2 text-center">
+                                  <div class="w-7 h-7 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm mx-auto mb-1">
+                                    {{remote.slotNumber}}
+                                  </div>
+                                  <div class="text-xs font-mono text-gray-600 truncate" [matTooltip]="remote.mac">
+                                    {{remote.mac}}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </ng-container>
+
+                          <!-- Edit Mode -->
+                          <ng-container *ngIf="isEditingRemotes(kit, 'student')">
+                            <div class="max-h-[200px]" [ngClass]="{'overflow-y-auto': getEditedRemotes(kit, 'student').length > 6}">
+                              <div class="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-3">
+                                <!-- Existing Remotes with Delete Button -->
+                                <div *ngFor="let remote of getEditedRemotes(kit, 'student'); let i = index"
+                                  class="bg-blue-50 border border-blue-200 rounded-lg p-2 text-center relative">
+                                  <!-- Delete Button -->
+                                  <div class="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center cursor-pointer hover:bg-red-600 transition-colors"
+                                    (click)="removeEditedRemote(kit, 'student', i)"
+                                    matTooltip="Remove Remote">
+                                    <mat-icon class="text-white" style="font-size: 14px; width: 14px; height: 14px;">close</mat-icon>
+                                  </div>
+                                  <div class="w-7 h-7 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm mx-auto mb-1">
+                                    {{remote.slotNumber}}
+                                  </div>
+                                  <div class="text-xs font-mono text-gray-600 truncate" [matTooltip]="remote.mac">
+                                    {{remote.mac}}
+                                  </div>
+                                </div>
+
+                                <!-- Add Button -->
+                                <div class="border-2 border-dashed border-blue-300 rounded-lg p-2 text-center flex flex-col items-center justify-center cursor-pointer hover:bg-blue-50 transition-colors min-h-[60px]"
+                                  [ngClass]="{'bg-blue-100 animate-pulse': isListeningForRemote(kit, 'student')}"
+                                  (click)="startListeningForRemote(kit, 'student')">
+                                  <mat-icon class="text-blue-500" style="font-size: 20px; width: 20px; height: 20px;">add_circle</mat-icon>
+                                  <span class="text-xs text-blue-600">
+                                    {{isListeningForRemote(kit, 'student') ? 'Press...' : 'Add'}}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </ng-container>
+                        </div>
+                      </ng-template>
+                    </mat-tab>
+
+                    <!-- Spare Remotes Tab -->
+                    <mat-tab>
+                      <ng-template matTabLabel>Spare Remotes ({{kit.spareRemotes?.length || 0}})</ng-template>
+                      <ng-template matTabContent>
+                        <div class="p-4 bg-white">
+                          <!-- Header with Edit/Save/Cancel buttons -->
+                          <div class="flex justify-between items-center mb-3">
+                            <!-- USB Status (only in edit mode) -->
+                            <div *ngIf="isEditingRemotes(kit, 'spare')" class="flex items-center gap-2">
+                              <ng-container *ngIf="usbConnected">
+                                <span class="flex items-center gap-1 text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full">
+                                  <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                                  USB Connected
+                                </span>
+                              </ng-container>
+                              <ng-container *ngIf="!usbConnected && !usbConnecting">
+                                <button mat-stroked-button color="primary" class="text-xs h-7" (click)="connectUsb()">
+                                  <mat-icon class="icon-size-4 mr-1">usb</mat-icon>
+                                  Connect USB
+                                </button>
+                              </ng-container>
+                              <ng-container *ngIf="usbConnecting">
+                                <span class="flex items-center gap-2 text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded-full">
+                                  <mat-spinner diameter="12"></mat-spinner>
+                                  Connecting...
+                                </span>
+                              </ng-container>
+                            </div>
+                            <div *ngIf="!isEditingRemotes(kit, 'spare')"></div>
+
+                            <!-- Edit/Save/Cancel buttons -->
+                            <div class="flex items-center">
+                              <ng-container *ngIf="!isEditingRemotes(kit, 'spare')">
+                                <button mat-icon-button matTooltip="Edit Remotes" (click)="startEditingRemotes(kit, 'spare')" class="text-gray-500 hover:text-primary">
+                                  <mat-icon>edit</mat-icon>
+                                </button>
+                              </ng-container>
+                              <ng-container *ngIf="isEditingRemotes(kit, 'spare')">
+                                <button mat-icon-button color="primary" matTooltip="Save Changes" (click)="saveEditedRemotes(kit, 'spare')">
+                                  <mat-icon>check</mat-icon>
+                                </button>
+                                <button mat-icon-button color="warn" matTooltip="Discard Changes" (click)="cancelEditingRemotes(kit, 'spare')">
+                                  <mat-icon>close</mat-icon>
+                                </button>
+                              </ng-container>
+                            </div>
+                          </div>
+
+                          <!-- View Mode -->
+                          <ng-container *ngIf="!isEditingRemotes(kit, 'spare')">
+                            <div *ngIf="kit.spareRemotes?.length === 0" class="text-gray-500 text-center py-4">
+                              No spare remotes
+                            </div>
+                            <div *ngIf="kit.spareRemotes?.length > 0"
+                              class="max-h-[200px]"
+                              [ngClass]="{'overflow-y-auto': kit.spareRemotes?.length > 4}">
+                              <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                <div *ngFor="let remote of kit.spareRemotes"
+                                  class="bg-orange-50 border border-orange-200 rounded-lg p-3 text-center">
+                                  <div class="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-white font-bold mx-auto mb-2">
+                                    S{{remote.slotNumber}}
+                                  </div>
+                                  <div class="text-xs font-mono text-gray-600 truncate" [matTooltip]="remote.mac">
+                                    {{remote.mac}}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </ng-container>
+
+                          <!-- Edit Mode -->
+                          <ng-container *ngIf="isEditingRemotes(kit, 'spare')">
+                            <div class="max-h-[200px]" [ngClass]="{'overflow-y-auto': getEditedRemotes(kit, 'spare').length > 4}">
+                              <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                <!-- Existing Remotes with Delete Button -->
+                                <div *ngFor="let remote of getEditedRemotes(kit, 'spare'); let i = index"
+                                  class="bg-orange-50 border border-orange-200 rounded-lg p-3 text-center relative">
+                                  <!-- Delete Button -->
+                                  <div class="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center cursor-pointer hover:bg-red-600 transition-colors"
+                                    (click)="removeEditedRemote(kit, 'spare', i)"
+                                    matTooltip="Remove Remote">
+                                    <mat-icon class="text-white" style="font-size: 14px; width: 14px; height: 14px;">close</mat-icon>
+                                  </div>
+                                  <div class="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-white font-bold mx-auto mb-2">
+                                    S{{remote.slotNumber}}
+                                  </div>
+                                  <div class="text-xs font-mono text-gray-600 truncate" [matTooltip]="remote.mac">
+                                    {{remote.mac}}
+                                  </div>
+                                </div>
+
+                                <!-- Add Button -->
+                                <div class="border-2 border-dashed border-orange-300 rounded-lg p-3 text-center flex flex-col items-center justify-center cursor-pointer hover:bg-orange-50 transition-colors min-h-[80px]"
+                                  [ngClass]="{'bg-orange-100 animate-pulse': isListeningForRemote(kit, 'spare')}"
+                                  (click)="startListeningForRemote(kit, 'spare')">
+                                  <mat-icon class="text-orange-500 mb-1">add_circle</mat-icon>
+                                  <span class="text-xs text-orange-600">
+                                    {{isListeningForRemote(kit, 'spare') ? 'Press remote...' : 'Add Remote'}}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </ng-container>
+                        </div>
+                      </ng-template>
+                    </mat-tab>
+
+                    <!-- Replacement History Tab -->
+                    <mat-tab>
+                      <ng-template matTabLabel>
+                        Replacement History ({{ replacementHistoryEntries?.length || 0 }})
+                      </ng-template>
+                      <ng-template matTabContent>
+                        <div class="p-4 bg-white">
+                          <div class="flex items-center justify-between mb-4">
+                            <div>
+                              <div class="text-sm font-semibold text-slate-800">Remote Replacement History</div>
+                              <div class="text-xs text-slate-500">Shows only users who used more than one remote</div>
+                              <div *ngIf="replacementHistoryContext" class="mt-1 text-xs text-slate-500">
+                                <span class="font-medium text-slate-700">{{ replacementHistoryContext.institutionName }}</span>
+                                <span class="mx-2 text-slate-300">|</span>
+                                <span>{{ replacementHistoryContext.classroomName }}</span>
+                              </div>
+                            </div>
+                            <button mat-stroked-button class="text-xs" (click)="openInactiveRemotesDialog()">
+                              <mat-icon class="icon-size-4 mr-1">report</mat-icon>
+                              Inactive Remotes
+                            </button>
+                          </div>
+
+                          <div *ngIf="replacementHistoryLoading" class="flex items-center gap-3 text-sm text-slate-600 py-6">
+                            <mat-spinner diameter="18"></mat-spinner>
+                            <span>Loading replacement history...</span>
+                          </div>
+
+                          <div *ngIf="!replacementHistoryLoading && replacementHistoryError" class="p-4 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
+                            {{ replacementHistoryError }}
+                          </div>
+
+                          <div *ngIf="!replacementHistoryLoading && !replacementHistoryError && (!replacementHistoryEntries || replacementHistoryEntries.length === 0)"
+                            class="p-6 rounded-lg bg-slate-50 border border-slate-200 text-center">
+                            <div class="text-sm font-medium text-slate-700">No replacements found</div>
+                            <div class="text-xs text-slate-500 mt-1">No teacher/student used more than one remote for this kit.</div>
+                          </div>
+
+                          <div *ngIf="!replacementHistoryLoading && !replacementHistoryError && replacementHistoryEntries?.length" class="space-y-3">
+                            <div *ngFor="let e of replacementHistoryEntries" class="rounded-xl border border-slate-200 bg-white p-4">
+                              <div class="flex items-start justify-between gap-4">
+                                <div class="min-w-0">
+                                  <div class="flex items-center gap-2">
+                                    <span class="text-xs font-semibold px-2 py-0.5 rounded-full"
+                                      [ngClass]="e.kind === 'teacher' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-blue-50 text-blue-700 border border-blue-200'">
+                                      {{ e.kind === 'teacher' ? 'Teacher' : 'Student' }}
+                                    </span>
+                                    <div class="text-sm font-semibold text-slate-800 truncate">
+                                      {{ e.kind === 'teacher' ? 'Teacher Remote' : ('Roll: ' + e.title) }}
+                                    </div>
+                                    <div *ngIf="e.kind === 'student' && e.slotNumber" class="text-xs text-slate-500">Slot {{ e.slotNumber }}</div>
+                                  </div>
+                                  <div *ngIf="e.subtitle" class="mt-1 text-xs text-slate-400 font-mono truncate">{{ e.subtitle }}</div>
+                                </div>
+
+                                <div class="shrink-0 text-right">
+                                  <div class="text-xs text-slate-500">Replacements</div>
+                                  <div class="text-sm font-semibold text-slate-800">{{ e.replacementCount }}</div>
+                                </div>
+                              </div>
+
+                              <div class="mt-3 rounded-lg bg-slate-50 border border-slate-200 px-3 py-2">
+                                <div class="flex flex-wrap items-center gap-2">
+                                  <ng-container *ngFor="let mac of e.chain; let i = index">
+                                    <span class="px-2 py-1 rounded-md bg-white border border-slate-200 text-xs font-mono text-slate-700" [matTooltip]="mac">
+                                      {{ mac }}
+                                    </span>
+                                    <mat-icon *ngIf="i < e.chain.length - 1" class="text-slate-400" style="font-size: 16px; width: 16px; height: 16px;">arrow_forward</mat-icon>
+                                  </ng-container>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </ng-template>
+                    </mat-tab>
+
+                    <!-- Dispatch History Tab -->
+                    <mat-tab>
+                      <ng-template matTabLabel>
+                        Dispatch History ({{ dispatchHistoryEntries?.length || 0 }})
+                      </ng-template>
+                      <ng-template matTabContent>
+                        <div class="p-4 bg-white">
+                          <div class="flex items-center justify-between mb-4">
+                            <div>
+                              <div class="text-sm font-semibold text-slate-800">Dispatch History</div>
+                              <div class="text-xs text-slate-500">Shows kit timeline events (created, dispatched, received, deleted, restored)</div>
+                            </div>
+                            <button mat-stroked-button class="text-xs" (click)="loadDispatchHistory()">
+                              <mat-icon class="icon-size-4 mr-1">sync</mat-icon>
+                              Reload
+                            </button>
+                          </div>
+
+                          <div *ngIf="dispatchHistoryLoading" class="flex items-center gap-3 text-sm text-slate-600 py-6">
+                            <mat-spinner diameter="18"></mat-spinner>
+                            <span>Loading dispatch history...</span>
+                          </div>
+
+                          <div *ngIf="!dispatchHistoryLoading && dispatchHistoryError" class="p-4 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
+                            {{ dispatchHistoryError }}
+                          </div>
+
+                          <div *ngIf="!dispatchHistoryLoading && !dispatchHistoryError && (!dispatchHistoryEntries || dispatchHistoryEntries.length === 0)"
+                            class="p-6 rounded-lg bg-slate-50 border border-slate-200 text-center">
+                            <div class="text-sm font-medium text-slate-700">No dispatch history yet</div>
+                            <div class="text-xs text-slate-500 mt-1">Create/dispatch/receive/delete/restore actions will appear here.</div>
+                          </div>
+
+                          <div *ngIf="!dispatchHistoryLoading && !dispatchHistoryError && dispatchHistoryEntries?.length" class="mt-2">
+                            <div class="relative">
+                              <div class="grid grid-cols-[80px_1fr] gap-4">
+                                <!-- Left rail: dates + line -->
+                                <div class="relative">
+                                  <div class="absolute right-3 top-2 bottom-2 w-px bg-slate-200"></div>
+                                  <div *ngFor="let e of dispatchHistoryEntries" class="relative h-[86px]">
+                                    <div class="absolute right-0 top-4 w-6 h-6 rounded-full border-2" [ngClass]="dispatchHistoryDotClass(e)"></div>
+                                    <div class="pt-1 pr-8 text-right">
+                                      <div class="text-lg font-semibold text-slate-800 leading-none">{{ dispatchHistoryDay(e) }}</div>
+                                      <div class="text-[11px] font-medium text-slate-500 uppercase tracking-wide">{{ dispatchHistoryMonth(e) }}</div>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <!-- Right: cards -->
+                                <div class="space-y-4">
+                                  <div *ngFor="let e of dispatchHistoryEntries" class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                                    <div class="flex items-start justify-between gap-4">
+                                      <div class="min-w-0">
+                                        <div class="flex flex-wrap items-center gap-2">
+                                          <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full" [ngClass]="dispatchHistoryBadgeClass(e)">
+                                            {{ dispatchHistoryBadgeLabel(e) }}
+                                          </span>
+                                          <span *ngIf="e.institutionName" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-slate-50 text-slate-700 border border-slate-200">
+                                            {{ e.institutionName }}
+                                          </span>
+                                        </div>
+                                        <div class="mt-2 text-sm font-semibold text-slate-900">
+                                          {{ dispatchHistoryMessage(e) }}
+                                        </div>
+                                      </div>
+
+                                      <div class="shrink-0 w-9 h-9 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-center">
+                                        <mat-icon class="text-slate-600">{{ dispatchHistoryIcon(e) }}</mat-icon>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </ng-template>
+                    </mat-tab>
+                  </mat-tab-group>
+                </div>
+              </ng-container>
+            </div>
+          </ng-container>
+        </div>
+
+        <!-- Footer -->
+        <p class="px-2 py-2 text-secondary">
+          Loaded {{filteredKits.length}} of {{filteredKits.length}} entries
+        </p>
+      </ng-container>
+    </div>
+  </div>
+</div>

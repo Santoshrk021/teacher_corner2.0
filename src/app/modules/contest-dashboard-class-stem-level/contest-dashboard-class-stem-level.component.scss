@@ -1,0 +1,12 @@
+.inventory-grid {
+    grid-template-columns: repeat(3, 150px) 600px;
+    // grid-template-columns: repeat(3, 150px) auto auto;
+    // grid-template-columns: 1.5fr 1fr repeat(4, 1fr) repeat(8, 1fr) ;
+    // grid-template-columns: 100px 0.5fr repeat(8, 1fr) ;
+}
+.inventory-grid-1 {
+    grid-template-columns: repeat(7, 150px) ;
+    // grid-template-columns: repeat(3, 150px) auto auto;
+    // grid-template-columns: 1.5fr 1fr repeat(4, 1fr) repeat(8, 1fr) ;
+    // grid-template-columns: 100px 0.5fr repeat(8, 1fr) ;
+}

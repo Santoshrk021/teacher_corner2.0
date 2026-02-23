@@ -1,0 +1,47 @@
+<div>
+    <div class="flex justify-end">
+        <button (click)="clickMe()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+
+    <div>
+        <p
+            class="text-center text-2xl font-semibold text-[#292b66] leading-relaxed mb-4"
+        >
+            Set specification for this <br />
+            component
+        </p>
+    </div>
+
+    <div class="bg-blue-50 rounded-xl p-4 m-4 space-y-5">
+        <mat-form-field appearance="fill" class="w-full">
+            <mat-label>Select Size</mat-label>
+            <mat-select [(value)]="selectedSize" [disabled]="sizeOptions.length === 0">
+                <mat-option value="" disabled>Select Size</mat-option>
+                <mat-option
+                    *ngFor="let option of sizeOptions"
+                    [value]="
+                        selectedUnit ? option.key + selectedUnit : option.key
+                    "
+                >
+                    {{ option.key }} {{ selectedUnit }}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+        <div *ngIf="sizeOptions.length === 0" class="flex items-center  text-red-700">
+            <mat-icon class="text-lg">info</mat-icon>
+            <small class="font-medium">No Other Options Are There, click close to add one ....</small>
+          </div>
+        <div class="flex justify-center">
+            <button
+                mat-raised-button
+                color="primary"
+                (click)="sendData()"
+                [disabled]="sizeOptions.length === 0"
+            >
+                Save
+            </button>
+        </div>
+    </div>
+</div>

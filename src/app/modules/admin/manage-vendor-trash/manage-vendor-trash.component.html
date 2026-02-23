@@ -1,0 +1,355 @@
+<div class="py-6 h-screen w-screen overflow-hidden relative">
+    <button (click)="drawerClose()" class="m-3  absolute top-0 right-0 z-40">
+        <mat-icon class=" hover:scale-110 transition duration-5000 transform" svgIcon="mat_outline:close">
+        </mat-icon>
+    </button>
+    <button (click)="emptyTrash()" mat-stroked-button color="warn"
+        class=" m-3 text-center absolute top-1 right-10 z-40">
+        <mat-icon class="text-red-500  cursor-pointer transition duration-500 transform  hover:scale-[115%]"
+            svgIcon="delete_outline">
+        </mat-icon>Empty Trash
+    </button>
+    <div class="pl-4 pr-22 h-10 flex justify-between">
+        <p Class=" font-bold text-lg text-accent-600">View Deleted Vendors
+        </p>
+    </div>
+
+    <div class="w-full ">
+        <div class="grid mt-4 ">
+            <div matSort matSortDisableClear (matSortChange)="sortData($event)"
+                class="inventory-grid gap-4 z-10 sticky top-0 grid py-4 px-10 md:px-8 shadow text-md font-semibold text-secondary bg-gray-50 dark:bg-black dark:bg-opacity-5">
+                <div [mat-sort-header]="'vendorName'">Vendor Name</div>
+                <div [mat-sort-header]="'vendorNumber'">
+                    Vendor Number
+                </div>
+                <!-- <div [mat-sort-header]="'docId'">
+                Institution ID
+            </div> -->
+                <div [mat-sort-header]="'docId'">
+                    Vendor docId
+                </div>
+                <div [mat-sort-header]="'pointOfContactFullName'">
+                    Contact Name
+                </div>
+                <div [mat-sort-header]="'pointOfContactPhoneNumber'">
+                    Contact PhoneNumber
+                </div>
+                <div [mat-sort-header]="'Pincode'">
+                    Pincode
+                </div>
+                <div [mat-sort-header]="'creationDate'">Created On</div>
+                <div [mat-sort-header]="'restore'" class="">
+                    Restore
+                </div>
+                <div class="">View More</div>
+                <div class="">Delete</div>
+            </div>
+
+
+            <div class="overflow-y-auto h-[calc(100vh_-_240px)] ">
+                <ng-container *ngFor="let vendor of deletedvendors">
+                    <div class="inventory-grid grid items-center text-secondary gap-4 py-3 px-10 md:px-8 border-b border-gray-400"
+                        [id]="vendor.docId">
+                        <div class="break-words" (click)="copyToClipboard(vendor?.vendorName)"
+                            [matTooltip]="vendor?.vendorName">
+                            <ng-container *ngIf="vendor?.vendorName?.length > 23; else showFullText">
+                                {{ vendor?.vendorName | slice:0:23 }}...
+                            </ng-container>
+
+                            <ng-template #showFullText>
+                                {{ vendor?.vendorName }}
+                            </ng-template>
+                        </div>
+
+                        <div (click)="copyToClipboard(vendor?.vendorNumber)"
+                            [matTooltip]="vendor?.vendorNumber">
+
+                            {{ vendor?.vendorNumber }}
+                        </div>
+
+                        <div (click)="copyToClipboard(vendor?.docId)" [matTooltip]="vendor?.docId
+                                ">
+
+                            {{ vendor?.docId | slice:0:4 }}...
+                        </div>
+                        <!-- Representative Name -->
+                        <div (click)="copyToClipboard(vendor.pointOfContactFullName)"
+                            [matTooltip]="vendor.pointOfContactFullName">
+                            {{ vendor.pointOfContactFullName }}
+                        </div>
+
+                        <!-- Representative Phone Number -->
+                        <div (click)="copyToClipboard(vendor.pointOfContactPhoneNumber)"
+                            [matTooltip]="vendor.pointOfContactPhoneNumber">
+                            {{ vendor.pointOfContactPhoneNumber }}
+                        </div>
+
+                        <div (click)="copyToClipboard(vendor.Pincode)" [matTooltip]="vendor.Pincode">
+                            {{ vendor.Pincode }}
+                        </div>
+
+
+
+                        <div [matTooltip]="vendor?.createdAt?.seconds*1000| date: 'dd/MM/yyyy'"
+                            (click)="copyToClipboardDate( vendor?.createdAt)">
+                            {{
+                            (vendor?.createdAt?.seconds * 1000
+                            | date : "dd/MM/yyyy")
+                            }}
+                        </div>
+                        <!-- </div> -->
+
+
+                        <!-- </div> -->
+                        <!-- <div [cdkCopyToClipboard]="partner?.verificationStatus || false"
+                            (click)="copyToClipboard(partner?.verificationStatus || false)"
+                            [matTooltip]="partner?.verificationStatus || false" class="lg:ml-3 xs:ml-0">
+                            <mat-slide-toggle [checked]="partner?.verificationStatus || false" [color]="'primary'"
+                                (change)="verificationToggle($event, partner)">
+                            </mat-slide-toggle>
+                        </div> -->
+                        <div>
+                            <mat-icon (click)="restoreVendor(vendor)"
+                            class="text-primary icon-size-5 cursor-pointer transition duration-500 transform  hover:scale-[115%]">
+                            <span class="material-icons">
+                                    restore_from_trash
+                                </span>
+                            </mat-icon>
+                        </div>
+
+                        <div>
+                            <button class="min-w-10 min-h-7 h-7 px-2 leading-6" mat-stroked-button
+                                (click)="toggleDetails(vendor)" [ngClass]="{
+                                        'bg-slate-200':
+                                        selectedvendor?.docId ==
+                                            vendor?.docId
+                                    }">
+                                <mat-icon class="icon-size-5" [svgIcon]="
+                                selectedvendor?.docId ==
+                                            vendor?.docId
+                                                ? 'heroicons_solid:chevron-up'
+                                                : 'heroicons_solid:chevron-down'
+                                        ">
+                                </mat-icon>
+                            </button>
+                        </div>
+
+                        <div class="ml-3">
+                            <div *ngIf="deleteLoader &&(vendor.docId==vendorTobeDeleted.docId); else deleted">
+                                <mat-spinner [diameter]="30"></mat-spinner>
+                            </div>
+                            <ng-template #deleted>
+                                <mat-icon (click)="deleteVendor(vendor)"
+                                    class="text-red-500 cursor-pointer transition duration-500 transform hover:scale-[115%]"
+                                    svgIcon="delete_outline">
+                                </mat-icon>
+                            </ng-template>
+
+                        </div>
+                    </div>
+                    <div class="grid">
+                        <ng-container *ngIf="
+                        selectedvendor?.docId ===
+                                    vendor?.docId
+                                ">
+                                <ng-container *ngTemplateOutlet="rowDetailsTemplate; context: { $implicit: vendor }">
+                            </ng-container>
+                        </ng-container>
+                    </div>
+                </ng-container>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<ng-template #rowDetailsTemplate let-vendor>
+    <div class=" border-b border-slate-300 overflow-scroll bg-blue-100 p-4 pt-10 ">
+        <form [formGroup]="vendorForm">
+            <mat-tab-group disablePagination="false">
+                <mat-tab label="Basic Info">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 -mt-4">
+                        <div class="sm:border-r border-primary-300 sm:pr-6">
+                            <mat-form-field class="w-full text-accent-600 text-sm" floatLabel="always">
+                                <mat-label class="text-accent-600">vendor Name</mat-label>
+                                <input class="" id="" matInput formControlName="vendorName" type="text"
+                                    placeholder="Enter vendor Name" />
+                                <mat-icon class="icon-size-5" matPrefix [svgIcon]="'mat_solid:business'"></mat-icon>
+                            </mat-form-field>
+
+                            <mat-form-field class="w-full text-accent-600 text-sm" floatLabel="always">
+                                <mat-label class="text-accent-600">vendor Gps Coordinates</mat-label>
+                                <input class="" id="" matInput formControlName="vendorGpsCoordinates" type="text"
+                                    placeholder="Enter vendorGpsCoordinates" />
+                                <mat-icon class="icon-size-5" matPrefix [svgIcon]="'mat_solid:business'"></mat-icon>
+                            </mat-form-field>
+
+                            <mat-form-field class="w-full text-accent-600 text-sm" floatLabel="always">
+                                <mat-label class="text-accent-600">Point Of Contact FirstName</mat-label>
+                                <input class="" id="" matInput formControlName="pointOfContactFirstName" type="text"
+                                    placeholder="Enter pointOfContactFirstName" />
+                                <mat-icon class="icon-size-5" matPrefix [svgIcon]="'mat_solid:business'"></mat-icon>
+                            </mat-form-field>
+
+                            <mat-form-field class="w-full text-accent-600 text-sm" floatLabel="always">
+                                <mat-label class="text-accent-600">Point Of Contact Surname</mat-label>
+                                <input class="" id="" matInput formControlName="pointOfContactSurname" type="text"
+                                    placeholder="Enter pointOfContactSurname" />
+                                <mat-icon class="icon-size-5" matPrefix [svgIcon]="'mat_solid:business'"></mat-icon>
+                            </mat-form-field>
+
+                            <mat-form-field class="w-full text-accent-600 text-sm" floatLabel="always">
+                                <mat-label class="text-accent-600">Point Of Contact CountryCode</mat-label>
+                                <input class="" id="" matInput formControlName="pointOfContactCountryCode" type="text"
+                                    placeholder="Enter pointOfContactCountryCode" />
+                                <mat-icon class="icon-size-5" matPrefix [svgIcon]="'heroicons_solid:pencil'"></mat-icon>
+                            </mat-form-field>
+                        </div>
+                        <div class="sm:border-r border-primary-300 sm:px-6">
+                            <mat-form-field class="w-full text-accent-600 text-sm" floatLabel="always">
+                                <mat-label class="text-accent-600">point Of Contact PhoneNumber</mat-label>
+                                <input class="" id="" matInput formControlName="pointOfContactPhoneNumber" type="text"
+                                    placeholder="Enter pointOfContactPhoneNumber">
+                                <mat-icon class="icon-size-5" matPrefix
+                                    [svgIcon]="'mat_outline:person_outline'"></mat-icon>
+                            </mat-form-field>
+                            <mat-form-field class="w-full text-accent-600 text-sm" floatLabel="always">
+                                <mat-label class="text-accent-600">pincode</mat-label>
+                                <input class="" id="" matInput formControlName="Pincode" type="text"
+                                    placeholder="Enter pincode" />
+                                <mat-icon class="icon-size-5" matPrefix
+                                    [svgIcon]="'mat_outline:person_outline'"></mat-icon>
+                            </mat-form-field>
+                            <!-- <mat-form-field class="w-full text-accent-600 text-sm" floatLabel="always">
+                                <mat-label class="text-accent-600">partnerAddress</mat-label>
+                                <input class="" id="" matInput formControlName="partnerAddress" type="text"
+                                    placeholder="Enter partnerAddress" />
+                                <mat-icon class="icon-size-5" matPrefix
+                                    [svgIcon]="'mat_solid:alternate_email'"></mat-icon>
+                            </mat-form-field> -->
+                            <mat-form-field class="w-full text-accent-600 text-sm" floatLabel="always">
+                                <mat-label class="text-accent-600">Vendor Number</mat-label>
+                                <span>+91</span>
+                                <input class="" id="" matInput formControlName="vendorNumber" type="text"
+                                    placeholder="Enter oragnization phoneNumber" />
+                                <mat-icon class="icon-size-5" matPrefix [svgIcon]="'mat_solid:phone_iphone'"></mat-icon>
+                            </mat-form-field>
+
+                            <mat-form-field class="w-full text-accent-600 text-sm" floatLabel="always">
+                                <mat-label class="text-accent-600">Vendor ID</mat-label>
+                                <input class="" id="" matInput type="text" disabled="true" readonly="true"
+                                    formControlName="docId" aria-disabled="true" [value]="vendor?.docId" />
+                                <mat-icon (click)="copyToClipboard(vendor?.docId)" svgIcon="mat_solid:content_copy"
+                                    matTooltip="Copy vendor ID"></mat-icon>
+                            </mat-form-field>
+
+                            <mat-form-field class="w-full text-accent-600 text-sm" floatLabel="always">
+                                <mat-label class="text-accent-600">Country</mat-label>
+                                <mat-select formControlName="Country" placeholder="Boys / Girls / Co-ed">
+                                    <mat-option *ngFor="let country of countries" [value]="country">
+                                        {{ country }}
+                                    </mat-option>
+                                </mat-select>
+                                <mat-icon class="icon-size-5" matPrefix [svgIcon]="'mat_solid:female'"></mat-icon>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="flex justify-center items-center mt-2">
+                        <button [disabled]="!saveButtonActive" mat-stroked-button type="submit"
+                            class="bg-primary text-white disabled:bg-primary-300 disabled:border">
+                            <div *ngIf="startLoading; else saveButton">
+                                <mat-spinner [diameter]="30"></mat-spinner>
+                            </div>
+                            <ng-template #saveButton>
+                                Save
+                            </ng-template>
+                        </button>
+                    </div>
+                </mat-tab>
+
+                <mat-tab label="Address">
+                    <div formGroupName="vendorAddress" class="grid grid-cols-1 sm:grid-cols-2 -mt-4">
+                        <div class="sm:border-r border-primary-300 sm:pr-6">
+
+                            <mat-form-field class="w-full text-accent-600 text-sm" floatLabel="always">
+                                <mat-label class="text-accent-600">Route</mat-label>
+                                <input class="" id="" matInput formControlName="route" type="text"
+                                    placeholder="Enter Route name" />
+                                <mat-icon class="icon-size-5" matPrefix
+                                    [svgIcon]="'mat_outline:location_on'"></mat-icon>
+                            </mat-form-field>
+
+                            <mat-form-field class="w-full text-accent-600 text-sm" floatLabel="always">
+                                <mat-label class="text-accent-600">Street</mat-label>
+                                <input class="" id="" matInput formControlName="street" type="text"
+                                    placeholder="Enter Street Name" />
+                                <mat-icon class="icon-size-5" matPrefix
+                                    [svgIcon]="'mat_outline:location_on'"></mat-icon>
+                            </mat-form-field>
+
+                            <mat-form-field class="w-full text-accent-600 text-sm" floatLabel="always">
+                                <mat-label class="text-accent-600">Village Name</mat-label>
+                                <input class="" id="" matInput formControlName="village" type="text"
+                                    placeholder="Enter Village Name" />
+                                <mat-icon class="icon-size-5" matPrefix
+                                    [svgIcon]="'mat_outline:location_on'"></mat-icon>
+                            </mat-form-field>
+
+                            <mat-form-field class="w-full text-accent-600 text-sm" floatLabel="always">
+                                <mat-label class="text-accent-600">Sublocality
+                                </mat-label>
+                                <input class="" id="" matInput formControlName="sublocality" type="text"
+                                    placeholder="Enter Sublocality" />
+                                <mat-icon class="icon-size-5" matPrefix
+                                    [svgIcon]="'mat_outline:location_on'"></mat-icon>
+                            </mat-form-field>
+
+                        </div>
+                        <div class="sm:border-r border-primary-300 sm:px-6">
+                            <mat-form-field class="w-full text-accent-600 text-sm" floatLabel="always">
+                                <mat-label class="text-accent-600">District Name</mat-label>
+                                <input class="" id="" matInput formControlName="district" type="text"
+                                    placeholder="Enter District Name" />
+                                <mat-icon class="icon-size-5" matPrefix
+                                    [svgIcon]="'mat_outline:location_on'"></mat-icon>
+                            </mat-form-field>
+
+                            <mat-form-field class="w-full text-accent-600 text-sm" floatLabel="always">
+                                <mat-label class="text-accent-600">City Name</mat-label>
+                                <input class="" id="" matInput formControlName="city" type="text"
+                                    placeholder="Enter City Name" />
+                                <mat-icon class="icon-size-5" matPrefix
+                                    [svgIcon]="'mat_outline:location_on'"></mat-icon>
+                            </mat-form-field>
+
+                            <mat-form-field class="w-full text-accent-600 text-sm" floatLabel="always">
+                                <mat-label class="text-accent-600">Sub District Name</mat-label>
+                                <input class="" id="" matInput formControlName="subDistrict" type="text"
+                                    placeholder="Enter Sub District Name" />
+                                <mat-icon class="icon-size-5" matPrefix
+                                    [svgIcon]="'mat_outline:location_on'"></mat-icon>
+                            </mat-form-field>
+
+                            <mat-form-field class="w-full text-accent-600 text-sm" floatLabel="always">
+                                <mat-label class="text-accent-600">State
+                                </mat-label>
+                                <input class="" id="" matInput formControlName="state" type="text"
+                                    placeholder="Enter State Name" />
+                                <mat-icon class="icon-size-5" matPrefix
+                                    [svgIcon]="'mat_outline:location_on'"></mat-icon>
+                            </mat-form-field>
+
+
+                        </div>
+                    </div>
+                    <div class="flex justify-center items-center mt-2">
+                        <button [disabled]="!saveButtonActive" mat-stroked-button type="submit"
+                            class="bg-primary text-white disabled:bg-primary-300 disabled:border">
+                            Save
+                        </button>
+                    </div>
+                </mat-tab>
+            </mat-tab-group>
+        </form>
+    </div>
+</ng-template>

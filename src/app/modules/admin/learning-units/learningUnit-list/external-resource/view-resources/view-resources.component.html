@@ -1,0 +1,152 @@
+<div class=" h-3 w-[75vw] flex flex-row-reverse ">
+    <button mat-dialog-close class="" (click)="close()">
+        <mat-icon class=" hover:scale-110 transition duration-1000 transform" svgIcon="mat_outline:close">
+        </mat-icon>
+    </button>
+</div>
+<div class="w-[75vw] h-[80vh] overflow-scroll">
+
+    <div
+        class="inventory-grid  w-[2200px] grid py-5 gap-3 pr-22 pl-8  shadow text-md font-semibold text-secondary bg-gray-50 dark:bg-black dark:bg-opacity-5 ">
+        <div>Board</div>
+        <div class="pl-16" *ngFor="let grade of grades">{{grade.name}}</div>
+    </div>
+
+    <div *ngIf="!loading ; else showloading">
+        <div
+            class="inventory-grid1 grid  w-[2200px] items-center text-secondary gap-4 py-3 px-10 md:px-8 border-b border-gray-400 ">
+
+            <div class="font-bold">Universal Board and Grade</div>
+            <div class="ml-20">
+                <div class="flex   justify-center">
+                    <div class="flex flex-col bg-grey-lighter">
+                        <label matRipple
+                            class=" border border-primary relative w-17 right-2 flex flex-col items-center  rounded-l-lg rounded-r-none py-[6px] px-[2px] cursor-pointer bg-slate-100 text-primary-600">
+                            <ng-container *ngIf="this.data?.componentDetails?.type === 'file'">
+                                <div class="flex items-center ">
+                                    <span class=" md:mr-6  relative text-[11px] sm:ml-6">
+                                        {{
+                                        resourceInfo?.universalGradeBoardResourcePath ?
+                                        "Re-Upload" :
+                                        "&nbsp;&nbsp;Upload&nbsp;"
+                                        }}
+                                    </span>
+                                </div>
+                                <input type='file' class="hidden" (change)="uploaduniversalGradeBoardResource($event)"
+                                    #elementRef1 />
+                            </ng-container>
+
+                            <ng-container *ngIf="this.data?.componentDetails?.type === 'video'">
+                                <input [readonly]="trashUINotEditable==true?true:false" class="w-full"
+                                    (keyup)="onInputModifyUniversalGradeBoardResource($event)"
+                                    [value]="resourceInfo?.universalGradeBoardResourcePath"
+                                    placeholder="Paste video URL">
+                            </ng-container>
+                        </label>
+
+                    </div>
+
+                    <button
+                        class="w-15 bg-primary-600 hover:bg-primary disabled:bg-primary-100 py-[6px] disabled:border-primary-200 border border-primary-600 rounded-lg rounded-l-none text-white active:bg-primary-800 cursor-pointer relative text-[11px]"
+                        [disabled]="!resourceInfo?.universalGradeBoardResourcePath">
+                        <div class=" w-full">
+                            <ng-container *ngIf="this.data?.componentDetails?.type === 'file'">
+                                <a target="_blank"
+                                    [href]="resourceInfo?.universalGradeBoardResourcePath | getDownloadURL"
+                                    class="w-full h-full flex items-center justify-center">
+                                    View
+                                </a>
+                            </ng-container>
+                            <ng-container *ngIf="this.data?.componentDetails?.type === 'video'">
+                                <a [ariaDisabled]="true" target="_blank"
+                                    [href]="resourceInfo?.universalGradeBoardResourcePath"
+                                    class="w-full h-full flex items-center justify-center">
+                                    <p>View</p>
+                                </a>
+                            </ng-container>
+                        </div>
+                    </button>
+                    <!-- <div class="w-15" *ngIf="b.value[grade.code]">
+                    <div class="w-full py-[6px]  border border-primary-600 rounded-lg rounded-l-none
+                    bg-primary-600 hover:bg-primary text-white
+                    active:bg-primary-800 cursor-pointer relative  text-[11px]">
+                        <a target="_blank" [href]="b.value[grade.code]| getDownloadURL"
+                            class="w-full h-full flex items-center justify-center">
+                            View
+                        </a>
+                    </div>
+                </div> -->
+                </div>
+            </div>
+        </div>
+        <div class="inventory-grid grid  w-[2200px] items-center text-secondary gap-4 py-3 px-10 md:px-8 border-b border-gray-400 "
+            *ngFor="let b of filteredResourceInfo |keyvalue ">
+            <div class="font-bold">{{b?.key}}</div>
+            <div *ngFor="let grade of grades">
+                <div class="flex  mt-1 justify-center">
+                    <div class="flex flex-col bg-grey-lighter">
+                        <label matRipple
+                            class=" border border-primary relative w-17 right-2 flex flex-col items-center rounded-l-lg rounded-r-none py-[6px] px-[2px] cursor-pointer bg-slate-100 text-primary-600">
+                            <ng-container *ngIf="this.data?.componentDetails?.type === 'file'">
+                                <div class="flex items-center">
+                                    <span class=" md:mr-6  relative text-[11px] sm:ml-6">
+                                        {{b.value[grade.code] ? "Re-Upload" : "&nbsp;&nbsp;Upload&nbsp;"}}
+                                    </span>
+                                </div>
+                                <input type='file' class="hidden" (change)="uploadFile($event,b?.key,grade.code)"
+                                    #elementRef />
+                            </ng-container>
+
+                            <ng-container *ngIf="this.data?.componentDetails?.type === 'video'">
+                                <input [readonly]="trashUINotEditable==true?true:false" class="w-full"
+                                    (keyup)="onInputModify($event, b?.key, grade.code)"
+                                    [value]="b?.value?.[grade?.code] ? b?.value?.[grade?.code] : 'Paste video URL' " placeholder="Paste video URL">
+                            </ng-container>
+                        </label>
+
+                    </div>
+
+                    <button
+                        class="w-15 bg-primary-600 hover:bg-primary disabled:bg-primary-100 py-[6px] disabled:border-primary-200 border border-primary-600 rounded-lg rounded-l-none text-white active:bg-primary-800 cursor-pointer relative  text-[11px]"
+                        [disabled]="!b.value[grade.code]">
+                        <div class=" w-full">
+                            <ng-container *ngIf="this.data?.componentDetails?.type === 'file'">
+                                <a target="_blank" [href]="b.value[grade.code]| getDownloadURL"
+                                    class="w-full h-full flex items-center justify-center">
+                                    View
+                                </a>
+                            </ng-container>
+
+                            <ng-container *ngIf="this.data?.componentDetails?.type === 'video'">
+                                <a [ariaDisabled]="true" target="_blank" [href]="b?.value?.[grade?.code]"
+                                    class="w-full h-full flex items-center justify-center">
+                                    <p>View</p>
+                                </a>
+                            </ng-container>
+                        </div>
+                    </button>
+                    <!-- <div class="w-15" *ngIf="b.value[grade.code]">
+                    <div class="w-full py-[6px]  border border-primary-600 rounded-lg rounded-l-none
+                    bg-primary-600 hover:bg-primary text-white
+                    active:bg-primary-800 cursor-pointer relative  text-[11px]">
+                        <a target="_blank" [href]="b.value[grade.code]| getDownloadURL"
+                            class="w-full h-full flex items-center justify-center">
+                            View
+                        </a>
+                    </div>
+                </div> -->
+
+                    <mat-icon color="primary" class="ml-1 mt-2" (click)="copyFileName(grade,b)"
+                        svgIcon="mat_solid:content_copy" matTooltip="Copy file name"></mat-icon>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+    <ng-template #showloading>
+        <div class="loading-container">
+            <mat-spinner [diameter]="30"></mat-spinner>
+        </div>
+    </ng-template>
+</div>

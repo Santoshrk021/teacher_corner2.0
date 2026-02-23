@@ -1,0 +1,170 @@
+<div class=" border-primary-300 w-full ">
+    <form [formGroup]="additionalResourcesForm" (ngSubmit)="saveAdditonalResources(additionalResourcesForm)" class="">
+        <div formArrayName="resources">
+            <div class="row" *ngFor="let resource of resource?.controls; let i = index" class="margin-top">
+                <div [formGroupName]="i">
+                    <div
+                        class="md:grid md:grid-cols-2 gap-6 sm:h-115 md:h-80 mt-8 w-full  sm:flex sm:flex-col bg-white shadow rounded-2xl px-8 pt-6 pb-13 mb-4 relative">
+                        <div class="border-primary-300 w-full md:col-span-1">
+                            <mat-form-field class=" text-accent-600 text-sm w-full">
+                                <mat-label class="text-accent-600">Resource Title</mat-label>
+                                <input [title]="trashUINotEditable?matTooltipMsg:''" class="" id="" matInput type="text"
+                                    placeholder="Enter Learning Unit Name" formControlName='title'>
+                                <mat-icon class="icon-size-5" matPrefix [svgIcon]="'heroicons_solid:pencil'"></mat-icon>
+                            </mat-form-field>
+
+                            <div class="md:grid md:grid-cols-3  gap-4 w-full ">
+                                <mat-form-field class=" text-accent-600 text-sm w-full ">
+                                    <mat-label class="text-accent-600">Select File Type *</mat-label>
+                                    <mat-select placeholder="Select File Type" [value]="selectType[i]"
+                                        (selectionChange)="selectFileType($event,i)">
+                                        <mat-option [disabled]="trashUINotEditable==true?true:false"
+                                            *ngFor="let fType of fileTypeOptions"
+                                            [value]="fType.name">{{fType.name}}</mat-option>
+                                    </mat-select>
+                                    <mat-icon svgIcon="mat_solid:blur_linear" matPrefix></mat-icon>
+                                </mat-form-field>
+
+                                <div *ngIf="resource?.value?.type==='VIDEO'; else elseBlock" class="w-full">
+                                    <mat-form-field class="w-full text-accent-600 text-sm">
+                                        <mat-label class="text-accent-600">Resource Video Url</mat-label>
+                                        <input [title]="trashUINotEditable?matTooltipMsg:''" class="" id="videoUrl"
+                                            matInput type="text" placeholder="Entern Video URl"
+                                            formControlName='resourcePath' (change)="checkVideoUrl($event,i)">
+                                        <mat-icon class="icon-size-5" matPrefix
+                                            [svgIcon]="'heroicons_solid:pencil'"></mat-icon>
+                                    </mat-form-field>
+                                    <mat-error *ngIf="files[i]?.type==='ERROR'">Enter valid URL</mat-error>
+                                </div>
+
+                                <ng-template #elseBlock>
+                                    <div class="mt-6" *ngIf="resource?.value?.type==='UPLOAD'; else elseBlock1">
+                                        <label matRipple class=" border border-primary relative w-full h-12 right-0
+                                     flex flex-col items-center  rounded-lg p-2  cursor-pointer
+                                       bg-slate-100 text-primary-600 hover:bg-slate-200">
+                                            <span class=" md:mx-2 absolute left-0 sm:mr-2 mt-[-2px] ">
+                                                <mat-icon class="text-primary mt-1"
+                                                    svgIcon="heroicons_outline:arrow-circle-up"></mat-icon>
+                                            </span>
+                                            <div *ngIf="resource?.value?.fileExtension==='pdf';else elseBlock"
+                                                class="flex items-center justify-center mt-1">
+                                                <span class=" md:mr-2 md:text-base relative sm:text-[10px] sm:ml-2">
+                                                    {{resource?.value?.resourcePath!==''?'Re-Upload':'Upload'}}</span>
+                                                <input [disabled]="trashUINotEditable==true?true:false" type='file'
+                                                    class="hidden" accept=".pdf" (change)="selectFile($event,i)"
+                                                    #elementRef />
+                                            </div>
+
+                                            <ng-template #elseBlock>
+                                                <div class="flex items-center justify-center mt-1">
+                                                    <span class=" md:ml-6 md:text-base relative sm:text-[10px] sm:ml-4">
+                                                        {{
+                                                        resource?.value?.resourcePath!=='' ?
+                                                        'Re-UploadPPT' :
+                                                        'Upload PPT'
+                                                        }}
+                                                    </span>
+                                                </div>
+                                                <input [disabled]="trashUINotEditable==true?true:false" type='file'
+                                                    class="hidden" accept=".ppt,.pptx" (change)="selectFile($event,i)"
+                                                    #elementRef />
+                                            </ng-template>
+                                        </label>
+                                    </div>
+                                </ng-template>
+
+                                <div class="mt-6">
+                                    <button matRipple type="button" class="w-full sm:mr-1 p-2 border border-primary-600 rounded-lg rounded-l-none
+                                          bg-primary-600 hover:bg-primary text-white h-12 active:bg-primary-800
+                                          cursor-pointer relative md:left-0 sm:left-0">
+                                        <div>
+                                            <a target="_blank" *ngIf="i>=resourceCopy?.length && resource?.value?.type!=='VIDEO'
+                                                && resource?.value?.type!=='UPLOAD'" [href]="">
+                                                <p class="w-full mr-1">View</p>
+                                            </a>
+
+                                            <a target="_blank" *ngIf="resource?.value?.type==='UPLOAD'"
+                                                [href]="resource?.value?.resourcePath | getDownloadURL ">
+                                                <p class="w-full mr-1">View</p>
+                                            </a>
+
+                                            <a target="_blank" *ngIf="resource?.value?.type==='VIDEO'"
+                                                [href]="resource?.value?.resourcePath">
+                                                <p class="w-full mr-1">View</p>
+                                            </a>
+
+                                            <a target="_blank" *ngIf="resource?.value?.type==='ERROR'"
+                                                [href]="resource?.value?.resourcePath">
+                                                <p class="w-full mr-1">View</p>
+                                            </a>
+                                        </div>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div *ngIf="resource.value.uploadProgress !=0 && resource.value.uploadProgress <100;else successfullyUploaded"
+                                class="pl-2 grid grid-cols-1 gap-1 justify-center">
+                                <mat-progress-bar mode="buffer" [value]="resource.value.uploadProgress">
+                                </mat-progress-bar>
+                                <p class="mb-3" class="text-yellow-500">
+                                    {{resource.value.uploadProgress}}% uploaded</p>
+                            </div>
+
+                            <ng-template #successfullyUploaded>
+                                <p *ngIf="resource.value.uploadProgress==100" class="mb-3" class="text-green-500">
+                                    Successfully Uploaded</p>
+                            </ng-template>
+
+                            <div class="mt-2 grid grid-cols-2 gap-4">
+                                <mat-form-field class="w-full text-accent-600 text-sm">
+                                    <mat-label class="text-accent-600">Publish</mat-label>
+                                    <mat-select [(value)]="publishstates[i]" formControlName="publish"
+                                        placeholder="Mode" (selectionChange)="selectPublish($event,i)">
+                                        <mat-option value="true">true</mat-option>
+                                        <mat-option value="false">false</mat-option>
+                                    </mat-select>
+                                    <mat-icon svgIcon="mat_solid:blur_linear" matPrefix></mat-icon>
+                                </mat-form-field>
+                            </div>
+                        </div>
+
+                        <div class="border-primary-300 md:col-span-1 ">
+                            <mat-form-field appearance="fill" class="w-full text-accent-600 text-sm ">
+                                <mat-label class="text-accent-600">Short Description</mat-label>
+                                <textarea [title]="trashUINotEditable?matTooltipMsg:''" matInput
+                                    formControlName="shortdescription">
+                                </textarea>
+                            </mat-form-field>
+
+                            <button mat-dialog-close class="m-4 sm:m-6 sm:mx-7 absolute -top-5 -right-5 z-40">
+                                <mat-icon class="text-red-500 hover:scale-110 transition duration-5000 transform"
+                                    svgIcon="mat_solid:delete_outline" (click)=" removeFormgroup(i)">
+                                </mat-icon>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div [ngClass]="trashUINotEditable==true?'hidden':''" class="w-full xs:grid-cols-8 grid">
+                <div class="col-span-2">
+                    <button matRipple matTooltipPosition="above" matTooltip="" type="button"
+                        class="h-10   paddingTop px-3 bg-primary-600 hover:bg-primary-500 font-semibold cursor-pointer  text-white rounded-full flex justify-center items-center"
+                        (click)="addResources()">
+                        <p>Add New Resource</p>
+                        <mat-icon class="text-white ml-2" svgIcon="heroicons_outline:plus-circle"></mat-icon>
+                    </button>
+                </div>
+
+                <div class="col-span-6 sm:mx-auto xs:text-right">
+                    <button type="submit"
+                        class=" px-4 h-10 active:bg-primary-700 rounded-full cursor-pointer text-white "
+                        [disabled]="additionalResourcesForm.invalid  || !enableForm"
+                        [ngClass]="additionalResourcesForm.invalid || !enableForm?'bg-primary-300':'bg-primary-600'">
+                        Save
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

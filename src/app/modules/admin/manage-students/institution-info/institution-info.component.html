@@ -1,0 +1,103 @@
+<div class="grid grid-flow-row m-auto bg-white border shadow rounded-2xl w-full sm:w-[30vw] p-6">
+    <div *ngIf="isLoaded; else loadingSpinner">
+        <form [formGroup]="classCreate" (ngSubmit)="onclassCreateSubmit(classCreate)">
+            <div class="flex flex-col w-full">
+                <!-- Select Country -->
+                <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                    <mat-label class="text-[#282B66]">Select Country</mat-label>
+                    <mat-select formControlName="country" placeholder="Select Country Name">
+                        <mat-option value="" disabled selected>Select</mat-option>
+                        <mat-option *ngFor="let country of countryCodes|keyvalue" [value]="country?.key"
+                            matTooltipPosition="right"
+                            [matTooltip]="country?.value?.displayName">{{country?.value?.displayName}}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <!-- Enter Pincode -->
+                <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                    <mat-label class="text-[#282B66]">Search a school from pincode</mat-label>
+                    <input id="pincode" maxlength="9" matInput formControlName="pincode" type="text"
+                        placeholder="Enter School Pincode">
+                    <mat-error *ngIf="classCreate?.get('pincode')?.invalid">
+                        School Pincode is required
+                    </mat-error>
+                </mat-form-field>
+
+                <!-- Select Board -->
+                <div class="w-full">
+                    <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                        <mat-label class="text-[#282B66]">Select Board</mat-label>
+                        <mat-select formControlName="board" placeholder="Select Board Name">
+                            <mat-option value="" disabled selected>Select</mat-option>
+                            <mat-option *ngFor="let board of countryBoard" [value]="board?.code"
+                                matTooltipPosition="right" [matTooltip]="board?.name" class="text-sm">
+                                {{board?.name}}
+                            </mat-option>
+                            <mat-option *ngIf="!isAddNewBoard && classCreate?.get('country')?.value !== 'india'">
+                                <span class="bg-gray-200 rounded-full text-gray-500 py-2 px-4"
+                                    (click)="isAddNewBoard = true;">Add A New Board&nbsp;&nbsp;
+                                    <mat-icon class="m-0" svgIcon="feather:plus-circle"></mat-icon>
+                                </span>
+                            </mat-option>
+                            <mat-option *ngIf="isAddNewBoard" [value]="addNewBoard.value">
+                                <div class="flex flex-row">
+                                    <input type="text" #addNewBoard matInput id="addNewBoard" formControlName="board"
+                                        (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()"
+                                        placeholder="Enter Board Name">
+                                    <span>
+                                        <mat-icon class="m-0 text-red-500" svgIcon="heroicons_solid:x-mark"
+                                            matTooltip="Clear the field"
+                                            (click)="schoolInfo?.get('board')?.reset(); isAddNewBoard = false"></mat-icon>
+                                    </span>
+                                    <span>
+                                        <mat-icon class="m-0 ml-2 text-green-500" svgIcon="heroicons_solid:check"
+                                            matTooltip="Save the new board" (click)="saveNewBoard()"></mat-icon>
+                                    </span>
+                                </div>
+                            </mat-option>
+                        </mat-select>
+                        <mat-error *ngIf="classCreate.get('board')?.invalid &&classCreate.get('board')?.touched">
+                            School Board is required
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+
+                <!-- Select School -->
+                <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                    <mat-label class="text-[#282B66]">Select School</mat-label>
+                    <mat-select formControlName="institutionData" placeholder="Select School form the list"
+                        (selectionChange)="onChangeInstitution($event)">
+                        <mat-option value="" disabled selected>Select a school</mat-option>
+                        <mat-option *ngFor="let school of institutions$ | async" [value]="school.payload.doc.data()">
+                            {{school.payload.doc.get('institutionName')}} </mat-option>
+                        <mat-option (click)="createSchool()"><span
+                                class="bg-gray-200 rounded-full text-gray-500 py-2 px-4">Add a New
+                                Institution&nbsp;&nbsp;
+                                <mat-icon class="m-0" svgIcon="feather:plus-circle"></mat-icon>
+                            </span>
+                        </mat-option>
+                    </mat-select>
+                    <mat-error
+                        *ngIf="classCreate.get('institutionName')?.invalid &&classCreate.get('institutionName')?.touched">
+                        School is required
+                    </mat-error>
+                </mat-form-field>
+            </div>
+
+            <!-- Continue Button -->
+            <div class="text-center" *ngIf="showContinueButton">
+                <button (click)="onContinue()" type="submit" [disabled]="classCreate.invalid"
+                    class="disabled:bg-primary-100 fuse-mat-stroked-button-large bg-primary-600 text-white hover:bg-primary-500"
+                    mat-stroked-button>
+                    Continue
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <ng-template #loadingSpinner>
+        <div class="flex h-full w-full items-center justify-center">
+            <mat-spinner [diameter]="35"></mat-spinner>
+        </div>
+    </ng-template>
+</div>

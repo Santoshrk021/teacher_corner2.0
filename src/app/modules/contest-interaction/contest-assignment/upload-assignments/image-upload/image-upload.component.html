@@ -1,0 +1,227 @@
+<div class="mr-6">
+    <!-- <h2 class="text-2xl sm:text-2xl text-accent text-center mb-4">Upload the image of completed activity</h2> -->
+    <table>
+        <tr>
+            <th class="w-1/3 pb-4 text-primary">Due Date</th>
+            <!-- <td class="pb-4 text-secondary">{{currentWorkflow?.contents
+                [0].assignmentDueDate?.seconds*1000 | date}}</td> -->
+            <td class="pb-4 text-secondary">{{assignmentData?.dueDate?.seconds*1000 | date}}</td>
+        </tr>
+        <tr>
+            <th class="w-1/3 pb-4 text-primary">Instructions</th>
+            <td class="pb-4 text-secondary">
+                <div *ngIf="assignmentData?.instructions?.includes('<'); else textOnly"
+                    [innerHTML]="assignmentData?.instructions"></div>
+                <ng-template #textOnly>{{assignmentData?.instructions}}</ng-template>
+            </td>
+        </tr>
+
+        <tr>
+            <th class="w-1/3 text-primary">Assignment</th>
+            <td class="">
+                <div class="flex items-center">
+
+                    <!-- contest timelines upload logic temporarily commented -->
+
+                    <!--
+                    <div *ngIf="!isFinalSubmission" class="flex flex-col sm:flex-row sm:items-center  bg-grey-lighter">
+                        <label *ngIf="!incompleteSubmissions?.length"
+                            class="max-w-36 flex flex-col items-center scale-90 mat-flat-button active:bg-primary-400 bg-primary text-white hover:bg-primary-700">
+                            <div class="flex items-center m-2">
+                                <span *ngIf="bytesTransferred==100" class="m-1">
+                                    <mat-icon svgIcon="heroicons_outline:check"></mat-icon>
+                                </span>
+                                <span *ngIf="!filename" class="mr-1">
+                                    <mat-icon svgIcon="heroicons_outline:plus"></mat-icon>
+                                </span>
+                                <span class=" mr-2 text-base"> {{storedFilePath?'Re-upload' : 'Upload'}}</span>
+                            </div>
+                            <input type='file' class="hidden" accept=".jpg,.png" #elementRef
+                                (change)="upload($event)" />
+                        </label>
+                        <label *ngIf="incompleteSubmissions?.length" (click)="onClickUploadAlt()"
+                            class="max-w-36 flex flex-col items-center scale-90 mat-flat-button active:bg-primary-400 bg-primary text-white hover:bg-primary-700">
+                            <div class="flex items-center m-2">
+                                <span *ngIf="bytesTransferred==100" class="m-1">
+                                    <mat-icon svgIcon="heroicons_outline:check"></mat-icon>
+                                </span>
+                                <span *ngIf="!filename" class="mr-1">
+                                    <mat-icon svgIcon="heroicons_outline:plus"></mat-icon>
+                                </span>
+                                <span class=" mr-2 text-base"> {{storedFilePath?'Re-upload' : 'Upload'}}</span>
+                            </div>
+                        </label>
+                    </div>
+                    <div *ngIf="isFinalSubmission && !isContestEnd"
+                        class="flex flex-col sm:flex-row  sm:items-center  bg-grey-lighter">
+                        <label
+                            class="max-w-36 flex flex-col items-center  scale-90 mat-flat-button active:bg-primary-400 bg-primary-100 pointer-events-none text-white hover:bg-primary-700">
+                            <div class="flex items-center m-2">
+                                <span class="mr-1">
+                                    <mat-icon svgIcon="heroicons_outline:plus"></mat-icon>
+                                </span>
+                                <span class=" mr-2 text-base"> {{storedFilePath?'Re-upload' : 'Upload'}}</span>
+                            </div>
+                        </label>
+                    </div>
+                    <div *ngIf="isFinalSubmission && isContestEnd"
+                        class="flex flex-col sm:flex-row  sm:items-center  bg-grey-lighter">
+                        <label
+                            class="max-w-36 flex flex-col items-center  scale-90 mat-flat-button  pointer-events-none text-white bg-slate-400 ">
+                            <div class="flex items-center m-2">
+                                <span class="mr-1">
+                                    <mat-icon svgIcon="heroicons_outline:plus"></mat-icon>
+                                </span>
+                                <span class=" mr-2 text-base"> {{'Upload'}}</span>
+                            </div>
+                        </label>
+                    </div>
+
+                    <div *ngIf="!isContestStarted && !isContestEnd"
+                        class="flex flex-col sm:flex-row  sm:items-center  bg-grey-lighter">
+                        <label
+                            class="max-w-36 flex flex-col items-center  scale-90 mat-flat-button  pointer-events-none text-white bg-slate-400 ">
+                            <div class="flex items-center m-2">
+                                <span class="mr-1">
+                                    <mat-icon svgIcon="heroicons_outline:plus"></mat-icon>
+                                </span>
+                                <span class=" mr-2 text-base"> {{'Upload'}}</span>
+                            </div>
+                        </label>
+                    </div>
+-->
+                    <div *ngIf="!inBetweenContest" class="flex flex-col sm:flex-row sm:items-center bg-grey-lighter">
+                        <!-- {{currentStage?.submissions[0]?.displayName}} -->
+                        <!-- {{contestInfo.contestTitle}}
+                        {{currentStage?.endDate?.seconds * 1000 | date}}
+                        {{currentStage?.startDate?.seconds * 1000 | date}} -->
+
+                        <label
+                            class="max-w-36 flex flex-col items-center scale-90 mat-flat-button text-white bg-slate-300"
+                            [matTooltip]="
+                      inBetweenContest ? '' :
+                      (isContestStarted
+                          ? 'The Stage ' + (currentStage?.submissions?.[0]?.displayName || '') +
+                            ' of the ' + (contestInfo?.contestTitle || '') +
+                            ' starts on the date of ' + (currentStage?.startDate?.seconds * 1000 | date:'dd/MM/yyyy')
+                          : 'The Stage ' + (currentStage?.submissions?.[0]?.displayName || '') +
+                            ' of the ' + (contestInfo?.contestTitle || '') +
+                            ' ended on the date of ' + (currentStage?.endDate?.seconds * 1000 | date:'dd/MM/yyyy')
+                      )" matTooltipPosition="above">
+                            <div class="flex items-center m-2">
+                                <span class="mr-1">
+                                    <mat-icon svgIcon="heroicons_outline:plus"></mat-icon>
+                                </span>
+                                <span class="mr-2 text-base">{{ storedFilePath ? 'Re-upload' : 'Upload' }}</span>
+                            </div>
+                        </label>
+
+                    </div>
+
+
+                    <div *ngIf="inBetweenContest" class="flex flex-col sm:flex-row sm:items-center bg-grey-lighter">
+                        <!-- {{currentStage?.submissions[0]?.displayName}} -->
+
+                        <label *ngIf="!incompleteSubmissions?.length"
+                            class="max-w-36 flex flex-col items-center scale-90 mat-flat-button active:bg-primary-400 bg-primary text-white hover:bg-primary-700"
+                            matTooltip="Upload your file" matTooltipPosition="above">
+                            <div class="flex items-center m-2">
+                                <span *ngIf="bytesTransferred==100" class="m-1">
+                                    <mat-icon svgIcon="heroicons_outline:check"></mat-icon>
+                                </span>
+                                <span *ngIf="!filename" class="mr-1">
+                                    <mat-icon svgIcon="heroicons_outline:plus"></mat-icon>
+                                </span>
+                                <span class="mr-2 text-base">{{ storedFilePath ? 'Re-upload' : 'Upload' }}</span>
+                            </div>
+                            <input type="file" class="hidden" accept=".jpg,.png" #elementRef
+                                (change)="upload($event)" />
+                        </label>
+
+                        <label *ngIf="incompleteSubmissions?.length" (click)="onClickUploadAlt()"
+                            class="max-w-36 flex flex-col items-center scale-90 mat-flat-button active:bg-primary-400 bg-primary text-white hover:bg-primary-700"
+                            matTooltip="Upload your file" matTooltipPosition="above">
+                            <div class="flex items-center m-2">
+                                <span *ngIf="bytesTransferred==100" class="m-1">
+                                    <mat-icon svgIcon="heroicons_outline:check"></mat-icon>
+                                </span>
+                                <span *ngIf="!filename" class="mr-1">
+                                    <mat-icon svgIcon="heroicons_outline:plus"></mat-icon>
+                                </span>
+                                <span class="mr-2 text-base">{{ storedFilePath ? 'Re-upload' : 'Upload' }}</span>
+                            </div>
+                        </label>
+                    </div>
+
+
+
+
+                    <!-- <div *ngIf="isFinalSubmission && !isContestStarted"
+                        class="flex flex-col sm:flex-row  sm:items-center  bg-grey-lighter">
+                        <label
+                            class="max-w-36 flex flex-col items-center  scale-90 mat-flat-button active:bg-primary-400 pointer-events-none text-white bg-primary-black  mat-button-disabled">
+                            <div class="flex items-center m-2">
+                                <span class="mr-1">
+                                    <mat-icon svgIcon="heroicons_outline:plus"></mat-icon>
+                                </span>
+                                <span class=" mr-2 text-base"> {{'Upload'}}</span>
+                            </div>
+                        </label>
+                    </div> -->
+
+                    <!-- <label
+                        class="max-w-36 flex flex-col items-center scale-90 mat-flat-button active:bg-primary-400 bg-primary text-white hover:bg-primary-700">
+                        <div class="flex items-center m-2">
+                            <span *ngIf="bytesTransferred==100" class="m-1">
+                                <mat-icon svgIcon="heroicons_outline:check"></mat-icon>
+                            </span>
+                            <span *ngIf="!filename" class="mr-1">
+                                <mat-icon svgIcon="heroicons_outline:plus"></mat-icon>
+                            </span>
+                            <span class=" mr-2 text-base"> {{storedFilePath?'Re-upload' : 'Upload'}}</span>
+                        </div>
+                        <input type='file' class="hidden" accept=".jpg,.png" #elementRef (change)="upload($event)" />
+                    </label> -->
+
+                    <div class="pl-2 mb-4 sm:hidden" [style.visibility]="loader ? 'visible' : 'hidden'">
+                        <span class="loader ml-6"></span>
+                    </div>
+                    <div class="hidden sm:block">
+                        <!-- <button matRipple
+                            class="ml-2 mat-stroked-button hover:bg-primary hover:text-white active:bg-primary-800 scale-90"
+                            (click)="onClickView()">View</button> -->
+
+                        <a *ngIf="storedFilePath" matRipple [href]="storedFilePath|getDownloadURL" target="_blank"
+                            class="ml-2 mat-stroked-button hover:bg-primary hover:text-white active:bg-primary-800 scale-90"
+                            title="View">
+                            View
+                        </a>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <th></th>
+            <td class="block sm:hidden pt-3">
+                <!-- <button matRipple class="ml-2 mat-stroked-button hover:bg-primary border-primary hover:text-white "
+                    (click)="onClickView()">View</button> -->
+                <a *ngIf="storedFilePath" matRipple [href]="storedFilePath|getDownloadURL" target="_blank"
+                    class="ml-2 mat-stroked-button hover:bg-primary hover:text-white active:bg-primary-800 scale-90"
+                    title="View">
+                    View
+                </a>
+            </td>
+        </tr>
+        <tr>
+            <th></th>
+            <div class="pl-2 mt-2 hidden sm:block" [style.visibility]="loader ? 'visible' : 'hidden'">
+                <span class="loader ml-12"></span>
+            </div>
+        </tr>
+    </table>
+
+    <!-- <div class="mt-4" *ngIf="bytesTransferred>0">
+        <mat-progress-bar class="flex-0 h-1 w-full m-3 pt-0" [value]="bytesTransferred">
+        </mat-progress-bar>
+    </div> -->
+</div>

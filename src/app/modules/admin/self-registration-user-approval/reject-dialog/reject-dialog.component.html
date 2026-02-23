@@ -1,0 +1,35 @@
+<div class="m-auto md:w-[40vw] xs:w-[55vw] md:px-8 xs:px-0 relative ">
+    <div class="">
+        <div class=" absolute -top-4 -right-2 ">
+            <button mat-dialog-close class="">
+                <mat-icon class=" hover:scale-110 transition duration-5000 transform" svgIcon="mat_outline:close">
+                </mat-icon>
+            </button>
+        </div>
+        <form *ngIf="infoForm" class="rounded-2xl overflow-hidden" [formGroup]="infoForm" (ngSubmit)="onSubmit()">
+            <div class="flex flex-row items-center justify-center w-full ">
+                <div class="flex flex-row justify-center w-full">
+                    <p class="text-2xl font-semibold mb-2 text-center text-accent ">{{data?.firstName}}
+                        {{data?.lastName}} - Update the Rejection</p>
+                </div>
+            </div>
+            <div class="">
+                <div class="">
+                    <mat-form-field class="w-full">
+                        <input matInput [placeholder]="'Type rejection message ...'"
+                            [formControlName]="'rejectionReason'">
+                        <mat-icon class="icon-size-5" matPrefix
+                            [svgIcon]="'heroicons_solid:question-mark-circle'"></mat-icon>
+                    </mat-form-field>
+                </div>
+                <!--------------------------------------------------------->
+                <div class="w-full text-center">
+                    <button type="submit" class="fuse-mat-stroked-button-large  mt-6" mat-flat-button
+                        [color]="'primary'" [disabled]="!infoForm.valid">
+                        Save
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

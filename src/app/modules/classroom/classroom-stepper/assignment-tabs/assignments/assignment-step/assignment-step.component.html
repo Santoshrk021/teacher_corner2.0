@@ -1,0 +1,97 @@
+<div>
+    <!-- <h2 class="text-2xl sm:text-2xl text-accent mt-0 text-center">Fill the observation sheet</h2> -->
+    <div class=" bg-white rounded-lg p-4 flex flex-col justify-between leading-normal">
+        <table class="w-full">
+            <tr>
+                <th class="w-1/3 py-6 text-primary text-left">Due Date</th>
+                <td class="py-6 text-secondary text-left">{{assignmentData?.dueDate?.seconds*1000 | date}}</td>
+            </tr>
+            <tr>
+                <th class="w-1/3 py-2 text-primary text-left">Instructions</th>
+                <td class="py-2 text-secondary text-sm text-left">
+                    <div *ngIf="assignmentData?.instructions?.includes('<'); else textOnly"
+                        [innerHTML]="assignmentData?.instructions"></div>
+                    <ng-template #textOnly>{{assignmentData?.instructions}}</ng-template>
+                </td>
+            </tr>
+            <tr>
+                <th class="w-1/3 py-2 text-primary text-left">Assignment</th>
+                <td class="py-2">
+                    <div class="flex items-center">
+                        <div class="flex flex-col sm:flex-row  sm:items-center  bg-grey-lighter mt-4">
+                            <!-- text-white bg-primary hover:bg-primary-700 -->
+                            <label matRipple
+                                [matRippleDisabled]="!assignment?.isStepIndependent && !previousAssignment?.isStepComplete"
+                                class="max-w-36 flex flex-col items-center scale-90 mat-flat-button"
+                                [ngClass]="{'bg-primary hover:bg-primary-700 text-white' : (!isTimeExceeded), 'text-slate-50 bg-slate-300 hover:bg-slate-300' : (isTimeExceeded)}"
+                                [matTooltip]="isTimeExceeded ? 'This assignment has timed out and submission cannot be made' : (!assignment?.isStepIndependent && !previousAssignment?.isStepComplete) ? completionMessage  : ''">
+                                <!-- [ngClass]="{'bg-primary hover:bg-primary-700 text-white' : (!isTimeExceeded || (assignment?.isStepIndependent && previousAssignment?.isStepComplete)), 'text-slate-50 bg-slate-300 hover:bg-slate-300' : (isTimeExceeded || (!assignment?.isStepIndependent && !previousAssignment?.isStepComplete))}"
+                                [matTooltip]="isTimeExceeded ? 'This assignment has timed out and submission cannot be made' : (!assignment?.isStepIndependent && !previousAssignment?.isStepComplete) ? completionMessage  : ''"> -->
+                                <div class="flex items-center m-2">
+                                    <span *ngIf="bytesTransferred==100" class="m-1">
+                                        <mat-icon svgIcon="heroicons_outline:check"></mat-icon>
+                                    </span>
+
+                                    <span *ngIf="!filename" class="mr-1">
+                                        <mat-icon svgIcon="heroicons_outline:plus"></mat-icon>
+                                    </span>
+
+                                    <!-- <span class=" mr-2 text-base"> {{bytesTransferred==100?'Uploaded' : 'Upload'}}</span> -->
+                                    <span class=" mr-2 text-base"> {{storedFilePath ? 'Re-upload' : 'Upload'}}</span>
+                                </div>
+
+                                <input type='file' class="hidden"
+                                    [accept]="acceptedFormats?.[assignmentData?.uploadFileType?.toLowerCase()]" #elementRef
+                                    (change)="upload($event)" [disabled]="isTimeExceeded" />
+                                <!-- [disabled]="isTimeExceeded || (!assignment?.isStepIndependent && !previousAssignment?.isStepComplete)" /> -->
+                            </label>
+                            <!-- <span class="text-xs text-secondary line-clamp-1 ml-1">{{filename?.substring(0,5)}} ... </span> -->
+                        </div>
+                        <div class="pl-2 mb-4 sm:hidden" [style.visibility]=" loader ? 'visible' : 'hidden'">
+                            <span class="loader ml-6"></span>
+                        </div>
+                        <div class="hidden sm:block">
+                            <!-- <button matRipple
+                            class="ml-2 mat-stroked-button hover:bg-primary hover:text-white active:bg-primary-800 scale-90"
+                            (click)="onClickView()">View</button> -->
+                            <a *ngIf="storedFilePath" matRipple [href]="storedFilePath|getDownloadURL" target="_blank"
+                                class="ml-2 mat-stroked-button hover:bg-primary hover:text-white active:bg-primary-800 scale-90"
+                                title="View">
+                                View
+                            </a>
+
+                            <a *ngIf="storedFilePath" matRipple [href]="storedFilePath|getDownloadURL"
+                                appDownloadDirective
+                                class="ml-2 mat-stroked-button hover:bg-primary hover:text-white active:bg-primary-800 scale-90"
+                                title="Download" [download]="storedFilePath" #dwld="appDownloadDirective"
+                                [attr.disabled]="dwld.busy">
+                                Download
+                            </a>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <th></th>
+                <td class="block sm:hidden pt-3">
+                    <!-- <button matRipple class="ml-2 mat-stroked-button hover:bg-primary border-primary hover:text-white "
+                    (click)="onClickView()">View</button> -->
+                    <a *ngIf="storedFilePath" matRipple [href]="storedFilePath|getDownloadURL" target="_blank"
+                        class="ml-2 mat-stroked-button hover:bg-primary hover:text-white active:bg-primary-800 scale-90"
+                        title="View">
+                        View
+                    </a>
+                </td>
+            </tr>
+            <tr>
+                <th></th>
+                <div class="pl-2 mt-2 hidden sm:block" [style.visibility]="loader ? 'visible' : 'hidden'">
+                    <span class="loader ml-12"></span>
+                </div>
+            </tr>
+            <tr>
+                <td colspan="2"></td>
+            </tr>
+        </table>
+    </div>
+</div>

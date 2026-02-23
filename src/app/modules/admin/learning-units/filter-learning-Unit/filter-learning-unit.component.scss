@@ -1,0 +1,26 @@
+:host::ng-deep .mat-dialog-container {
+    // overflow-x: scroll !important;
+    position: relative;
+    padding: 0 !important;
+}
+.dynamicwidth{
+width: 100%;
+}
+
+.leftalign{
+    // margin-left: 65px;
+}
+
+@media only screen and (max-width:800px) {
+    .dynamicwidth{
+
+    width:1000px ;
+}
+}
+
+.custom-modalbox .mat-dialog-container.add-new-learningunit div:nth-child(2) form div.mat-form-field:nth-child(2) div:nth-child(1) {
+       //  body.light .mat-form-field-appearance-fill.mat-form-field .mat-form-field-flex {
+        padding-inline: 0px !important;
+    // }
+  }
+

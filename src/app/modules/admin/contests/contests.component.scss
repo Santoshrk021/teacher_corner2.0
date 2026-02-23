@@ -1,0 +1,16 @@
+.plusIcon {
+    transition: transform .3s ease-in-out;
+
+    &:hover {
+        transform: rotate(90deg);
+    }
+}
+
+.quizCreateBtn {
+    &:hover {
+        .plusIcon {
+            transform: rotate(90deg);
+        }
+    }
+}
+

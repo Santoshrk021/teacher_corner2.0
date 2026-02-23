@@ -1,0 +1,61 @@
+.outreach-grid {
+  grid-template-columns: 0.7fr 1.5fr 1fr 0.7fr 1fr 1fr 0.5fr;
+}
+
+.teacher-lu-chip-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 8px;
+}
+
+.teacher-lu-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  box-shadow: 0 1px 1px rgba(2, 6, 23, 0.04);
+}
+
+.teacher-lu-chip-text {
+  font-size: 12px;
+  line-height: 16px;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.teacher-lu-chip-progress {
+  font-size: 11px;
+  line-height: 14px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  color: #334155;
+  white-space: nowrap;
+}
+
+:host ::ng-deep .kit-tabs.mat-tab-group .mat-tab-header .mat-tab-label-container .mat-tab-list .mat-tab-labels .mat-tab-label.mat-tab-label-active {
+  background-color: #F1F5F9 !important;
+  color: #179AD7 !important;
+  border-radius: 20px !important;
+  border: 1px solid #179AD7;
+  scale: 90%
+}
+
+:host::ng-deep .kit-tabs.mat-tab-group .mat-tab-header .mat-tab-label-container {
+  padding: 5px 24px;
+  background-color: transparent;
+  height: 50px;
+}
+
+:host::ng-deep .kit-tabs.mat-tab-group .mat-tab-header .mat-tab-label-container .mat-tab-list .mat-tab-labels .mat-tab-label {
+  color: #179AD7;
+  scale: 90%
+}

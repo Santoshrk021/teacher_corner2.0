@@ -1,0 +1,259 @@
+<div class="py-6 h-screen w-screen overflow-hidden relative">
+    <button (click)="drawerClose()" class="m-3  absolute top-0 right-0 z-40">
+        <mat-icon class=" hover:scale-110 transition duration-5000 transform" svgIcon="mat_outline:close">
+        </mat-icon>
+    </button>
+    <button (click)="emptyTrash()" mat-stroked-button color="warn"
+        class=" m-3 text-center absolute top-1 right-10 z-40">
+        <mat-icon class="text-red-500  cursor-pointer transition duration-500 transform  hover:scale-[115%]"
+            svgIcon="delete_outline">
+        </mat-icon>Empty Trash
+    </button>
+    <div class="pl-4 pr-22 h-10 flex justify-between">
+        <p Class=" font-bold text-lg text-accent-600">View Deleted Institutions
+        </p>
+    </div>
+
+    <div class="w-full ">
+        <div class="grid mt-4 ">
+            <div matSort matSortDisableClear (matSortChange)="sortData($event)"
+                class="inventory-grid z-10 sticky top-0 grid gap-8 py-4 px-10 md:px-8 shadow text-md font-semibold text-secondary bg-gray-50 dark:bg-black dark:bg-opacity-5">
+                <div [mat-sort-header]="'institutionName'">School Name</div>
+                <div [mat-sort-header]="'registrationNumber'">School Registration Number</div>
+                <div [mat-sort-header]="'representativeFirstName'">Representative Name </div>
+                <div [mat-sort-header]="'representativePhoneNumber'">Representative Phone</div>
+                <div [mat-sort-header]="'institutionCreatorPhoneNumber'">Institution Creator</div>
+                <div [mat-sort-header]="'creationDate'">Creation Date</div>
+                <div [mat-sort-header]="'pincode'">Pin Code</div>
+
+                <!-- <div class="" [mat-sort-header]="'verificationStatus'>Varification Status</div> -->
+                <div class="">View More</div>
+                <div class="hidden sm:block">Restore</div>
+                <div class="hidden sm:block">Delete</div>
+
+            </div>
+
+
+            <div class="overflow-y-auto h-[calc(100vh_-_240px)] ">
+                <ng-container *ngFor="let institute of deletedInstitues">
+                    <div
+                        class="inventory-grid grid items-center text-secondary gap-8 py-3 px-10 md:px-8 border-b border-gray-400 ">
+                        <div>
+                            {{institute?.institutionName}}
+                        </div>
+                        <div [matTooltip]="institute?.registrationNumber" class="truncate">
+                            {{institute?.registrationNumber}}
+                        </div>
+                        <div>
+                            {{institute?.representativeFirstName+' '+institute?.representativeLastName}}
+                        </div>
+                        <div>
+                            {{institute?.representativePhoneNumber ? institute?.representativeCountryCode +
+                            institute?.representativePhoneNumber : ''}}
+                        </div>
+                        <div>
+                            {{institute?.institutionCreatorPhoneNumber ? institute?.institutionCreatorCountryCode +
+                            institute?.institutionCreatorPhoneNumber : ''}}
+                        </div>
+                        <div>
+                            {{institute?.createdAt?.seconds*1000|date :'shortDate'}}
+                        </div>
+                        <div>
+                            {{institute?.institutionAddress?.pincode}}
+                        </div>
+                        <!-- <div>
+                            <mat-slide-toggle class="ml-2" [color]="'primary'">
+                            </mat-slide-toggle>
+                        </div> -->
+                        <div class="">
+                            <button class="min-w-10 min-h-7 h-7 px-2 leading-6" mat-stroked-button
+                                (click)="toggleDetails(institute)"
+                                [ngClass]="{'bg-slate-200':selectedInstitute?.docId==institute?.docId}">
+                                <mat-icon class="icon-size-5"
+                                    [svgIcon]="selectedInstitute?.docId==institute?.docId ? 'heroicons_solid:chevron-up' : 'heroicons_solid:chevron-down'">
+                                </mat-icon>
+                            </button>
+                        </div>
+                        <!-- Restore -->
+                        <div>
+                            <mat-icon (click)="restoreInstitute(institute)"
+                                class="text-primary icon-size-5 cursor-pointer transition duration-500 transform  hover:scale-[115%]">
+                                <span class="material-icons">
+                                    restore_from_trash
+                                </span>
+                            </mat-icon>
+                        </div>
+                        <!-- Delete  -->
+                        <div>
+                            <mat-icon (click)="deleteInstitute(institute?.docId)"
+                                class="text-red-500  cursor-pointer transition duration-500 transform  hover:scale-[115%]"
+                                svgIcon="delete_outline"></mat-icon>
+                        </div>
+                    </div>
+                    <div class="grid">
+                        <ng-container *ngIf="selectedInstitute?.docId === institute?.docId">
+                            <ng-container *ngTemplateOutlet="rowDetailsTemplate;context: {$implicit: institute}">
+                            </ng-container>
+                        </ng-container>
+                    </div>
+                </ng-container>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #rowDetailsTemplate let-institute>
+    <div class=" border-b border-slate-300 overflow-scroll bg-blue-100 p-4 pt-10 ">
+        <form [formGroup]="instituteForm">
+            <mat-tab-group disablePagination="false">
+                <mat-tab label="Basic Info">
+                    <div class="grid grid-cols-1 sm:grid-cols-2  -mt-4">
+                        <div class="sm:border-r border-primary-300 sm:pr-6">
+                            <mat-form-field class="w-full text-accent-600 text-sm">
+                                <mat-label class="text-accent-600">Institution Name</mat-label>
+                                <input class="" id="" matInput [formControlName]="'institutionName'" type="text"
+                                    placeholder="Enter institutionName Name">
+                                <mat-icon class="icon-size-5" matPrefix [svgIcon]="'mat_solid:business'"></mat-icon>
+                            </mat-form-field>
+
+                            <mat-form-field class="w-full text-accent-600 text-sm">
+                                <mat-label class="text-accent-600">Gender Types</mat-label>
+                                <mat-select formControlName="genderType" placeholder="Boys / Girls / Co-ed">
+                                    <mat-option *ngFor="let gender of genderTypes" [value]="gender">
+                                        {{gender}}
+                                    </mat-option>
+                                </mat-select>
+                                <mat-icon class="icon-size-5" matPrefix [svgIcon]="'mat_solid:female'"></mat-icon>
+                            </mat-form-field>
+
+                            <!-- <mat-form-field class="w-full text-accent-600 text-sm">
+                                <mat-label class="text-accent-600">Medium</mat-label>
+                                <input class="" id="" matInput [formControlName]="'medium'" type="text"
+                                    placeholder="Enter institutionName Name">
+                                <mat-icon class="icon-size-5" matPrefix [svgIcon]="'g_translate'"></mat-icon>
+                            </mat-form-field> -->
+
+                            <mat-form-field class="w-full text-accent-600">
+                                <mat-label class="text-accent-600">Medium of Instruction</mat-label>
+                                <mat-select formControlName="medium" placeholder="Select Medium of Instruction">
+                                    <mat-option value="" disabled selected>Select</mat-option>
+                                    <mat-option *ngFor="let la of langList" [value]="la?.code">
+                                        <span class="text-sm">{{la?.name}}</span>
+                                    </mat-option>
+                                </mat-select>
+                                <mat-icon class="icon-size-5" matPrefix [svgIcon]="'g_translate'"></mat-icon>
+                            </mat-form-field>
+
+                            <mat-form-field class="w-full text-accent-600 text-sm">
+                                <mat-label class="text-accent-600">Registration Number</mat-label>
+                                <input class="" id="" matInput [formControlName]="'registrationNumber'" type="text"
+                                    placeholder="Enter institutionName Name">
+                                <mat-icon class="icon-size-5" matPrefix [svgIcon]="'heroicons_solid:pencil'"></mat-icon>
+                            </mat-form-field>
+                        </div>
+
+                        <div class="sm:border-r border-primary-300  sm:px-6 ">
+                            <mat-form-field class="w-full text-accent-600 text-sm">
+                                <mat-label class="text-accent-600">Representative First Name</mat-label>
+                                <input class="" id="" matInput [formControlName]="'representativeFirstName'" type="text"
+                                    placeholder="Enter Representative First Name">
+                                <mat-icon class="icon-size-5" matPrefix
+                                    [svgIcon]="'mat_outline:person_outline'"></mat-icon>
+                            </mat-form-field>
+
+                            <mat-form-field class="w-full text-accent-600 text-sm">
+                                <mat-label class="text-accent-600">Representative Last Name</mat-label>
+                                <input class="" id="" matInput [formControlName]="'representativeLastName'" type="text"
+                                    placeholder="Enter Representative Last Name">
+                                <mat-icon class="icon-size-5" matPrefix
+                                    [svgIcon]="'mat_outline:person_outline'"></mat-icon>
+                            </mat-form-field>
+
+                            <mat-form-field class="w-full text-accent-600 text-sm">
+                                <mat-label class="text-accent-600">Representative Email</mat-label>
+                                <input class="" id="" matInput [formControlName]="'representativeEmail'" type="text"
+                                    placeholder="Enter Representative Email">
+                                <mat-icon class="icon-size-5" matPrefix
+                                    [svgIcon]="'mat_solid:alternate_email'"></mat-icon>
+                            </mat-form-field>
+
+                            <mat-form-field class="w-full text-accent-600 text-sm">
+                                <mat-label class="text-accent-600">Representative Phone</mat-label>
+                                <span class="text-slate-400">
+                                    {{institute?.representativeCountryCode}}
+                                </span>
+                                <input class="" id="" matInput [formControlName]="'representativePhoneNumber'"
+                                    type="text" placeholder="Enter Representative Phone">
+                                <mat-icon class="icon-size-5" matPrefix [svgIcon]="'mat_solid:phone_iphone'"></mat-icon>
+                            </mat-form-field>
+                        </div>
+                    </div>
+
+                </mat-tab>
+                <mat-tab label="Address">
+                    <div formGroupName="institutionAddress" class="grid grid-cols-1 sm:grid-cols-2 -mt-4">
+                        <div class="sm:border-r border-primary-300 sm:pr-6">
+                            <mat-form-field class="w-full text-accent-600 text-sm">
+                                <mat-label class="text-accent-600">Street</mat-label>
+                                <input class="" id="" matInput [formControlName]="'street'" type="text"
+                                    placeholder="Enter Street Name">
+                                <mat-icon class="icon-size-5" matPrefix
+                                    [svgIcon]="'mat_outline:location_on'"></mat-icon>
+                            </mat-form-field>
+
+                            <mat-form-field class="w-full text-accent-600 text-sm">
+                                <mat-label class="text-accent-600">City Name</mat-label>
+                                <input class="" id="" matInput [formControlName]="'city'" type="text"
+                                    placeholder="Enter City Name">
+                                <mat-icon class="icon-size-5" matPrefix
+                                    [svgIcon]="'mat_outline:location_on'"></mat-icon>
+                            </mat-form-field>
+
+                            <mat-form-field class="w-full text-accent-600 text-sm">
+                                <mat-label class="text-accent-600">Village Name</mat-label>
+                                <input class="" id="" matInput [formControlName]="'village'" type="text"
+                                    placeholder="Enter Village Name">
+                                <mat-icon class="icon-size-5" matPrefix
+                                    [svgIcon]="'mat_outline:location_on'"></mat-icon>
+                            </mat-form-field>
+
+                            <mat-form-field class="w-full text-accent-600 text-sm">
+                                <mat-label class="text-accent-600">Sub District Name</mat-label>
+                                <input class="" id="" matInput [formControlName]="'subDistrict'" type="text"
+                                    placeholder="Enter Sub District Name">
+                                <mat-icon class="icon-size-5" matPrefix
+                                    [svgIcon]="'mat_outline:location_on'"></mat-icon>
+                            </mat-form-field>
+                        </div>
+
+                        <div class="sm:border-r border-primary-300  sm:px-6 ">
+                            <mat-form-field class="w-full text-accent-600 text-sm">
+                                <mat-label class="text-accent-600">District Name</mat-label>
+                                <input class="" id="" matInput [formControlName]="'district'" type="text"
+                                    placeholder="Enter district Name">
+                                <mat-icon class="icon-size-5" matPrefix
+                                    [svgIcon]="'mat_outline:location_on'"></mat-icon>
+                            </mat-form-field>
+
+                            <mat-form-field class="w-full text-accent-600 text-sm">
+                                <mat-label class="text-accent-600">State </mat-label>
+                                <input class="" id="" matInput [formControlName]="'state'" type="text"
+                                    placeholder="Enter State Name">
+                                <mat-icon class="icon-size-5" matPrefix
+                                    [svgIcon]="'mat_outline:location_on'"></mat-icon>
+                            </mat-form-field>
+
+                            <mat-form-field class="w-full text-accent-600 text-sm">
+                                <mat-label class="text-accent-600">Pincode </mat-label>
+                                <input class="" id="" matInput [formControlName]="'pincode'" type="text"
+                                    placeholder="Enter pincode ">
+                                <mat-icon class="icon-size-5" matPrefix
+                                    [svgIcon]="'mat_outline:location_on'"></mat-icon>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </mat-tab>
+            </mat-tab-group>
+        </form>
+    </div>
+</ng-template>

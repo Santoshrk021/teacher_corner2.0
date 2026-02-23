@@ -1,0 +1,455 @@
+<div class="min-h-screen w-full bg-slate-50">
+  <!-- Page header -->
+  <header class="w-full bg-[#F1F5F9] ">
+    <div class="mx-auto max-w-7xl px-6 py-6">
+      <h1 class="text-3xl font-bold">Master Manager</h1>
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-7xl px-6 py-6 space-y-6 bg-gray-50">
+    <!-- Choose collection + Add Mapping -->
+    <div class="flex flex-wrap items-center gap-3">
+      <label class="text-slate-700 font-medium">Choose Collection</label>
+      <select
+        class="h-10 w-64 rounded-md border border-slate-300 bg-white px-3 text-slate-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
+        [(ngModel)]="selectedCollection"
+        (change)="onSelectionChange()"
+      >
+        <option [ngValue]="null" disabled>-- Select Collection --</option>
+        <option *ngFor="let col of collections" [ngValue]="col">
+          {{ col.type }}
+        </option>
+      </select>
+
+      <button
+        type="button"
+        class="flex items-center gap-2 bg-primary-500 text-white px-4 py-2 rounded-lg shadow-md"
+        (click)="showMappingDialog = true"
+      >
+      <mat-icon svgIcon="heroicons_outline:plus-circle" aria-hidden="false" class="text-white scale-110">
+      </mat-icon>Add Mapping
+      </button>
+
+
+      
+    </div>
+
+    <!-- Stats row -->
+    <section class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div class="rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
+        <div class="text-slate-500 text-sm">Total in Master</div>
+        <div class="mt-1 text-3xl font-semibold text-slate-800">
+          <ng-container *ngIf="!isLoading; else statSkeleton">{{ totalInMaster | number }}</ng-container>
+        </div>
+      </div>
+      <div class="rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
+        <div class="text-slate-500 text-sm">Total in {{selectedCollection?.type || 'Normal'}}</div>
+        <div class="mt-1 text-3xl font-semibold text-slate-800">
+          <ng-container *ngIf="!isLoading; else statSkeleton">{{ totalInNormal | number }}</ng-container>
+        </div>
+      </div>
+      <div class="rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
+        <div class="text-slate-500 text-sm">Missing in Master</div>
+        <div class="mt-1 text-3xl font-semibold text-emerald-600">
+          <ng-container *ngIf="!isLoading; else statSkeleton">{{ missingInMasterCount | number }}</ng-container>
+        </div>
+      </div>
+      <div class="rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
+        <div class="text-slate-500 text-sm">Missing in {{selectedCollection?.type || 'Normal'}}</div>
+        <div class="mt-1 text-3xl font-semibold text-rose-600">
+          <ng-container *ngIf="!isLoading; else statSkeleton">{{ missingInNormalCount | number }}</ng-container>
+        </div>
+      </div>
+    </section>
+    <ng-template #statSkeleton>
+      <div class="h-8 w-24 rounded-md bg-slate-200 animate-pulse"></div>
+    </ng-template>
+
+    <!-- Two panes -->
+    <section class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <!-- Left: Normal → Master -->
+      <div class="rounded-2xl bg-white ring-1 ring-slate-200 shadow-sm overflow-hidden">
+        <div class="flex items-center justify-between border-b border-slate-200 px-5 pt-2">
+          <h2 class="text-lg font-semibold text-slate-800">
+            {{ selectedCollection?.type || 'Normal' }} → Add to Master
+          </h2>
+          <div class="flex items-center gap-3 ">
+            <mat-form-field appearance="outline" class="w-24 compact">
+              <mat-label>Select</mat-label>
+              <mat-select
+              [disabled]="!selectedCollection"
+                [(value)]="leftBatch"
+                (selectionChange)="onLeftBatchChange($event.value)"
+              >
+                <mat-option [value]="null">Select</mat-option>
+                <mat-option *ngFor="let n of batchOptions" [value]="n">{{ n }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+            <button
+              class="rounded-md bg-primary-500 px-3 py-2 text-white disabled:opacity-50"
+              [disabled]="!selectedCollection || selectedItems.length === 0 || isLoading || isWorking"
+              (click)="onAddToMaster()"
+            >
+              Add Selected to Master
+            </button>
+          </div>
+        </div>
+
+        <div class="max-h-[60vh] overflow-auto">
+          <table class="min-w-full text-left">
+            <thead class="sticky top-0 bg-slate-50 text-slate-500 text-sm">
+              <tr>
+                <th class="w-10 px-5 py-3">
+                  <input
+                    type="checkbox"
+                    [disabled]="isLoading"
+                    [checked]="missingMaster?.length && selectedItems.length === missingMaster.length"
+                    (change)="toggleAllLeft($event.target.checked)"
+                  />
+                </th>
+                <th class="px-3 py-3">
+                  Doc ID <span *ngIf="selectedItems.length > 0">({{ selectedItems.length }})</span>
+                </th>
+                <th class="px-3 py-3">Collection</th>
+                <th class="px-3 py-3 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+              <!-- Loading row -->
+              <tr *ngIf="isLoading">
+                <td colspan="4" class="px-5 py-8 text-center">
+                  <div class="inline-flex items-center gap-3 text-slate-600">
+                    <mat-spinner diameter="20"></mat-spinner>
+                    Loading…
+                  </div>
+                </td>
+              </tr>
+
+              <tr *ngFor="let row of missingMaster" class="hover:bg-slate-50" [class.opacity-50]="isLoading">
+                <td class="px-5 py-3 align-middle">
+                  <input type="checkbox" [checked]="isSelected(row)" (change)="toggleSelection(row)" [disabled]="isLoading"/>
+                </td>
+                <td class="px-3 py-3 font-medium text-slate-800 truncate">
+                  {{ row.id || row.docId || row.docID }}
+                </td>
+                <td class="px-3 py-3 text-slate-600">
+                  {{ selectedCollection?.type }}
+                </td>
+                <td class="px-3 py-3 text-right">
+                  <button class="rounded-md bg-slate-100 px-3 py-1 text-slate-700 hover:bg-slate-200"
+                          (click)="preview('normal', row)" [disabled]="isLoading">
+                    Preview
+                  </button>
+                </td>
+              </tr>
+
+              <tr *ngIf="!isLoading && !missingMaster?.length">
+                <td colspan="4" class="px-5 py-8 text-center text-slate-500">
+                  Nothing is missing in Master
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Right: Master → Normal -->
+      <div class="rounded-2xl bg-white ring-1 ring-slate-200 shadow-sm overflow-hidden">
+        <div class="flex items-center justify-between border-b border-slate-200 px-5 pt-2">
+          <h2 class="text-lg font-semibold text-slate-800">
+            Master → Add to {{ selectedCollection?.type || 'Normal' }}
+          </h2>
+          <div class="flex items-center gap-3">
+            <mat-form-field appearance="outline" class="w-24">
+              <mat-label>Select</mat-label>
+              <mat-select
+                [disabled]="!selectedCollection"
+                [(value)]="rightBatch"
+                (selectionChange)="onRightBatchChange($event.value)"
+              >
+                <mat-option [value]="null">Select</mat-option>
+                <mat-option *ngFor="let n of batchOptions" [value]="n">{{ n }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+            <button
+              class="rounded-md bg-sky-600 px-3 py-2 text-white disabled:opacity-50"
+              [disabled]="!selectedCollection || selectedNormalItems.length === 0 || isLoading || isWorking"
+              (click)="onAddToNormal()"
+            >
+              Add Selected to Normal
+            </button>
+          </div>
+        </div>
+
+        <div class="max-h-[60vh] overflow-auto">
+          <table class="min-w-full text-left">
+            <thead class="sticky top-0 bg-slate-50 text-slate-500 text-sm">
+              <tr>
+                <th class="w-10 px-5 py-3">
+                  <input
+                    type="checkbox"
+                    [disabled]="isLoading"
+                    [checked]="missingNormal?.length && selectedNormalItems.length === missingNormal.length"
+                    (change)="toggleAllRight($event.target.checked)"
+                  />
+                </th>
+                <th class="px-3 py-3">Doc ID <span *ngIf="selectedNormalItems.length > 0">({{ selectedNormalItems.length }})</span></th>
+                <th class="px-3 py-3">Collection</th>
+                <th class="px-3 py-3 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+              <!-- Loading row -->
+              <tr *ngIf="isLoading">
+                <td colspan="4" class="px-5 py-8 text-center">
+                  <div class="inline-flex items-center gap-3 text-slate-600">
+                    <mat-spinner diameter="20"></mat-spinner>
+                    Loading…
+                  </div>
+                </td>
+              </tr>
+
+              <tr *ngFor="let row of missingNormal" class="hover:bg-slate-50" [class.opacity-50]="isLoading">
+                <td class="px-5 py-3 align-middle">
+                  <input type="checkbox" [checked]="isSelectedNormal(row)" (change)="toggleSelectionNormal(row)" [disabled]="isLoading"/>
+                </td>
+                <td class="px-3 py-3 font-medium text-slate-800 truncate">
+                  {{ row.key || row.id || row.docId || row.docID }}
+                </td>
+                <td class="px-3 py-3 text-slate-600">
+                  {{ selectedCollection?.type }}
+                </td>
+                <td class="px-3 py-3 text-right">
+                  <button class="rounded-md bg-slate-100 px-3 py-1 text-slate-700 hover:bg-slate-200"
+                          (click)="preview('master', row)" [disabled]="isLoading">
+                    Preview
+                  </button>
+                </td>
+              </tr>
+
+              <tr *ngIf="!isLoading && !missingNormal?.length">
+                <td colspan="4" class="px-5 py-8 text-center text-slate-500">
+                  Nothing is missing in Normal
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Add Mapping modal -->
+  <div *ngIf="showMappingDialog" class="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl">
+      <h3 class="text-lg font-semibold text-slate-800">Add Mapping</h3>
+      <p class="mt-1 text-sm text-slate-500">
+        Adds a row in <code>Configuration/masterManager.collections</code>
+      </p>
+
+      <form class="mt-4 grid grid-cols-1 gap-3" (ngSubmit)="saveMapping()">
+        <label class="text-sm text-slate-600">
+          Collection name
+          <input class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2"
+                 [(ngModel)]="mappingForm.type" name="type" placeholder="e.g. Teachers" />
+        </label>
+
+        <label class="text-sm text-slate-600">
+          Master type
+          <input class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2"
+                 [(ngModel)]="mappingForm.master" name="master" placeholder="e.g. TEACHER" />
+        </label>
+
+        <label class="text-sm text-slate-600">
+          Field key in shard map
+          <input class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2"
+                 [(ngModel)]="mappingForm.field" name="field" placeholder="e.g. teachers" />
+        </label>
+
+        <div class="mt-4 flex justify-end gap-2">
+          <button type="button" class="rounded-md border px-3 py-2" (click)="showMappingDialog=false">
+            Cancel
+          </button>
+          <button type="submit" class="rounded-md bg-sky-600 px-3 py-2 text-white">
+            Save mapping
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Preview drawer -->
+  <div *ngIf="previewOpen" class="fixed inset-0 z-50">
+    <div class="absolute inset-0 bg-black/40 z-40" (click)="closePreview()"></div>
+
+    <!-- Drawer (no translateX transform; only width transition) -->
+    <aside
+      class="absolute inset-y-0 right-0 z-50 bg-white shadow-xl ring-1 ring-slate-200
+             flex flex-col transition-[width] duration-300 isolate"
+      [ngStyle]="{ width: previewWidth + 'vw', minWidth: '50vw', maxWidth: '96vw' }">
+
+      <div class="flex items-center justify-between px-4 py-3 border-b border-slate-200">
+        <div>
+          <h3 class="text-base font-semibold text-slate-800">
+            <ng-container *ngIf="previewSide === 'normal'; else masterTitle">
+              Preview ( Normal ({{ selectedCollection?.type || '—' }}) → Master ({{ selectedCollection?.master || '—' }}) )
+            </ng-container>
+            <ng-template #masterTitle>
+              Preview ( Master ({{ selectedCollection?.master || '—' }}) vs Normal ({{ selectedCollection?.type || '—' }}) )
+            </ng-template>
+          </h3>
+          <div class="text-xs text-slate-500 mt-0.5">
+            ID: <code>{{ previewId }}</code>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <div class="flex items-center gap-2 text-xs text-slate-500 select-none">
+            <span>Width</span>
+            <input
+              type="range"
+              [min]="50"
+              [max]="96"
+              [step]="1"
+              [value]="previewWidth"
+              (input)="onWidthInput($event)"
+              class="w-28 cursor-pointer"
+              aria-label="Preview width"
+            />
+            <span>{{ previewWidth }}vw</span>
+            <button type="button" class="ml-2 rounded border px-2 py-1" (click)="bump(-2)">–</button>
+            <button type="button" class="rounded border px-2 py-1" (click)="bump(+2)">+</button>
+          </div>
+
+          <button
+            *ngIf="previewSide === 'normal' && previewNotFound"
+            class="rounded-md bg-sky-600 px-3 py-2 text-white"
+            (click)="addOneToMasterFromPreview()">
+            Add to Master
+          </button>
+
+          <button
+            *ngIf="previewSide === 'master' && previewNotFound"
+            class="rounded-md bg-sky-600 px-3 py-2 text-white"
+            (click)="addOneToNormalFromPreview()">
+            Add to Normal
+          </button>
+
+          <button class="rounded-md border px-3 py-2" (click)="closePreview()">Close</button>
+        </div>
+      </div>
+
+      <div *ngIf="previewNotFound" class="mx-4 mt-3 rounded-md bg-amber-50 p-3 text-amber-800 text-sm">
+        <strong>No matching record found</strong> on the other side.
+        <span *ngIf="previewSide === 'normal'">
+          Below is the payload that would be created in <em>Master</em>.
+        </span>
+        <span *ngIf="previewSide === 'master'">
+          Below is the payload that would be created in <em>Normal</em>.
+        </span>
+      </div>
+
+      <!-- tabs -->
+      <div class="px-4 mt-3">
+        <div class="inline-flex items-center gap-1 rounded-lg bg-slate-100 p-1">
+          <button
+            class="px-3 py-1.5 rounded-md text-sm"
+            [ngClass]="previewTab === 'diff' ? 'bg-white shadow text-slate-800' : 'text-slate-600'"
+            (click)="previewTab = 'diff'">
+            Diff
+          </button>
+          <button
+            class="px-3 py-1.5 rounded-md text-sm"
+            [ngClass]="previewTab === 'expected' ? 'bg-white shadow text-slate-800' : 'text-slate-600'"
+            (click)="previewTab = 'expected'">
+            Expected
+          </button>
+          <button
+            class="px-3 py-1.5 rounded-md text-sm"
+            [ngClass]="previewTab === 'actual' ? 'bg-white shadow text-slate-800' : 'text-slate-600'"
+            (click)="previewTab = 'actual'">
+            Actual
+          </button>
+        </div>
+      </div>
+
+      <div class="mt-3 px-4 pb-4 overflow-hidden flex-1">
+        <div *ngIf="previewTab === 'diff'" class="h-full overflow-auto">
+          <div class="text-sm text-slate-600 mb-2">
+            Diff ({{ previewMismatchCount | number }} mismatch,
+            {{ previewMatchCount | number }} match)
+          </div>
+
+          <table class="min-w-full text-left">
+            <thead class="sticky top-0 bg-slate-50 text-slate-500 text-sm">
+              <tr>
+                <th class="px-4 py-2">Field</th>
+                <th class="px-4 py-2">Expected</th>
+                <th class="px-4 py-2">Actual</th>
+                <th class="px-4 py-2">Status</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100" *ngIf="previewDiffs?.length; else noDiffRows">
+              <tr *ngFor="let d of previewDiffs">
+                <td class="px-4 py-2 font-medium text-slate-800">{{ d.field }}</td>
+                <td class="px-4 py-2">{{ formatVal(d.expected) }}</td>
+                <td class="px-4 py-2">{{ formatVal(d.actual) }}</td>
+                <td class="px-4 py-2">
+                  <span
+                    class="inline-flex items-center rounded-md px-2 py-0.5 text-xs"
+                    [ngClass]="d.match
+                      ? 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200'
+                      : 'bg-rose-50 text-rose-700 ring-1 ring-rose-200'">
+                    {{ d.match ? 'Match' : 'Mismatch' }}
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <ng-template #noDiffRows>
+            <div class="px-4 py-6 text-center text-slate-500 text-sm">
+              No fields to compare.
+            </div>
+          </ng-template>
+        </div>
+
+        <div *ngIf="previewTab === 'expected'" class="h-full overflow-auto rounded-xl bg-slate-50 p-3 ring-1 ring-slate-200">
+          <div class="flex items-center justify-between mb-2">
+            <div class="text-sm font-medium text-slate-700">
+              Expected (to {{ previewSide === 'normal' ? 'Master' : (selectedCollection?.type || 'Normal') }})
+            </div>
+            <button class="text-xs px-2 py-1 rounded-md border" (click)="copyToClipboard(previewExpected)">Copy</button>
+          </div>
+          <pre class="text-xs whitespace-pre-wrap">{{ stringify(previewExpected) }}</pre>
+        </div>
+
+        <div *ngIf="previewTab === 'actual'" class="h-full overflow-auto rounded-xl bg-slate-50 p-3 ring-1 ring-slate-200">
+          <div class="flex items-center justify-between mb-2">
+            <div class="text-sm font-medium text-slate-700">
+              Actual ({{ previewSide === 'normal' ? 'Master' : 'Normal' }})
+            </div>
+            <button class="text-xs px-2 py-1 rounded-md border" (click)="copyToClipboard(previewActual)">Copy</button>
+          </div>
+          <pre class="text-xs whitespace-pre-wrap">{{ stringify(previewActual) }}</pre>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Global overlay spinner (centered) -->
+  <div *ngIf="isLoading || isWorking" class="fixed inset-0 z-[60] flex items-center justify-center bg-black/20">
+    <div class="flex items-center gap-3 rounded-xl bg-white px-4 py-3 shadow-lg ring-1 ring-slate-200">
+      <mat-spinner [diameter]="30"></mat-spinner>
+      <span class="text-slate-700 text-base">
+        <ng-container *ngIf="isWorking; else loadingText">
+          Saving…
+          <ng-container *ngIf="progressTotal > 0">
+            ({{ progressCurrent }} of {{ progressTotal }})
+          </ng-container>
+        </ng-container>
+        <ng-template #loadingText>Loading data…</ng-template>
+      </span>
+    </div>
+  </div>
+</div>

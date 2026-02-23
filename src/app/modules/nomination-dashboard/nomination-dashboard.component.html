@@ -1,0 +1,85 @@
+<div id="test">
+
+</div>
+<ng-container *ngIf="isInstituteExist; else noInstitute">
+    <ng-container *ngIf="nominationListView; else instituteSelection">
+        <div *ngIf="!spinner" class="absolute flex flex-col w-full h-full  overflow-auto" cdkScrollable>
+            <div class="flex flex-row-reverse justify-between w-full text-secondary px-5 py-3">
+                <!-- <mat-slide-toggle [color]="'primary'" (change)="toggleList($event)" [(ngModel)]="listView"
+                    [checked]="listView">
+                    List View Toggle
+                </mat-slide-toggle> -->
+
+                <button (click)="dashboardOpen()" class="bg-white text-primary" mat-stroked-button>View
+                    Submissions</button>
+            </div>
+
+            <ng-container *ngIf="!listView">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8 mx-5 ">
+                    <ng-container *ngFor="let g of gradeList;trackBy: trackByFn">
+                        <!-- tactivity -->
+                        <div class="m-auto" *ngIf="g  as classInfo">
+                            <app-card-view [stageInfo]="stageInfo" [grade]="g" [nominatedObjSub]="nominatedObjSub"
+                                [institutionInfo]="institutionInfo" [contest]="contestInfo"></app-card-view>
+                        </div>
+                    </ng-container>
+                </div>
+            </ng-container>
+
+            <ng-container *ngIf="listView">
+                <div class="w-full overflow-auto">
+                    <app-list-view [stageInfo]="stageInfo" [nominatedObjSub]="nominatedObjSub"
+                        [institutionInfo]="institutionInfo" [contest]="contestInfo"></app-list-view>
+                </div>
+
+            </ng-container>
+        </div>
+        <div *ngIf="spinner" class="h-full w-full flex justify-center items-center">
+            <mat-spinner [diameter]="40"></mat-spinner>
+        </div>
+    </ng-container>
+</ng-container>
+<ng-template #instituteSelection>
+    <div class="flex justify-center items-center w-full">
+        <form [formGroup]="infoForm" (ngSubmit)="onSubmit(infoForm)">
+            <div class="w-full sm:w-[40vw] py-4 px-4 sm:px-12 sm:py-4 sm:rounded-2xl sm:shadow sm:bg-card">
+                <p class="mb-10 text-center text-lg text-accent-600 font-semibold">Institution Selection</p>
+
+
+                <!-- school -->
+                <mat-form-field class="w-full text-accent-600 ">
+                    <mat-label class="text-[#282B66]">Select School</mat-label>
+                    <mat-select [formControlName]="'institution'" placeholder="Select School form the list">
+
+                        <mat-option value="" disabled selected>Select school from the list</mat-option>
+                        <mat-option *ngFor="let school of classroomArray " [value]="school">
+                            {{school}} </mat-option>
+
+                    </mat-select>
+                    <mat-error
+                        *ngIf="infoForm.get('institutionName')?.invalid &&infoForm.get('institutionName')?.touched">
+                        School is required
+                    </mat-error>
+                </mat-form-field>
+
+                <button type="submit"
+                    class="fuse-mat-stroked-button-large w-full mt-6 bg-primary text-white disabled:bg-slate-300"
+                    mat-flat-button [color]="'primary'" [disabled]="!infoForm.valid">
+                    Submit
+                </button>
+            </div>
+        </form>
+    </div>
+</ng-template>
+<ng-template #noInstitute>
+    <div class="flex justify-center items-center w-full">
+        <p class="text-accent">Institution does not exist</p>
+    </div>
+</ng-template>
+
+<fuse-drawer class="w-screen min-w-screen z-999" [opened]="drawerOpened" fixed [mode]="'over'" [name]="'settingsDrawer'"
+    [position]="'left'" #settingsDrawer>
+    <div>
+        <ng-container *ngComponentOutlet="component"></ng-container>
+    </div>
+</fuse-drawer>

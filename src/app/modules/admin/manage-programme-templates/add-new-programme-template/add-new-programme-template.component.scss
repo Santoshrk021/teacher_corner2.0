@@ -1,0 +1,68 @@
+.arrowBtn {
+    &:hover {
+        .arrowIcon {
+            animation: bounce 1s infinite;
+        }
+    }
+}
+
+.arrowBtnBack {
+    &:hover {
+        .arrowIconBack {
+            animation: bounceBack 1s infinite;
+        }
+    }
+}
+
+@keyframes bounce {
+    0% {
+        transform: translateX(0%);
+        animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+    }
+
+    100% {
+        transform: translateX(0%);
+        animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+    }
+
+    50% {
+        transform: translateX(35%);
+        animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+    }
+}
+
+@keyframes bounceBack {
+    0% {
+        transform: translateX(0%);
+        animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+    }
+
+    100% {
+        transform: translateX(0%);
+        animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+    }
+
+    50% {
+        transform: translateX(-35%);
+        animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+    }
+}
+
+:host ::ng-deep.ngx-slider .ngx-slider-pointer {
+    background-color: #049bd8;
+}
+
+:host ::ng-deep.ngx-slider .ngx-slider-selection {
+    background-color: #049bd8;
+}
+
+:host ::ng-deep.ngx-slider .ngx-slider-pointer.ngx-slider-pointer:after {
+    background-color: #EFF5FA;
+}
+
+.disableUpload {
+    border-width: 1px;
+    border-color: #9ca3af;
+    border-radius: 0.5rem;
+    color: #9ca3af;
+}

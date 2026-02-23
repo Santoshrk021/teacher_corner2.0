@@ -1,0 +1,61 @@
+<!-- <div class="w-full "> -->
+    <div class="dynamicwidth flex justify-between ">
+        <div class=" w-[300px] text-3xl font-bold  mt-1 pl-4">Learning Units</div>
+
+        <!-- <div class="mt-0 mb-2 w-[300px] h-[50px] ml-11">
+          <mat-form-field appearance="fill" class="w-full">
+            <input matInput (keyup)="search($event)" placeholder="Search Learning units">
+            <mat-icon matPrefix svgIcon="heroicons_solid:search"></mat-icon>
+          </mat-form-field> <br>
+        </div> -->
+        <div class=" flex flex-row  w-[470px] h-[40px] mb-5 mr-3">
+
+            <mat-form-field appearance="fill" class="w-[300px] ml-4">
+                <input matInput  placeholder="Search" [(ngModel)]="searchValue">
+                <mat-icon matPrefix svgIcon="heroicons_solid:search"></mat-icon>
+            </mat-form-field>
+            <button (click)="search(searchValue)" mat-raised-button color="primary" class=" ml-2 mt-1 w-max mb-2">
+                Search
+            </button>
+        </div>
+
+        <div class="flex flex-row justify-center mt-1 mr-1">
+          <div class="mr-4">
+            <button mat-raised-button color="primary" class="w-full" (click)="openDialog()">
+              <mat-icon class="mr-1" svgIcon="heroicons_outline:plus-circle"></mat-icon>
+              Add </button>
+          </div>
+          <div class="mr-2">
+            <button mat-raised-button color="primary" class="w-full" (click)="viewTrashLU()">
+              <mat-icon  class="mr-1" svgIcon="heroicons_outline:trash"></mat-icon>Trash
+            </button>
+          </div>
+
+          <div class="ml-1">
+            <button mat-raised-button color="primary" class="md:w-[8vw] sm:w-[16vw] xs:w-[28vw] " (click)="exportLUjson()">
+
+            <div *ngIf="exportLoading; else saveButton">
+                <mat-spinner [diameter]="30"></mat-spinner>
+            </div>
+            <ng-template #saveButton>
+                <mat-icon class="mr-1">cloud_download</mat-icon>
+                Export
+            </ng-template>
+
+        </button>
+
+
+          </div>
+        </div>
+      </div>
+
+
+
+    <!-- </div> -->
+    <fuse-drawer class="w-screen min-w-screen" [opened]="drawerOpened" fixed [mode]="'over'"
+            [position]="'left'">
+            <div>
+                <ng-container *ngComponentOutlet="component"></ng-container>
+            </div>
+        </fuse-drawer>
+    <!-- </fuse-card> -->

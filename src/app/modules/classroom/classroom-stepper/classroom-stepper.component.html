@@ -1,0 +1,508 @@
+<div class="h-full">
+    <div class="absolute inset-0 flex flex-col min-w-0 overflow-hidden ">
+        <mat-drawer-container class="flex-auto h-full">
+            <mat-drawer class="w-90 dark:bg-gray-900" [autoFocus]="false" [mode]="drawerMode"
+                [opened]="drawerOpened && !isQuizActive" #matDrawer>
+                <div class="flex flex-col items-start p-8 border-b">
+                    <!-- close button for mobile navigation -->
+                    <a class="place-self-end lg:hidden" (click)="matDrawer.toggle()"><mat-icon class="icon-size-5"
+                            svgIcon="mat_outline:close"></mat-icon></a>
+
+                    <!-- Back to courses -->
+                    <a class="inline-flex items-center leading-6 text-primary hover:underline cursor-pointer"
+                        (click)="goBack()">
+                        <span class="inline-flex items-center">
+                            <mat-icon class="icon-size-5 text-current" [svgIcon]="'heroicons_solid:arrow-sm-left'">
+                            </mat-icon>
+                            <span class="ml-1.5 font-medium leading-5">Back to Classroom</span>
+                        </span>
+                    </a>
+
+                    <div>
+                        <!-- Course title  -->
+                        <div
+                            class="my-3 py-0.5 px-3 rounded-full text-lg font-semibold w-max text-primary-700 bg-blue-100">
+                            {{selectedTemplate?currentWorkflow?.workflowStepName:routerData.learningUnitDisplayName}}
+                        </div>
+                        <!-- <div class="my-3 py-0.5 px-3 rounded-full text-lg font-semibold w-max text-blue-800 bg-blue-100"
+                            [ngClass]="{'text-pink-800 bg-pink-100 dark:text-pink-50 dark:bg-pink-500': currentStep  === 1,
+                                                        'text-blue-800 bg-blue-100 dark:text-blue-50 dark:bg-blue-500': currentStep=== 2,
+                                                        'text-green-800 bg-green-100 dark:text-green-50 dark:bg-green-500': currentStep === 3,
+                                                    'text-yellow-800 bg-yellow-100 dark:text-yellow-50 dark:bg-yellow-500': currentStep === 4}">
+                            {{selectedTemplate?currentWorkflow?.workflowStepName:routerData.displayName}}
+                        </div> -->
+
+                        <!-- description -->
+                        <div class="text-secondary">
+                            <!-- {{selectedTemplate?currentWorkflow?.workflowStepDescription:routerData.shortDescription?routerData.shortDescription:routerData.longDescription}} -->
+                            {{ selectedTemplate ? currentWorkflow?.workflowStepDescription : routerData.shortDescription
+                            ? routerData.shortDescription : '' }}
+                        </div>
+                        <!-- workflowInfo time -->
+                        <!-- <div class="mt-6 flex items-center leading-5 text-md text-secondary">
+                            <mat-icon class="icon-size-5 text-hint" [svgIcon]="'heroicons_solid:clock'"></mat-icon>
+                            <div class="ml-1.5">{{currentWorkflow?.workflowStepDuration}} minutes</div>
+                        </div> -->
+                    </div>
+
+                    <!-- Select WorkFlow Template -->
+                    <!-- <div class="w-full my-3 py-0.5 rounded-full">
+                        <mat-form-field class="w-full ">
+                            <mat-label class="text-[#282B66]">Select the Workflow Template</mat-label>
+                            <mat-select placeholder="Select a workflow Template"
+                                (selectionChange)="selectedWFTemplate($event.value)">
+                                <mat-option value="" disabled selected>Select a workflow Template</mat-option>
+                                <mat-option *ngFor="let template of workflowTemplateDocs" [value]="template">
+                                    {{template.templateName}} </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div> -->
+                    <!-- <div class="w-full my-3 py-0.5 rounded-full">
+
+                        <div *ngIf="privilege" type="button" (click)="saveWorkFlowSteps()" matRipple
+                             matTooltipPosition="above" matTooltip="Add New Workflow Step"
+                            class="h-10 w-full bg bg-primary-100 hover:bg-primary-200 font-semibold cursor-pointer text-sm text-primary-600 rounded-lg border-2 border-dashed border-primary-400 flex justify-center items-center">
+                            <p>Save WorkFlow Steps</p>
+                            <mat-icon class="text-primary-600 ml-2" svgIcon="heroicons_outline:plus-circle"></mat-icon>
+                        </div>
+                    </div> -->
+                </div>
+
+                <!-- WorkFlow Steps -->
+                <div>
+                    <div *ngIf="selectedTemplate">
+                        <div class="py-2 px-8 relative">
+                            <div *ngIf="resetButton &&checkLearningUnitId" (click)="workflowInitialization()"
+                                matTooltip="Back to Saved Workflow" class="absolute right-1 top-1 cursor-pointer">
+                                <mat-icon class="text-primary-600 active:text-primary-800" svgIcon="undo"></mat-icon>
+                            </div>
+                            <ol>
+                                <ng-container
+                                    *ngFor="let step of workflowInfo?.workflowSteps; let last = last; trackBy: trackByFn">
+                                    <li class="relative group py-6"
+                                        [class.current-step]="step.sequenceNumber === currentStep">
+                                        <ng-container *ngIf="!last">
+                                            <div class="absolute top-6 left-4 w-0.5 h-full -ml-px"
+                                                [ngClass]="{'bg-primary': step.sequenceNumber < currentStep,
+                                                                                        'bg-gray-300 dark:bg-gray-600  ': step.sequenceNumber >= currentStep}"></div>
+                                        </ng-container>
+                                        <div *ngIf="privilege || !workflowDataInProgramme?.workflowLocked "
+                                            class="relative flex items-start cursor-pointer "
+                                            (click)="goToStep(step.sequenceNumber) "
+                                            [ngClass]="{'pointer-events-none ': step.sequenceNumber > currentStep+1}">
+                                            <div class="flex flex-0 items-center justify-center w-8 h-8 rounded-full ring-2 ring-inset bg-card dark:bg-default"
+                                                [ngClass]="{'bg-primary dark:bg-primary text-on-primary group-hover:bg-primary-800 ring-transparent': step.sequenceNumber < currentStep,
+                                                                                        'ring-primary': step.sequenceNumber === currentStep,
+                                                                                        'ring-gray-300 dark:ring-gray-600 group-hover:ring-gray-400  ': step.sequenceNumber > currentStep}">
+                                                <!-- Check icon, show if the step is completed -->
+                                                <ng-container *ngIf="step.sequenceNumber < currentStep">
+                                                    <mat-icon class="icon-size-5 text-current"
+                                                        [svgIcon]="'heroicons_solid:check'"></mat-icon>
+                                                </ng-container>
+                                                <!-- Step order, show if the step is the current step -->
+                                                <ng-container *ngIf="step.sequenceNumber === currentStep">
+                                                    <div
+                                                        class="text-md font-semibold text-primary dark:text-primary-500">
+                                                        {{step.sequenceNumber}}
+                                                    </div>
+                                                </ng-container>
+                                                <!-- Step order, show if the step is not completed -->
+                                                <ng-container *ngIf="step.sequenceNumber > currentStep">
+                                                    <div
+                                                        class="text-md font-semibold  text-hint group-hover:text-secondary">
+                                                        {{step.sequenceNumber}}
+                                                        <!-- <mat-icon svgIcon="lock"></mat-icon> -->
+
+                                                    </div>
+                                                </ng-container>
+                                            </div>
+                                            <div class="ml-4">
+                                                <div class="flex items-center">
+                                                    <div class="font-medium leading-4"
+                                                        [ngClass]="{'text-primary': step.sequenceNumber == currentStep}">
+                                                        {{step.workflowStepName}}</div>
+                                                    <span *ngIf="privilege"
+                                                        class="transform transition duration-500 hover:scale-110">
+                                                        <mat-icon
+                                                            [ngClass]="{'text-primary': step.sequenceNumber == currentStep}"
+                                                            (click)="editWorkFlow(false,step)" class="icon-size-5 ml-1"
+                                                            [svgIcon]="'heroicons_solid:pencil-alt'"></mat-icon>
+                                                    </span>
+                                                    <span *ngIf="privilege && step.allowArtefactUpload === true"
+                                                        class="transform transition duration-500 hover:scale-110">
+                                                        <mat-icon (click)="openScannedDocumentsInterface(step)"
+                                                            [ngClass]="{'text-primary': step.sequenceNumber == currentStep}"
+                                                            svgIcon="heroicons_outline:upload"
+                                                            class="icon-size-5 ml-1"></mat-icon>
+                                                    </span>
+                                                    <span *ngIf="privilege"
+                                                        class="transform transition duration-500 hover:scale-110">
+                                                        <mat-icon
+                                                            [ngClass]="{'text-red-500': step.sequenceNumber == currentStep}"
+                                                            (click)="deleteWFStep(step)" class="icon-size-5 ml-1 "
+                                                            svgIcon="mat_outline:delete"></mat-icon>
+                                                    </span>
+
+
+                                                </div>
+
+                                                <div *ngIf="step?.workflowStepDuration"
+                                                    class="pt-2 text-md leading-4 text-secondary flex items-center">
+                                                    <mat-icon class="icon-size-5 text-hint"
+                                                        [svgIcon]="'heroicons_solid:clock'"></mat-icon>
+                                                    <div class="ml-1.5 ">{{step.workflowStepDuration}} minutes</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div *ngIf="step.isStepUnlocked &&!privilege &&workflowDataInProgramme?.workflowLocked"
+                                            class="relative flex items-start cursor-pointer "
+                                            (click)="goToStep(step.sequenceNumber) "
+                                            [ngClass]="{'pointer-events-none ': step.sequenceNumber > currentStep+1}">
+                                            <div class="flex flex-0 items-center justify-center w-8 h-8 rounded-full ring-2 ring-inset bg-card dark:bg-default"
+                                                [ngClass]="{'bg-primary dark:bg-primary text-on-primary group-hover:bg-primary-800 ring-transparent': step.sequenceNumber < currentStep,
+                                                                                        'ring-primary': step.sequenceNumber === currentStep,
+                                                                                        'ring-gray-300 dark:ring-gray-600 group-hover:ring-gray-400  ': step.sequenceNumber > currentStep}">
+                                                <!-- Check icon, show if the step is completed -->
+                                                <ng-container *ngIf="step.sequenceNumber < currentStep">
+                                                    <mat-icon class="icon-size-5 text-current"
+                                                        [svgIcon]="'heroicons_solid:check'"></mat-icon>
+                                                </ng-container>
+                                                <!-- Step order, show if the step is the current step -->
+                                                <ng-container *ngIf="step.sequenceNumber === currentStep">
+                                                    <div
+                                                        class="text-md font-semibold text-primary dark:text-primary-500">
+                                                        {{step.sequenceNumber}}
+                                                    </div>
+                                                </ng-container>
+                                                <!-- Step order, show if the step is not completed -->
+                                                <ng-container *ngIf="step.sequenceNumber > currentStep">
+                                                    <div
+                                                        class="text-md font-semibold  text-hint group-hover:text-secondary">
+                                                        {{step.sequenceNumber}}
+                                                        <!-- <mat-icon svgIcon="lock"></mat-icon> -->
+
+                                                    </div>
+                                                </ng-container>
+                                            </div>
+                                            <div class="ml-4">
+                                                <div class="flex items-center">
+                                                    <div class="font-medium leading-4"
+                                                        [ngClass]="{'text-primary': step.sequenceNumber == currentStep}">
+                                                        {{step.workflowStepName}}</div>
+                                                    <span *ngIf="privilege"
+                                                        class="transform transition duration-500 hover:scale-110">
+                                                        <mat-icon
+                                                            [ngClass]="{'text-primary': step.sequenceNumber == currentStep}"
+                                                            (click)="editWorkFlow(false,step)" class="icon-size-5 ml-1 "
+                                                            [svgIcon]="'heroicons_solid:pencil-alt'"></mat-icon>
+                                                    </span>
+                                                    <span *ngIf="privilege"
+                                                        class="transform transition duration-500 hover:scale-110">
+                                                        <mat-icon
+                                                            [ngClass]="{'text-red-500': step.sequenceNumber == currentStep}"
+                                                            (click)="deleteWFStep(step)" class="icon-size-5 ml-1 "
+                                                            svgIcon="mat_outline:delete"></mat-icon>
+                                                    </span>
+
+
+                                                </div>
+
+                                                <div *ngIf="step?.workflowStepDuration"
+                                                    class="pt-2 text-md leading-4 text-secondary flex items-center">
+                                                    <mat-icon class="icon-size-5 text-hint"
+                                                        [svgIcon]="'heroicons_solid:clock'"></mat-icon>
+                                                    <div class="ml-1.5 ">{{step.workflowStepDuration}} minutes</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div *ngIf="!step.isStepUnlocked &&!privilege &&workflowDataInProgramme?.workflowLocked"
+                                            class="relative flex items-start ">
+                                            <div class=" flex flex-0 items-center justify-center w-8 h-8 rounded-full ring-2 ring-inset bg-card dark:bg-default"
+                                                [ngClass]="{'bg-primary dark:bg-primary text-on-primary group-hover:bg-primary-800 ring-transparent': step.sequenceNumber < currentStep,
+                                                                                        'ring-primary': step.sequenceNumber === currentStep,
+                                                                                        'ring-gray-300 dark:ring-gray-600   ': step.sequenceNumber > currentStep}">
+                                                <!-- Check icon, show if the step is completed -->
+                                                <ng-container *ngIf="step.sequenceNumber < currentStep">
+                                                    <mat-icon class="icon-size-5 text-current"
+                                                        [svgIcon]="'heroicons_solid:check'"></mat-icon>
+                                                </ng-container>
+                                                <!-- Step order, show if the step is the current step -->
+                                                <ng-container *ngIf="step.sequenceNumber === currentStep">
+                                                    <div
+                                                        class="text-md font-semibold text-primary dark:text-primary-500">
+                                                        {{step.sequenceNumber}}
+                                                    </div>
+                                                </ng-container>
+                                                <!-- Step order, show if the step is not completed -->
+                                                <ng-container *ngIf="step.sequenceNumber > currentStep">
+                                                    <div class="relative  text-gray-400 group-hover:text-secondary">
+                                                        <!-- {{step.sequenceNumber}} -->
+                                                        <mat-icon
+                                                            class="bottom-[-11px] left-[-12px] text-sm font-normal text-gray-300 absolute "
+                                                            svgIcon="lock"></mat-icon>
+
+                                                    </div>
+                                                </ng-container>
+                                            </div>
+                                            <div class="ml-4">
+                                                <div class="flex items-center">
+                                                    <div class="font-medium leading-4 text-gray-300"
+                                                        [ngClass]="{'text-primary': step.sequenceNumber == currentStep}">
+                                                        {{step.workflowStepName}}</div>
+                                                    <span *ngIf="privilege"
+                                                        class="transform transition text-gray-300 duration-500 ">
+                                                        <mat-icon
+                                                            [ngClass]="{'text-primary': step.sequenceNumber == currentStep}"
+                                                            class="icon-size-5 text-gray-300 ml-1 "
+                                                            [svgIcon]="'heroicons_solid:pencil-alt'"></mat-icon>
+                                                    </span>
+                                                    <span *ngIf="privilege"
+                                                        class="transform transition text-gray-300 duration-500 ">
+                                                        <mat-icon
+                                                            [ngClass]="{'text-red-500': step.sequenceNumber == currentStep}"
+                                                            class="icon-size-5 ml-1 text-gray-300"
+                                                            svgIcon="mat_outline:delete"></mat-icon>
+                                                    </span>
+
+
+                                                </div>
+
+                                                <div *ngIf="step?.workflowStepDuration"
+                                                    class="pt-2 text-md leading-4 text-secondary flex items-center">
+                                                    <mat-icon class="icon-size-5 text-gray-300"
+                                                        [svgIcon]="'heroicons_solid:clock'"></mat-icon>
+                                                    <div class="ml-1.5 text-gray-300">{{step.workflowStepDuration}}
+                                                        minutes</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                    </li>
+                                </ng-container>
+                            </ol>
+                        </div>
+
+                        <!-- <button *ngIf="privilege" type="button" (click)="addNewWorkFlowStep()"
+                            class="fuse-mat-stroked-button-large w-full mt-6 " mat-stroked-button [color]="'primary'">
+                            Add New Workflow Step
+                        </button> -->
+                        <div *ngIf="privilege" class="py-2 px-8">
+                            <div type="button" (click)="addNewWorkFlowStep()" matRipple matTooltipPosition="above"
+                                matTooltip="Add New Workflow Step"
+                                class="h-10 w-full bg bg-primary-100 hover:bg-primary-200 font-semibold cursor-pointer text-sm text-primary-600 rounded-lg border-2 border-dashed border-primary-400 flex justify-center items-center">
+                                <p>Add New Workflow Step </p>
+                                <mat-icon class="text-primary-600 ml-2"
+                                    svgIcon="heroicons_outline:plus-circle"></mat-icon>
+                            </div>
+                        </div>
+
+                        <!-- <div *ngIf="privilege" class="w-full my-3 py-0.5 rounded-full">
+                            <div type="button" (click)="saveWorkFlowSteps()" matRipple
+                                 matTooltipPosition="above" matTooltip="Add New Workflow Step"
+                                class="h-10 w-full bg bg-primary-100 hover:bg-primary-200 font-semibold cursor-pointer text-sm text-primary-600 rounded-lg border-2 border-dashed border-primary-400 flex justify-center items-center">
+                                <p>Save WorkFlow Steps</p>
+                                <mat-icon class="text-primary-600 ml-2"
+                                    svgIcon="heroicons_outline:plus-circle"></mat-icon>
+                            </div>
+                        </div> -->
+
+                        <!-- <div class="w-full border-b" *ngIf="privilege"></div> -->
+                        <div *ngIf="privilege" class="py-6 px-8">
+                            <button type="button" (click)="saveWorkFlowTemplate()"
+                                class="  fuse-mat-stroked-button-large w-full bg-primary-600 text-white hover:bg-primary-500"
+                                mat-stroked-button [color]="'primary'">
+                                Save Workflow Steps
+                            </button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div *ngIf="privilege" class="text-[#282B66] py-2 px-8 flex font-medium">
+                            <p class="mr-2">Select New Template </p>
+                            <mat-slide-toggle [color]="'primary'" (change)="toggleTemplate($event)"
+                                [(ngModel)]="tempView" [checked]="tempView">
+
+                            </mat-slide-toggle>
+                        </div>
+                        <div class="w-full border-b" *ngIf="selectedTemplate"></div>
+
+                        <div class="w-full my-3 rounded-full py-2 px-8" *ngIf="tempView">
+                            <mat-form-field class="w-full ">
+                                <mat-label class="text-[#282B66]">Select the Workflow Template</mat-label>
+                                <mat-select placeholder="Select a workflow Template"
+                                    (selectionChange)="selectedWFTemplate($event.value,false)">
+                                    <mat-option value="" disabled selected>Select a workflow Template</mat-option>
+                                    <mat-option *ngFor="let template of workflowTemplateDocs" [value]="template">
+                                        {{template.templateName}} </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                    </div>
+
+
+                </div>
+            </mat-drawer>
+
+            <!-- Drawer content -->
+            <mat-drawer-content class="flex flex-col overflow-hidden sm:bg-accent-50" *ngIf="isLoaded">
+                <!-- Header -->
+                <div
+                    class="lg:hidden flex flex-0 items-center py-2 pl-4 pr-6 sm:py-4 md:pl-6 md:pr-8 border-b lg:border-b-0 bg-card dark:bg-transparent">
+                    <!-- Title & Actions -->
+                    <!-- <a mat-icon-button [routerLink]="['/dashboard']"> -->
+                    <a mat-icon-button (click)="goBack()">
+                        <mat-icon [svgIcon]="'heroicons_outline:arrow-sm-left'"></mat-icon>
+                    </a>
+                    <h2 class="ml-2.5 text-blue-800 bg-blue-100 text-md sm:text-xl font-medium tracking-tight truncate py-0.5 px-3 rounded-full "
+                        [ngClass]="{'text-pink-800 bg-pink-100 dark:text-pink-50 dark:bg-pink-500': currentStep  === 0,
+                                    'text-blue-800 bg-blue-100 dark:text-blue-50 dark:bg-blue-500': currentStep=== 1,
+                                    'text-green-800 bg-green-100 dark:text-green-50 dark:bg-green-500': currentStep === 2,
+                                    'text-orange-800 bg-orange-100 dark:text-orange-50 dark:bg-orange-500': currentStep === 3}">
+                        {{currentStep==0?'Learn AndMake':currentStep==1?'Resources':currentStep==2?'Assignment':'Quiz'}}
+                    </h2>
+                </div>
+
+                <mat-progress-bar class="hidden lg:block flex-0 h-0.5 w-ful l"
+                    [value]="100 * (currentStep ) / workflowInfo?.totalSteps">
+                </mat-progress-bar>
+
+                <!-- Main -->
+                <div class="flex-auto overflow-y-auto sm:-mt-16 -mt-12 -z-99" cdkScrollable>
+                    <!-- Steps -->
+                    <mat-tab-group class="fuse-mat-no-header" [animationDuration]="'200'" #courseSteps>
+                        <mat-tab>
+                            <ng-template matTabContent>
+                                <div>
+                                    <app-learn-tabs [workflow]="currentWorkflow" [workflowId]="workflowInfo?.workflowId"
+                                        [luData]="routerData"></app-learn-tabs>
+                                </div>
+                            </ng-template>
+                        </mat-tab>
+                    </mat-tab-group>
+
+                    <!-- Navigation - Desktop -->
+                    <div *ngIf="!isQuizActive">
+                        <div *ngIf="privilege || !workflowDataInProgramme?.workflowLocked"
+                            class="z-10 sticky hidden lg:flex bottom-4 p-4">
+                            <div class="flex items-center justify-center mx-auto p-2 rounded-full shadow-lg bg-primary">
+                                <button class="flex-0 flex items-center text-white fill-white"
+                                    (click)="goToPreviousStep()">
+                                    <mat-icon class="mr-2 white-icon " color="white"
+                                        svgIcon='heroicons_outline:arrow-narrow-left'></mat-icon>
+                                    <span class="mr-1">Prev</span>
+                                </button>
+
+                                <div
+                                    class="flex items-center justify-center mx-2.5 font-medium leading-5 text-on-primary">
+                                    <span>{{currentStep}}</span>
+                                    <span class="mx-0.5 ">/</span>
+                                    <span>{{workflowInfo?.totalSteps}}</span>
+                                </div>
+
+                                <button class="flex-0 flex items-center  text-white" (click)="goToNextStep()">
+                                    <span class="ml-1">Next</span>
+                                    <mat-icon class="ml-2 white-icon"
+                                        [svgIcon]="'heroicons_outline:arrow-narrow-right'">
+                                    </mat-icon>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div *ngIf="!privilege && workflowDataInProgramme?.workflowLocked"
+                            class="z-10 sticky hidden lg:flex bottom-4 p-4">
+                            <div class="flex items-center justify-center mx-auto p-2 rounded-full shadow-lg bg-primary">
+                                <button class="flex-0 flex items-center text-white fill-white"
+                                    (click)="goToPreviousStep()">
+                                    <mat-icon class="mr-2 white-icon " color="white"
+                                        svgIcon='heroicons_outline:arrow-narrow-left'></mat-icon>
+                                    <span class="mr-1">Prev</span>
+                                </button>
+
+                                <div
+                                    class="flex items-center justify-center mx-2.5 font-medium leading-5 text-on-primary">
+                                    <span>{{currentStep}}</span>
+                                    <span class="mx-0.5 ">/</span>
+                                    <span>{{workflowInfo?.totalSteps}}</span>
+                                </div>
+
+                                <button [disabled]="currentStep+1 > unlockedSteps"
+                                    class="flex-0 flex items-center  text-white" (click)="goToNextStep()">
+                                    <span class="ml-1">Next</span>
+                                    <mat-icon class="ml-2 white-icon"
+                                        [svgIcon]="'heroicons_outline:arrow-narrow-right'">
+                                    </mat-icon>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progress & Navigation - Mobile -->
+                <div *ngIf="!isQuizActive">
+                    <div *ngIf="privilege || !workflowDataInProgramme?.workflowLocked"
+                        class="lg:hidden flex items-center p-4 border-t bg-card ">
+                        <button mat-icon-button (click)="matDrawer.toggle()">
+                            <mat-icon [svgIcon]="'heroicons_outline:view-list'"></mat-icon>
+                        </button>
+                        <div class="flex items-center justify-center ml-1 lg:ml-2 font-medium leading-5">
+                            <span>{{currentStep}}</span>
+                            <span class="mx-0.5 text-hint">/</span>
+                            <span>{{workflowInfo?.totalSteps}}</span>
+                        </div>
+                        <mat-progress-bar class="flex-auto ml-6 rounded-full"
+                            [value]="100 * (currentStep ) / workflowInfo?.totalSteps">
+                        </mat-progress-bar>
+                        <button class="ml-4" mat-icon-button (click)="goToPreviousStep()">
+                            <mat-icon [svgIcon]="'heroicons_outline:arrow-narrow-left'"></mat-icon>
+                        </button>
+                        <button class="ml-0.5" mat-icon-button (click)="goToNextStep()">
+                            <mat-icon [svgIcon]="'heroicons_outline:arrow-narrow-right'"></mat-icon>
+                        </button>
+                    </div>
+
+                    <div *ngIf="!privilege && workflowDataInProgramme?.workflowLocked"
+                        class="lg:hidden flex items-center p-4 border-t bg-card ">
+                        <button mat-icon-button (click)="matDrawer.toggle()">
+                            <mat-icon [svgIcon]="'heroicons_outline:view-list'"></mat-icon>
+                        </button>
+                        <div class="flex items-center justify-center ml-1 lg:ml-2 font-medium leading-5">
+                            <span>{{currentStep}}</span>
+                            <span class="mx-0.5 text-hint">/</span>
+                            <span>{{workflowInfo?.totalSteps}}</span>
+                        </div>
+                        <mat-progress-bar class="flex-auto ml-6 rounded-full"
+                            [value]="100 * (currentStep ) / workflowInfo?.totalSteps">
+                        </mat-progress-bar>
+                        <button class="ml-4" mat-icon-button (click)="goToPreviousStep()">
+                            <mat-icon [svgIcon]="'heroicons_outline:arrow-narrow-left'"></mat-icon>
+                        </button>
+                        <button [disabled]="currentStep+1 > unlockedSteps" class="ml-0.5" mat-icon-button
+                            (click)="goToNextStep()">
+                            <mat-icon [svgIcon]="'heroicons_outline:arrow-narrow-right'"></mat-icon>
+                        </button>
+                    </div>
+                </div>
+            </mat-drawer-content>
+
+            <mat-drawer-content *ngIf="!isLoaded" class="flex items-center justify-center">
+                <mat-spinner [diameter]="30" *ngIf="isHaveWorkflow"></mat-spinner>
+                <!-- error message -->
+                <div *ngIf="!isHaveWorkflow">
+                    <p class="text-center text-3xl">
+                        This learning unit has not been configured yet.
+                    </p>
+                    <p class="text-center text-3xl">
+                        Please contact us at +{{environment.whatsAppSender}} or
+                    </p>
+                    <p class="text-center text-3xl">
+                        at {{environment.emailSender}} for further assistance.
+                    </p>
+                </div>
+            </mat-drawer-content>
+
+            <!-- <mat-drawer-content *ngIf="!isLoaded && !isHaveWorkflow"> -->
+            <!-- </mat-drawer-content> -->
+        </mat-drawer-container>
+    </div>
+</div>

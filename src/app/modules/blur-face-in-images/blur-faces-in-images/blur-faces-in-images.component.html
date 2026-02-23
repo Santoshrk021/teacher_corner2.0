@@ -1,0 +1,64 @@
+<div class="relative rounded-xl p-6 mt-40 shadow-md h-[44vh] bg-white max-w-md mx-auto">
+
+  <!-- 🔄 Overlay Loader -->
+  <div
+    *ngIf="isFetchingImages"
+    class="absolute inset-0 flex justify-center items-center loading-overlay rounded-xl"
+  >
+    <mat-progress-spinner
+      diameter="40"
+      mode="indeterminate"
+      color="primary"
+    ></mat-progress-spinner>
+  </div>
+
+  <!-- Main Content -->
+  <h2 class="text-2xl font-semibold text-center mb-4">
+    Upload Image to Blur Faces
+  </h2>
+
+  <mat-form-field class="w-full text-accent-600">
+    <mat-label class="text-[#282B66]">Select Image</mat-label>
+    <mat-select
+      [(ngModel)]="selectedImage"
+      multiple
+      placeholder="Select Image"
+     
+    >
+      <mat-option value="" disabled>Select an image</mat-option>
+      <mat-option
+        *ngFor="let imageName of imageNames"
+        [value]="imageName"
+      >
+        {{ imageName }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <!-- Upload Button -->
+  <div class="text-center mt-4">
+    <button
+      (click)="sendImageUrlToCloudFunction()"
+      class="bg-primary disabled:bg-primary-100 text-white px-4 py-2 rounded-2xl"
+     
+    >
+      <span *ngIf="!uploading">Upload & Blur Faces</span>
+      <mat-progress-spinner
+        *ngIf="uploading"
+        [diameter]="24"
+        [mode]="'indeterminate'"
+        color="accent"
+      ></mat-progress-spinner>
+    </button>
+  </div>
+
+  <!-- View blurred image Button -->
+  <div class="text-center mt-4" *ngIf="blurredImageUrl">
+    <button
+      (click)="openPdfInNewTab()"
+      class="bg-green-600 text-white px-4 py-2 rounded-2xl hover:bg-green-700 transition duration-200"
+    >
+      View Blurred Image
+    </button>
+  </div>
+</div>

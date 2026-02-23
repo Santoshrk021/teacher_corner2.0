@@ -1,0 +1,424 @@
+<div class="flex flex-col h-full w-full bg-gray-50">
+  <!-- Header -->
+  <div class="flex items-center justify-between bg-white px-6 py-4 border-b shadow-sm">
+        <div class="flex items-center gap-3">
+      <div class="text-2xl font-bold text-gray-800">Create New Kit</div>
+
+      <!-- ✅ Source badge with switch option - only show when user has chosen a mode -->
+      <div *ngIf="eventSource !== 'NONE'" class="flex items-center gap-2">
+        <span class="text-xs px-2 py-1 rounded-full"
+          [ngClass]="eventSource === 'USB' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'">
+          Input: {{ eventSource }}
+        </span>
+        <!-- Switch mode button (only show when not in connect step) -->
+        <button *ngIf="currentStep !== 'connect' && !connecting" mat-icon-button
+          [matTooltip]="eventSource === 'USB' ? 'Switch to Cloud mode' : 'Switch to USB mode'"
+          (click)="eventSource === 'USB' ? switchToFirestore() : switchToUsb()"
+          class="text-gray-500 hover:text-primary scale-75">
+          <mat-icon>{{ eventSource === 'USB' ? 'cloud' : 'usb' }}</mat-icon>
+        </button>
+        <mat-spinner *ngIf="connecting" diameter="16"></mat-spinner>
+      </div>
+    </div>
+    <button mat-icon-button (click)="close()" class="text-gray-500 hover:text-gray-700">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Progress Steps -->
+  <div class="flex items-center justify-center bg-white px-6 py-4 border-b" *ngIf="currentStep !== 'connect'">
+    <div class="flex items-center space-x-4">
+      <!-- Teacher Step -->
+      <div class="flex items-center">
+        <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold"
+          [ngClass]="{'bg-primary': currentStep === 'teacher', 'bg-green-500': teacherRemotes.length > 0 && currentStep !== 'teacher', 'bg-gray-300': teacherRemotes.length === 0 && currentStep !== 'teacher'}">
+          <mat-icon *ngIf="teacherRemotes.length > 0 && currentStep !== 'teacher'" class="text-white">check</mat-icon>
+          <span *ngIf="!(teacherRemotes.length > 0 && currentStep !== 'teacher')">1</span>
+        </div>
+        <span class="ml-2 font-medium" [ngClass]="{'text-primary': currentStep === 'teacher'}">Teacher</span>
+      </div>
+
+      <div class="w-16 h-1 bg-gray-300"></div>
+
+      <!-- Students Step -->
+      <div class="flex items-center">
+        <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold"
+          [ngClass]="{'bg-primary': currentStep === 'students', 'bg-green-500': studentRemotes.length > 0 && currentStep !== 'students', 'bg-gray-300': studentRemotes.length === 0 && currentStep !== 'students'}">
+          <mat-icon *ngIf="studentRemotes.length > 0 && currentStep !== 'students'" class="text-white">check</mat-icon>
+          <span *ngIf="!(studentRemotes.length > 0 && currentStep !== 'students')">2</span>
+        </div>
+        <span class="ml-2 font-medium" [ngClass]="{'text-primary': currentStep === 'students'}">Students</span>
+      </div>
+
+      <div class="w-16 h-1 bg-gray-300"></div>
+
+      <!-- Spare Step -->
+      <div class="flex items-center">
+        <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold"
+          [ngClass]="{'bg-primary': currentStep === 'spare', 'bg-green-500': spareRemotes.length > 0 && currentStep !== 'spare', 'bg-gray-300': spareRemotes.length === 0 && currentStep !== 'spare'}">
+          <mat-icon *ngIf="spareRemotes.length > 0 && currentStep !== 'spare'" class="text-white">check</mat-icon>
+          <span *ngIf="!(spareRemotes.length > 0 && currentStep !== 'spare')">3</span>
+        </div>
+        <span class="ml-2 font-medium" [ngClass]="{'text-primary': currentStep === 'spare'}">Spare</span>
+      </div>
+
+      <div class="w-16 h-1 bg-gray-300"></div>
+
+      <!-- Review Step -->
+      <div class="flex items-center">
+        <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold"
+          [ngClass]="{'bg-primary': currentStep === 'review', 'bg-gray-300': currentStep !== 'review'}">
+          4
+        </div>
+        <span class="ml-2 font-medium" [ngClass]="{'text-primary': currentStep === 'review'}">Review</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Area -->
+  <div class="flex-1 p-6" [ngClass]="{'overflow-y-auto': currentStep !== 'students', 'overflow-hidden': currentStep === 'students'}">
+
+    <!-- STEP: Connect USB -->
+    <div *ngIf="currentStep === 'connect'" class="flex flex-col items-center justify-center h-full">
+      <div class="bg-white rounded-2xl shadow-xl p-8 max-w-md text-center">
+        <mat-icon class="text-primary text-6xl mb-4" style="font-size: 80px; width: 80px; height: 80px;">usb</mat-icon>
+        <h2 class="text-2xl font-bold mb-2">Connect USB Receiver</h2>
+        <p class="text-gray-500 mb-4">Insert your USB receiver and click the button below to start pairing remotes.</p>
+        <p *ngIf="!connected" class="text-sm text-red-500 mb-6">Ensure the receiver is properly inserted before connecting.</p>
+        <p *ngIf="connected" class="text-sm text-green-500 mb-6">USB receiver is already connected. Click to continue.</p>
+
+        <!-- Already Connected - Show "Connected >" -->
+        <button *ngIf="connected" mat-raised-button color="primary" (click)="goToStep('teacher')"
+          class="px-8 py-3 text-lg">
+          <mat-icon class="mr-2 text-green-400">check_circle</mat-icon>
+          Connected
+          <mat-icon class="ml-2">arrow_forward</mat-icon>
+        </button>
+
+        <!-- Not Connected - Show "Connect Receiver" -->
+        <button *ngIf="!connected" mat-raised-button color="primary" (click)="connectReceiver()" [disabled]="connecting"
+          class="px-8 py-3 text-lg">
+          <mat-icon *ngIf="!connecting" class="mr-2">wifi_tethering</mat-icon>
+          <mat-spinner *ngIf="connecting" diameter="20" class="mr-2"></mat-spinner>
+          {{ connecting ? 'Connecting...' : 'Connect Receiver' }}
+        </button>
+
+        <!-- Instruction hint -->
+        <div class="mt-4 text-sm text-gray-500 max-w-sm">
+          <p class="mb-1"><strong>Select USB device</strong> to use USB receiver</p>
+          <p><strong>Click Cancel</strong> in the dialog to use Cloud (Firestore) mode</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP: Teacher Remotes -->
+    <div *ngIf="currentStep === 'teacher'" class="max-w-4xl mx-auto">
+      <!-- Firestore Fallback Notice -->
+      <div *ngIf="eventSource === 'FIRESTORE'" class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4 flex items-center gap-2">
+        <mat-icon class="text-blue-500">cloud</mat-icon>
+        <span class="text-sm text-blue-700">No USB receiver detected. Listening for remote events via cloud (Firestore).</span>
+      </div>
+      <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center">
+            <mat-icon class="text-primary mr-3" style="font-size: 36px; width: 36px; height: 36px;">school</mat-icon>
+            <div>
+              <div class="flex items-center gap-2">
+                <h2 class="text-xl font-bold">Teacher Remotes</h2>
+                <span class="bg-green-100 text-green-800 px-2 py-0.5 rounded-full text-sm font-medium">
+                  {{teacherRemotes.length}}/{{maxTeacherRemotes}}
+                </span>
+              </div>
+              <p class="text-gray-500">Press any button on teacher remotes to register them</p>
+            </div>
+          </div>
+          <!-- Edit Count Button -->
+          <div class="flex items-center gap-2">
+            <ng-container *ngIf="!editingTeacherCount">
+              <button mat-icon-button matTooltip="Edit count" (click)="startEditingCount('teacher')" class="text-gray-500 hover:text-primary">
+                <mat-icon>edit</mat-icon>
+              </button>
+            </ng-container>
+            <ng-container *ngIf="editingTeacherCount">
+              <input type="number" [(ngModel)]="tempTeacherCount" min="1" max="10"
+                class="w-16 px-2 py-1 border rounded text-center text-sm">
+              <button mat-icon-button color="primary" matTooltip="Save" (click)="saveCount('teacher')">
+                <mat-icon>check</mat-icon>
+              </button>
+              <button mat-icon-button color="warn" matTooltip="Cancel" (click)="cancelEditingCount('teacher')">
+                <mat-icon>close</mat-icon>
+              </button>
+            </ng-container>
+          </div>
+        </div>
+
+        <!-- Captured Teacher Remotes -->
+        <div class="grid grid-cols-2 gap-4 mb-4">
+          <div *ngFor="let remote of teacherRemotes; let i = index"
+            class="bg-green-50 border-2 border-green-500 rounded-lg p-4 flex items-center justify-between">
+            <div class="flex items-center">
+              <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white font-bold mr-3">
+                T{{remote.slotNumber}}
+              </div>
+              <div>
+                <div class="font-medium">Teacher Remote {{remote.slotNumber}}</div>
+                <div class="text-sm text-gray-500 font-mono">{{remote.mac}}</div>
+              </div>
+            </div>
+            <button mat-icon-button color="warn" (click)="removeRemote('teacher', i)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+
+          <!-- Empty Slots -->
+          <div *ngFor="let slot of [].constructor(maxTeacherRemotes - teacherRemotes.length); let i = index"
+            class="border-2 border-dashed border-gray-300 rounded-lg p-4 flex items-center justify-center text-gray-400">
+            <mat-icon class="mr-2">wifi_tethering</mat-icon>
+            Press button on remote...
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP: Student Remotes -->
+    <div *ngIf="currentStep === 'students'" class="max-w-6xl mx-auto h-full flex flex-col">
+      <!-- Firestore Fallback Notice -->
+      <div *ngIf="eventSource === 'FIRESTORE'" class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4 flex items-center gap-2 flex-shrink-0">
+        <mat-icon class="text-blue-500">cloud</mat-icon>
+        <span class="text-sm text-blue-700">Listening for remote events via cloud (Firestore).</span>
+      </div>
+      <div class="bg-white rounded-xl shadow-lg p-6 flex flex-col flex-1 min-h-0">
+        <div class="flex items-center justify-between mb-4 flex-shrink-0">
+          <div class="flex items-center">
+            <mat-icon class="text-blue-500 mr-3" style="font-size: 36px; width: 36px; height: 36px;">groups</mat-icon>
+            <div>
+              <div class="flex items-center gap-2">
+                <h2 class="text-xl font-bold">Student Remotes</h2>
+                <span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full text-sm font-medium">
+                  {{studentRemotes.length}}/{{maxStudentRemotes}}
+                </span>
+              </div>
+              <p class="text-gray-500">Press any button on student remotes to register them</p>
+            </div>
+          </div>
+          <!-- Edit Count Button -->
+          <div class="flex items-center gap-2">
+            <ng-container *ngIf="!editingStudentCount">
+              <button mat-icon-button matTooltip="Edit count" (click)="startEditingCount('student')" class="text-gray-500 hover:text-blue-500">
+                <mat-icon>edit</mat-icon>
+              </button>
+            </ng-container>
+            <ng-container *ngIf="editingStudentCount">
+              <input type="number" [(ngModel)]="tempStudentCount" min="1" max="100"
+                class="w-16 px-2 py-1 border rounded text-center text-sm">
+              <button mat-icon-button color="primary" matTooltip="Save" (click)="saveCount('student')">
+                <mat-icon>check</mat-icon>
+              </button>
+              <button mat-icon-button color="warn" matTooltip="Cancel" (click)="cancelEditingCount('student')">
+                <mat-icon>close</mat-icon>
+              </button>
+            </ng-container>
+          </div>
+        </div>
+
+        <!-- Captured Student Remotes Grid - Scrollable -->
+        <div class="flex-1 overflow-y-auto min-h-0 max-h-[240px] border rounded-lg p-3 bg-gray-50">
+          <div class="grid grid-cols-5 gap-3">
+            <div *ngFor="let remote of studentRemotes; let i = index"
+              class="bg-blue-50 border-2 border-blue-500 rounded-lg p-3 text-center relative">
+              <button mat-icon-button color="warn" class="absolute -top-2 -right-2 scale-75" (click)="removeRemote('student', i)">
+                <mat-icon>cancel</mat-icon>
+              </button>
+              <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold mx-auto mb-1">
+                {{remote.slotNumber}}
+              </div>
+              <div class="text-xs font-mono text-gray-500 truncate">{{remote.mac}}</div>
+            </div>
+
+            <!-- Empty Slots (show remaining slots) -->
+            <div *ngFor="let slot of [].constructor(maxStudentRemotes - studentRemotes.length); let i = index"
+              class="border-2 border-dashed border-gray-300 rounded-lg p-3 text-center text-gray-400 bg-white">
+              <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-1">
+                {{studentRemotes.length + i + 1}}
+              </div>
+              <div class="text-xs">Waiting...</div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="studentRemotes.length < maxStudentRemotes" class="text-center text-gray-500 mt-4 flex-shrink-0">
+          <mat-icon class="animate-pulse">wifi_tethering</mat-icon>
+          Listening for student remotes... ({{maxStudentRemotes - studentRemotes.length}} remaining)
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP: Spare Remotes -->
+    <div *ngIf="currentStep === 'spare'" class="max-w-4xl mx-auto">
+      <!-- Firestore Fallback Notice -->
+      <div *ngIf="eventSource === 'FIRESTORE'" class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4 flex items-center gap-2">
+        <mat-icon class="text-blue-500">cloud</mat-icon>
+        <span class="text-sm text-blue-700">Listening for remote events via cloud (Firestore).</span>
+      </div>
+      <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center">
+            <mat-icon class="text-orange-500 mr-3" style="font-size: 36px; width: 36px; height: 36px;">build</mat-icon>
+            <div>
+              <div class="flex items-center gap-2">
+                <h2 class="text-xl font-bold">Spare Remotes</h2>
+                <span class="bg-orange-100 text-orange-800 px-2 py-0.5 rounded-full text-sm font-medium">
+                  {{spareRemotes.length}}/{{maxSpareRemotes}}
+                </span>
+              </div>
+              <p class="text-gray-500">Press any button on spare remotes to register them - Optional</p>
+            </div>
+          </div>
+          <!-- Edit Count Button -->
+          <div class="flex items-center gap-2">
+            <ng-container *ngIf="!editingSpareCount">
+              <button mat-icon-button matTooltip="Edit count" (click)="startEditingCount('spare')" class="text-gray-500 hover:text-orange-500">
+                <mat-icon>edit</mat-icon>
+              </button>
+            </ng-container>
+            <ng-container *ngIf="editingSpareCount">
+              <input type="number" [(ngModel)]="tempSpareCount" min="0" max="20"
+                class="w-16 px-2 py-1 border rounded text-center text-sm">
+              <button mat-icon-button color="primary" matTooltip="Save" (click)="saveCount('spare')">
+                <mat-icon>check</mat-icon>
+              </button>
+              <button mat-icon-button color="warn" matTooltip="Cancel" (click)="cancelEditingCount('spare')">
+                <mat-icon>close</mat-icon>
+              </button>
+            </ng-container>
+          </div>
+        </div>
+
+        <!-- Captured Spare Remotes -->
+        <div class="grid grid-cols-2 gap-4 mb-4">
+          <div *ngFor="let remote of spareRemotes; let i = index"
+            class="bg-orange-50 border-2 border-orange-500 rounded-lg p-4 flex items-center justify-between">
+            <div class="flex items-center">
+              <div class="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center text-white font-bold mr-3">
+                S{{remote.slotNumber}}
+              </div>
+              <div>
+                <div class="font-medium">Spare Remote {{remote.slotNumber}}</div>
+                <div class="text-sm text-gray-500 font-mono">{{remote.mac}}</div>
+              </div>
+            </div>
+            <button mat-icon-button color="warn" (click)="removeRemote('spare', i)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+
+          <!-- Empty Slots -->
+          <div *ngFor="let slot of [].constructor(maxSpareRemotes - spareRemotes.length); let i = index"
+            class="border-2 border-dashed border-gray-300 rounded-lg p-4 flex items-center justify-center text-gray-400">
+            <mat-icon class="mr-2">wifi_tethering</mat-icon>
+            Press button on remote...
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP: Review -->
+    <div *ngIf="currentStep === 'review'" class="max-w-4xl mx-auto">
+      <div class="bg-white rounded-xl shadow-lg p-6">
+        <div class="flex items-center mb-6">
+          <mat-icon class="text-green-500 mr-3" style="font-size: 36px; width: 36px; height: 36px;">fact_check</mat-icon>
+          <div>
+            <h2 class="text-xl font-bold">Review Kit Configuration</h2>
+            <p class="text-gray-500">Total Remotes: {{getAllRemotes().length}} - Click on a card to view details</p>
+          </div>
+        </div>
+
+        <!-- Summary Cards - Clickable -->
+        <div class="grid grid-cols-3 gap-4 mb-6">
+          <div class="bg-green-50 rounded-lg p-4 text-center cursor-pointer transition-all hover:shadow-md"
+            [ngClass]="{'ring-2 ring-green-500': selectedReviewType === 'teacher'}"
+            (click)="selectReviewType('teacher')">
+            <mat-icon class="text-green-500 mb-2">school</mat-icon>
+            <div class="text-2xl font-bold text-green-600">{{teacherRemotes.length}}</div>
+            <div class="text-sm text-gray-500">Teacher Remotes</div>
+          </div>
+          <div class="bg-blue-50 rounded-lg p-4 text-center cursor-pointer transition-all hover:shadow-md"
+            [ngClass]="{'ring-2 ring-blue-500': selectedReviewType === 'student'}"
+            (click)="selectReviewType('student')">
+            <mat-icon class="text-blue-500 mb-2">groups</mat-icon>
+            <div class="text-2xl font-bold text-blue-600">{{studentRemotes.length}}</div>
+            <div class="text-sm text-gray-500">Student Remotes</div>
+          </div>
+          <div class="bg-orange-50 rounded-lg p-4 text-center cursor-pointer transition-all hover:shadow-md"
+            [ngClass]="{'ring-2 ring-orange-500': selectedReviewType === 'spare'}"
+            (click)="selectReviewType('spare')">
+            <mat-icon class="text-orange-500 mb-2">build</mat-icon>
+            <div class="text-2xl font-bold text-orange-600">{{spareRemotes.length}}</div>
+            <div class="text-sm text-gray-500">Spare Remotes</div>
+          </div>
+        </div>
+
+        <!-- Filtered Remotes Table - Collapsible -->
+        <div *ngIf="selectedReviewType">
+          <div class="flex items-center justify-between mb-2">
+            <span class="font-medium text-gray-700">{{selectedReviewType | titlecase}} Remotes ({{getFilteredRemotes().length}})</span>
+            <button mat-icon-button (click)="toggleTable()" class="text-gray-500">
+              <mat-icon>{{showTable ? 'expand_less' : 'expand_more'}}</mat-icon>
+            </button>
+          </div>
+
+          <div *ngIf="showTable" class="border rounded-lg overflow-hidden">
+            <div class="max-h-[200px] overflow-y-auto">
+              <table class="w-full text-sm">
+                <thead class="bg-gray-100 sticky top-0">
+                  <tr>
+                    <th class="px-4 py-2 text-left">Slot</th>
+                    <th class="px-4 py-2 text-left">Type</th>
+                    <th class="px-4 py-2 text-left">MAC Address</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let remote of getFilteredRemotes()" class="border-t">
+                    <td class="px-4 py-2">{{remote.slotNumber}}</td>
+                    <td class="px-4 py-2">
+                      <span class="px-2 py-1 rounded text-xs font-medium"
+                        [ngClass]="{
+                          'bg-green-100 text-green-800': remote.role === 'teacher',
+                          'bg-blue-100 text-blue-800': remote.role === 'student',
+                          'bg-orange-100 text-orange-800': remote.role === 'spare'
+                        }">
+                        {{remote.role | titlecase}}
+                      </span>
+                    </td>
+                    <td class="px-4 py-2 font-mono text-gray-600">{{remote.mac}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Footer Navigation - Fixed at bottom -->
+  <div class="bg-white border-t px-6 py-4 flex justify-between items-center flex-shrink-0" *ngIf="currentStep !== 'connect'">
+    <button mat-stroked-button (click)="previousStep()" *ngIf="currentStep !== 'teacher'">
+      <mat-icon class="mr-1">arrow_back</mat-icon> Previous
+    </button>
+    <div *ngIf="currentStep === 'teacher'"></div>
+
+    <div class="flex gap-3">
+      <button *ngIf="currentStep !== 'review'" mat-raised-button color="primary" (click)="nextStep()" [disabled]="!canProceed()">
+        Next <mat-icon class="ml-1">arrow_forward</mat-icon>
+      </button>
+
+      <button *ngIf="currentStep === 'review'" mat-raised-button color="primary" (click)="saveKit()" [disabled]="saving">
+        <mat-icon *ngIf="!saving" class="mr-1">save</mat-icon>
+        <mat-spinner *ngIf="saving" diameter="20" class="mr-2"></mat-spinner>
+        {{ saving ? 'Saving...' : 'Save Kit' }}
+      </button>
+    </div>
+  </div>
+</div>

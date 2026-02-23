@@ -1,0 +1,56 @@
+<div class="flex justify-center" *ngIf="isAssignmentUi;else assignmentDeleted">
+    <div class="w-full">
+        <mat-stepper labelPosition="bottom" linear #stepper class="bg-transparent" [animationDuration]="1000">
+            <div *ngFor="let assignmentObject of contentInfo?.assignments">
+                <app-upload-type [assignment]="assignmentObject">
+                </app-upload-type>
+                <!-- <mat-step *ngIf="assignmentObject?.uploadFileType?.toLowerCase() === 'image'">
+                    <ng-template matStepLabel>{{assignmentObject?.title}}</ng-template>
+                    <ng-template matStepContent>
+                        <app-upload-images [assignment]="assignmentObject"></app-upload-images>
+                    </ng-template>
+                </mat-step>
+
+                <mat-step *ngIf="assignmentObject?.uploadFileType?.toLowerCase() === 'pdf'">
+                    <ng-template matStepLabel>{{assignmentObject?.title}}</ng-template>
+                    <ng-template matStepContent>
+                        <app-upload-pdfs [assignment]="assignmentObject"></app-upload-pdfs>
+                    </ng-template>
+                </mat-step> -->
+            </div>
+
+            <!-- Icon overrides -->
+            <ng-template matStepperIcon="camera">
+                <mat-icon> perm_media</mat-icon>
+            </ng-template>
+            <ng-template matStepperIcon="pdf">
+                <mat-icon>receipt</mat-icon>
+            </ng-template>
+
+        </mat-stepper>
+    </div>
+</div>
+
+<ng-template #assignmentDeleted>
+    <div class="text-slate-600 font-medium text-lg h-[300px] w-full flex justify-center items-center">
+        <div>
+            <p>The assignment has been
+                deleted.</p>
+            <div class="mt-3 flex flex-wrap ">
+                <span>Please&nbsp;contact&nbsp;us&nbsp;at</span>
+                <span class="text-primary">&nbsp;+{{environment.whatsAppSender}}</span>
+                <span>&nbsp;or&nbsp;</span>
+                <span class="flex  items-center bg-white h-max w-max px-1 py-0.5 rounded shadow">
+                    <img class="h-4 w-4 mr-1 "
+                        src="https://static.whatsapp.net/rsrc.php/v3/yz/r/ujTY9i_Jhs1.png">
+                    <a class="text-[#049CD8] text-base hover:underline underline-offset-2 " target="_blank"
+                        [href]="'https://api.whatsapp.com/send/?phone=' + environment.whatsAppSender + '&text=Greetings%21+I+have+a+question+regarding+Teacher+Corner&type=phone_number&app_absent=0'">
+                        {{environment.projectName}}
+                    </a>
+                </span>
+                <span>&nbsp;,&nbsp;</span>
+                <span>for&nbsp;further assistance.</span>
+            </div>
+        </div>
+    </div>
+</ng-template>

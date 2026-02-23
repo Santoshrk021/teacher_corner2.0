@@ -1,0 +1,115 @@
+<div [formGroup]="mcq" class="flex flex-col h-full w-full">
+    <div>
+        <!-- <p class="mb-4">{{quizData?.questionTitle}}</p> -->
+        <p class="mb-2"><quill-view-html  [content]="quizData?.questionTitle"></quill-view-html></p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 h-full w-full">
+        <!-- <div *ngIf="getOneCorrectOption() ; else singleCorrectOptionUI " class="order-2 sm:order-1"> -->
+
+
+        <!-- tabs -->
+        <div *ngIf="quizData.optionalResource.length" class="h-100 flex-auto border-t w-full max-w-screen-xl mx-auto">
+            <div class="flex flex-wrap ">
+                <div class="w-full h-full">
+                    <ul class="flex mb-0 list-none flex-wrap pt-3 pb-4 flex-row">
+                        <li class="-mb-px mr-2 last:mr-0 flex-auto text-center"
+                            *ngFor="let res of quizData.optionalResource ; let i = index">
+                            <a (click)="toggleTabs(i)"
+                                class=" text-sm uppercase px-5 py-3 shadow-lg border rounded-full block leading-normal scale-90 cursor-pointer line-clamp-1"
+                                [ngClass]="{'text-primary bg-white ': openTab !== i, 'text-white bg-primary': openTab === i}">
+                                {{res.resourceName}}
+                            </a>
+                        </li>
+                    </ul>
+
+                    <div class="relative flex flex-col min-w-0 break-words bg-white w-full h-full mb-6 ">
+                        <div class="px-4 py-5 flex-auto w-full h-full">
+                            <div class="tab-content tab-space w-full h-full">
+                                <div *ngFor="let res of quizData.optionalResource ; let i = index"
+                                    [ngClass]="{'hidden': openTab !== i, 'block': openTab === i}" class="w-full h-full">
+                                    <div *ngIf="res.type == 'IMAGE'; else otherRes">
+                                        <img [src]="res?.resourcePath|getDownloadURL" alt="Image loading...">
+                                    </div>
+                                    <ng-template #otherRes>
+                                        <div *ngIf="res.type ==='VIDEO' ;else pdfContainer" #videoRef
+                                            class="w-full h-full">
+                                            <div *ngIf="res?.resourcePath">
+                                                <app-video [videoUrl]="res.resourcePath"></app-video>
+                                            </div>
+                                        </div>
+                                    </ng-template>
+                                    <ng-template #pdfContainer>
+                                        <ng-container *ngIf="res.type ==='PDF'">
+                                            <div class="flex justify-center items-center h-50 pb-2">
+                                                <div *ngIf="res?.resourcePath" class="h-full w-full">
+                                                    <app-pdf [pdfUrl]="res.resourcePath |getDownloadURL"
+                                                        class="w-full h-full">
+                                                    </app-pdf>
+                                                </div>
+                                            </div>
+                                        </ng-container>
+                                    </ng-template>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+       
+
+        <div formArrayName="options">
+            <label class="uppercase text-primary font-medium">Options <small
+                    class="uppercase text-muted">
+                    {{ mcq.get('oneCorrectOption').value?
+                    "(Select the correct option)": "(Tick the correct options)"
+                    }}
+                </small>
+            </label>
+            <div
+                *ngIf="!mcq.get('oneCorrectOption').value ; else singleCorrectOptionUI">
+                <div
+                    *ngFor="let option of mcq.get('options').controls; let optionIndex=index; let f = first; let l = last">
+                    <div [formGroupName]="optionIndex"
+                        class="flex py-1 items-center mt-2">
+                        <div class="pr-1">{{optionIndex +1}}:</div>
+                        <div class="flex items-center"
+                            [ngClass]="{'ml-[1.5px]': optionIndex === 0}">
+                            <input type="checkbox"
+                                formControlName="attemptedOption">
+                            <!-- <input type="text" formControlName="Title" class="form-control pr-1" for="exampleCheck1"> -->
+                            <label class="ml-2"
+                                [for]="'exampleCheck1' + i+optionIndex">{{option.get('name').value}}</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <ng-template #singleCorrectOptionUI>
+                <div
+                    *ngFor="let option of mcq.get('options').controls; let optionIndex=index; let f = first; let l = last">
+                    <div [formGroupName]="optionIndex"
+                        class="flex py-1 items-center mt-2">
+                        <div class="pr-1 ">{{optionIndex +1}}:</div>
+                        <div class="flex items-center "
+                            [ngClass]="{'ml-[1.5px]': optionIndex === 0}">
+                            <input type="radio"
+                                [checked]="option.value.attemptedOption"
+                                class=" mr-2" name="mcqSingleSelect"
+                                (click)="singleCorrectOptionSetRadio(optionIndex)">
+                            <label class="font-weight-normal">
+                                {{option.get('name').value}}
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </ng-template>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="lastStep" class="w-full  text-center mt-3">
+    <button  mat-stroked-button (click)="onSubmit()">Submit</button>
+</div>

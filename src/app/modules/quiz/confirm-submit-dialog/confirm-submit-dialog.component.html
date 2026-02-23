@@ -1,0 +1,12 @@
+<h2 mat-dialog-title>Confirm Submission</h2>
+<mat-dialog-content>
+    <p class="text-red-700">Are you sure you want to submit the quiz?</p>
+    <p class="text-gray-500 mt-2">
+        Note*: You can press button Y on remote to confirm or N to cancel.(if
+        remote is Used)
+    </p>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+    <button mat-button (click)="onCancel()">Cancel</button>
+    <button mat-raised-button color="primary" (click)="onConfirm()">Yes</button>
+</mat-dialog-actions>

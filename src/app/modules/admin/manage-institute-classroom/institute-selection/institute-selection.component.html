@@ -1,0 +1,331 @@
+<div *ngIf="isDataLoaded; else dataNotLoaded"
+    class="grid grid-flow-row m-auto bg-white border shadow rounded-2xl w-full p-6"
+    [ngClass]="{'sm:w-[43vw]':isBulkUpload, 'sm:w-[30vw]':!isBulkUpload}">
+    <div class="text-accent-600 font-medium mb-4 flex items-center flex-row-reverse">
+        <mat-slide-toggle class="ml-2" [color]="'primary'" (change)="bulkUploadEnable($event)">
+        </mat-slide-toggle>
+        <p>Bulk Upload Schools</p>
+    </div>
+
+    <!-- Bulk Upload -->
+    <ng-container *ngIf="isBulkUpload">
+        <div class="w-full">
+            <div [formGroup]="bulkUploadForm">
+                <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                    <mat-label class="text-[#282B66]">Select Country</mat-label>
+                    <mat-select formControlName="country" placeholder="Select Country Name">
+                        <mat-option value="" disabled selected>Select</mat-option>
+                        <mat-option *ngFor="let country of countryCodes|keyvalue" [value]="country?.key"
+                            matTooltipPosition="right"
+                            [matTooltip]="country?.value?.displayName">{{country?.value?.displayName}}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                    <mat-label class="text-[#282B66]">Select Board</mat-label>
+                    <mat-select formControlName="board" placeholder="Select Board Name"
+                        (selectionChange)="onBoardChange($event)">
+                        <mat-option value="" selected>Select</mat-option>
+                        <mat-option *ngFor="let board of countryBoard" [value]="board?.code" matTooltipPosition="right"
+                            [matTooltip]="board?.name" class="text-sm" (click)="bulkInstituteBoardSel=true"
+                            [disabled]="bulkUploadForm.controls['country'].invalid">
+                            {{board?.name}}
+                        </mat-option>
+                        <mat-option
+                            *ngIf="!isAddNewBoard && schoolInfo?.get('institutionAddress')?.get('country')?.value !== 'india'">
+                            <span class="bg-gray-200 rounded-full text-gray-500 py-2 px-4"
+                                (click)="isAddNewBoard = true; bulkInstituteBoardSel = true">Add A New Board&nbsp;&nbsp;
+                                <mat-icon class="m-0" svgIcon="feather:plus-circle"></mat-icon>
+                            </span>
+                        </mat-option>
+                        <mat-option *ngIf="isAddNewBoard" [value]="addNewBoard.value">
+                            <div class="flex flex-row">
+                                <input type="text" #addNewBoard matInput id="addNewBoard" formControlName="board"
+                                    (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()"
+                                    placeholder="Enter Board Name">
+                                <span>
+                                    <mat-icon class="m-0 text-red-500" svgIcon="heroicons_solid:x-mark"
+                                        matTooltip="Clear the field"
+                                        (click)="schoolInfo?.get('board')?.reset(); isAddNewBoard = false"></mat-icon>
+                                </span>
+                                <span>
+                                    <mat-icon class="m-0 ml-2 text-green-500" svgIcon="heroicons_solid:check"
+                                        matTooltip="Save the new board" (click)="saveNewBoard()"></mat-icon>
+                                </span>
+                            </div>
+                        </mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="classCreate.get('board')?.invalid && classCreate.get('board')?.touched">
+                        School Board is required
+                    </mat-error>
+                </mat-form-field>
+
+                <!-- Classrooms & Programme Templates -->
+                <div *ngIf="classInfoArrayVisible"
+                    class="bg-blue-50 overflow-scroll h-[calc(70vh_-_250px)] rounded-2xl p-2 relative items-center text-center m-auto">
+                    <div class="grid">
+                        <div formArrayName="classInfoArray">
+                            <div *ngFor="let selection of classInfo.controls; let i=index">
+                                <div [formGroupName]="i" class="grid-container">
+                                    <div class="">
+                                        <mat-form-field class="w-max text-accent-600" floatLabel="always"
+                                            matTooltip="Grade {{ selection.get('grade')?.value  }}">
+                                            <mat-label class="text-accent-600">Grade</mat-label>
+                                            <mat-select formControlName="grade" placeholder="Select Grade"
+                                                (selectionChange)="onGradeChange(selection,i)">
+                                                <mat-option value="" disabled selected>Select</mat-option>
+
+                                                <!-- Filter out selected grades -->
+                                                <mat-option *ngFor="let gr of gradeList" [value]="gr">
+                                                    Class {{ gr }}
+                                                </mat-option>
+                                            </mat-select>
+                                            <!-- <mat-error *ngIf="bulkUploadForm.get('classInfoArray').get(i.toString())?.get('grade')?.invalid &&
+                                            bulkUploadForm.get('classInfoArray').get(i.toString())?.get('grade')?.touched">
+                                                Grade is required
+                                            </mat-error> -->
+                                        </mat-form-field>
+                                    </div>
+
+                                    <div class="">
+                                        <mat-form-field class="w-max text-accent-600" floatLabel="always">
+                                            <mat-label class="text-accent-600">Section</mat-label>
+                                            <mat-select formControlName="section" placeholder="Select Section"
+                                                matTooltip="Section {{ selection.get('section')?.value }}"
+                                                (selectionChange)="onSectionChange(selection,i)">
+
+                                                <mat-option value="" disabled selected>Select</mat-option>
+                                                <mat-option
+                                                    *ngFor="let sec of  selection.get('availableSections')?.value"
+                                                    [value]="sec">
+                                                    {{ sec }}
+                                                </mat-option>
+                                            </mat-select>
+                                            <mat-error
+                                                *ngIf="selection.get('section')?.invalid &&selection.get('section')?.touched">
+                                                sec is required
+                                            </mat-error>
+                                        </mat-form-field>
+                                    </div>
+
+                                    <div class="">
+                                        <mat-form-field class="w-max text-accent-600" floatLabel="always">
+                                            <mat-label class="text-accent-600">Subject</mat-label>
+                                            <mat-select formControlName="subject" placeholder="Select Subject"
+                                                matTooltip="{{ selection.get('subject')?.value }}"
+                                                (selectionChange)="onSubjectChange(selection,i)">
+
+                                                <mat-option value="" disabled selected>Select</mat-option>
+                                                <mat-option
+                                                    *ngFor="let sec of selection.get('availableSubjects')?.value"
+                                                    [value]="sec">
+                                                    {{ sec}}
+                                                </mat-option>
+                                            </mat-select>
+                                            <mat-error
+                                                *ngIf="selection.get('subject')?.invalid &&selection.get('subject')?.touched">
+                                                Grade is required
+                                            </mat-error>
+                                        </mat-form-field>
+                                    </div>
+
+                                    <div class="">
+                                        <mat-form-field class="w-max text-accent-600" floatLabel="always"
+                                            [matTooltip]="getSelectedProgrammesTooltip(selection)">
+                                            <mat-label class="text-accent-600">Programme Templates</mat-label>
+                                            <mat-select formControlName="programmetmplates"
+                                                placeholder="Select ProgrammeTemplates"
+                                                (selectionChange)="onProgrammeTemplateChange(selection,i)">
+                                                <mat-option
+                                                    *ngFor="let pr of  selection.get('availableProgrammes')?.value"
+                                                    [value]="pr">
+                                                    {{ pr }}
+                                                </mat-option>
+                                            </mat-select>
+                                            <mat-error
+                                                *ngIf="selection.get('programmetmplates')?.invalid && selection.get('programmetmplates')?.touched">
+                                                Programme is required
+                                            </mat-error>
+                                        </mat-form-field>
+                                    </div>
+
+                                    <div class="mt-8 w-max">
+                                        <button (click)="removeClassInfo(i)" type="button" matTooltipPosition="above"
+                                            matTooltip="Delete Classroom">
+                                            <mat-icon
+                                                class="text-red-500 icon-size-6 scale_on_hover125 active:text-red-200"
+                                                svgIcon="mat_solid:delete"></mat-icon>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1">
+                            <div class="col-span-1 flex flex-row-reverse">
+                                <button (click)="addClassInfo()" [disabled]="!isAddClassroomEnabled" type="button">
+                                    <mat-icon matTooltipPosition="right" [matTooltip]="boardExists ? 'Add Classroom' : 'Templates Not Available for Board'"
+                                        class="icon-size-8 text-primary-600 cursor-pointer plusIcon active:text-primary-500"
+                                        [svgIcon]="'heroicons_solid:plus-circle'"></mat-icon>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex items-start">
+            <div class=" bg-white w-full">
+                <mat-label class="text-accent-600 font-medium ">Bulk Upload Institutes</mat-label>
+
+                <label class="-ml-3 mt-2 flex p-[22px] flex-col items-center scale-90 mat-flat-button" [ngClass]="{
+                        'pointer-events-none': !bulkInstituteBoardSel,
+                        'text-white bg-primary-600 hover:bg-primary-700': showSelectCsvBtn,
+                        'text-slate-400 bg-primary-100 hover:bg-primary-200': !showSelectCsvBtn
+                    }">
+                    <div class="flex items-center">
+                        <span class="m-1">
+                            <mat-icon svgIcon="heroicons_outline:upload"></mat-icon>
+                        </span>
+                        <span class="mr-1">
+                            <!-- <mat-icon svgIcon="heroicons_outline:plus"></mat-icon> -->
+                        </span>
+                        <span class="smr-2 text-base">Select CSV file</span>
+                    </div>
+                    <input [disabled]="!showSelectCsvBtn" type='file' class="hidden" accept=".CSV" #elementRefInstitute
+                        (change)="onInstituteFileUpload($event)" />
+                </label>
+
+                <span class="text-xs text-secondary line-clamp-1 ml-1">{{instituteInputFile}}</span>
+
+                <div class="pl-4 mt-3 " [style.visibility]=" loader ? 'visible' : 'hidden'">
+                    <span class="loader ml-24"></span>
+                </div>
+            </div>
+
+            <div class="mt-[30px]">
+                <button [disabled]="!instituteInputFile || loader" (click)="onInstitutionUpload()"
+                    class=" disabled:bg-primary-100 hover:bg-primary-500 text-end mat-stroked-button bg-primary-600 text-white"
+                    mat-stroked-button>
+                    <ng-container *ngIf="loader; else loaded">
+                        <mat-spinner diameter="20"></mat-spinner>
+                    </ng-container>
+                    <ng-template #loaded>
+                        Upload
+                    </ng-template>
+                </button>
+            </div>
+        </div>
+
+        <a [href]="storageTemplatePath | getDownloadURL" target="_blank"
+            class="flex items-center mt-6 text-primary-600 hover:underline w-max">
+            <span>Download Template</span>
+            <mat-icon svgIcon="heroicons_outline:arrow-circle-down" class="ml-1 text-primary-600"></mat-icon>
+        </a>
+    </ng-container>
+
+    <form [formGroup]="classCreate" (ngSubmit)="onclassCreateSubmit(classCreate)">
+        <ng-container *ngIf="!isBulkUpload">
+            <div class="flex flex-col  w-full">
+                <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                    <mat-label class="text-[#282B66]">Select Country</mat-label>
+                    <mat-select formControlName="country" placeholder="Select Country Name">
+                        <mat-option value="" disabled selected>Select</mat-option>
+                        <mat-option *ngFor="let country of countryCodes|keyvalue" [value]="country?.key"
+                            matTooltipPosition="right"
+                            [matTooltip]="country?.value?.displayName">{{country?.value?.displayName}}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                    <mat-label class="text-[#282B66]">Search a school from pincode</mat-label>
+                    <input id="pincode" maxlength="9" matInput formControlName="pincode" type="text"
+                        placeholder="Enter School Pincode">
+                    <mat-error *ngIf="classCreate?.get('pincode')?.invalid">
+                        School Pincode is required
+                    </mat-error>
+                </mat-form-field>
+
+                <div class="w-full">
+                    <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                        <mat-label class="text-[#282B66]">Select Board</mat-label>
+                        <mat-select formControlName="board" placeholder="Select Board Name">
+                            <mat-option value="" disabled selected>Select</mat-option>
+                            <mat-option *ngFor="let board of countryBoard" [value]="board?.code"
+                                matTooltipPosition="right" [matTooltip]="board?.name" class="text-sm">
+                                {{board?.name}}
+                            </mat-option>
+                            <mat-option *ngIf="!isAddNewBoard && classCreate?.get('country')?.value !== 'india'">
+                                <span class="bg-gray-200 rounded-full text-gray-500 py-2 px-4"
+                                    (click)="isAddNewBoard = true;">Add A New Board&nbsp;&nbsp;
+                                    <mat-icon class="m-0" svgIcon="feather:plus-circle"></mat-icon>
+                                </span>
+                            </mat-option>
+                            <mat-option *ngIf="isAddNewBoard" [value]="addNewBoard.value">
+                                <div class="flex flex-row">
+                                    <input type="text" #addNewBoard matInput id="addNewBoard" formControlName="board"
+                                        (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()"
+                                        placeholder="Enter Board Name">
+                                    <span>
+                                        <mat-icon class="m-0 text-red-500" svgIcon="heroicons_solid:x-mark"
+                                            matTooltip="Clear the field"
+                                            (click)="schoolInfo?.get('board')?.reset(); isAddNewBoard = false"></mat-icon>
+                                    </span>
+                                    <span>
+                                        <mat-icon class="m-0 ml-2 text-green-500" svgIcon="heroicons_solid:check"
+                                            matTooltip="Save the new board" (click)="saveNewBoard()"></mat-icon>
+                                    </span>
+                                </div>
+                            </mat-option>
+                        </mat-select>
+                        <mat-error *ngIf="classCreate.get('board')?.invalid &&classCreate.get('board')?.touched">
+                            School Board is required
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+
+                <mat-form-field class="w-full text-accent-600" floatLabel="always">
+                    <mat-label class="text-[#282B66]">Select School</mat-label>
+                    <mat-select formControlName="institutionName" placeholder="Select School form the list"
+                        (selectionChange)="onChangeInstitution($event)">
+                        <!-- [disabled]="classCreate?.get('board')?.untouched" (selectionChange)="onChangeInstitution($event)"> -->
+                        <mat-option value="" disabled selected>Select a school</mat-option>
+                        <!-- <mat-option *ngFor="let school of institutions$ | async"
+                            [value]="school.payload.doc.data().institutionName"
+                            (click)="getAllClassrooms(school.payload.doc.data())">
+                            {{school.payload.doc.data().institutionName}} </mat-option> -->
+                        <mat-option *ngFor="let school of institutions$ | async" [value]="school.payload.doc.data()">
+                            {{school.payload.doc.data().institutionName}} </mat-option>
+                        <mat-option (click)="createSchool()"><span
+                                class="bg-gray-200 rounded-full text-gray-500 py-2 px-4">Add A New
+                                Institution&nbsp;&nbsp;
+                                <mat-icon class="m-0" svgIcon="feather:plus-circle"></mat-icon>
+                            </span>
+                        </mat-option>
+                    </mat-select>
+                    <mat-error
+                        *ngIf="classCreate.get('institutionName')?.invalid &&classCreate.get('institutionName')?.touched">
+                        School is required
+                    </mat-error>
+                </mat-form-field>
+            </div>
+
+
+            <div class="text-center">
+                <button (click)="onContinue()" type="submit" [disabled]="classCreate.invalid"
+                    class="disabled:bg-primary-100 fuse-mat-stroked-button-large bg-primary-600 text-white hover:bg-primary-500"
+                    mat-stroked-button>
+                    Continue
+                </button>
+            </div>
+
+        </ng-container>
+    </form>
+</div>
+
+<ng-template #dataNotLoaded>
+    <div class="flex items-center justify-center">
+        <mat-spinner diameter="30"></mat-spinner>
+    </div>
+</ng-template>
